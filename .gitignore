@@ -1,12 +1,14 @@
 /node_modules
 /vendor
 npm-debug.log
+.editorconfig
 
 
 /public/hot
 /public/storage
 /public/css
 /public/js
+/public/mix-manifest.json
 
 /storage/*.key
 .env
