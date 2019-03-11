@@ -1,0 +1,5 @@
+*.json
+ircbot.py
+irclib.py
+*.pid
+*.log

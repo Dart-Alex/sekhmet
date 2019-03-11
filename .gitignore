@@ -1,0 +1,14 @@
+/node_modules
+/vendor
+npm-debug.log
+
+
+/public/hot
+/public/storage
+/public/css
+/public/js
+
+/storage/*.key
+.env
+.phpunit.result.cache
+
