@@ -65,7 +65,7 @@
 		"npm run dev",
 		"@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
 		"@php artisan key:generate --ansi",
-        "./install-bot-dependencies.sh"
+        "install-bot-dependencies.sh"
 	]
     }
 }
