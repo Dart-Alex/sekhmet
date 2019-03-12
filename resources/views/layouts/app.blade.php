@@ -19,14 +19,16 @@
 </head>
 
 <body class="has-navbar-fixed-top">
-	@include('layouts.navbar')
-
 	<div id="app">
+	@include('layouts.navbar')
 		<main class="container">
 			@yield('content')
 		</main>
+		<!-- Scripts -->
+		@if(session('message'))
+		<message type="{{ session('message')["type"] }}">{{ session('message')["content"] }}</message>
+		@endif
 	</div>
-	<!-- Scripts -->
 	<script src="{{ mix('js/manifest.js') }}"></script>
 	<script src="{{ mix('js/vendor.js') }}"></script>
 	<script src="{{ mix('js/app.js') }}"></script>

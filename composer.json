@@ -40,7 +40,10 @@
         "classmap": [
             "database/seeds",
             "database/factories"
-        ]
+		],
+		"files": [
+			"app/Helpers/Messages.php"
+		]
     },
     "autoload-dev": {
         "psr-4": {
