@@ -22,18 +22,27 @@ export default {
 			return this.users.length > 0;
 		}
 	},
+	methods: {
+		addUser(user) {
+			if(!user.guest) {
+				if(!this.users.includes(user.name)) {
+					this.users.push(user.name);
+				}
+			}
+		}
+	},
 	created() {
 		this.channel.listen('Login', e => {})
 			.here(users => {
 				users.forEach(user => {
-					if(!user.guest) this.users.push(user.name);
+					this.addUser(user);
 				});
 			})
 			.joining(user => {
-				if(!user.guest) this.users.push(user.name);
+				this.addUser(user);
 			})
 			.leaving(user => {
-				if(!user.guest) this.users.splice(this.users.indexOf(user.name), 1);
+				this.addUser(user);
 			})
 	}
 }
