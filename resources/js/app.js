@@ -7,6 +7,12 @@
 
 require('./bootstrap');
 
+let userMeta = document.head.querySelector('meta[name="user"]');
+let user;
+if (userMeta) {
+	user = JSON.parse(userMeta.content);
+}
+
 window.Vue = require('vue');
 
 /**
@@ -15,10 +21,15 @@ window.Vue = require('vue');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 import Message from './components/Message.vue';
-Vue.component('message', Message);
+import LoggedIn from './components/LoggedIn.vue';
+
 
 const app = new Vue({
-    el: '#app'
+	el: '#app',
+	components: {
+		"message": Message,
+		"logged-in":LoggedIn
+	}
 });
 
 
