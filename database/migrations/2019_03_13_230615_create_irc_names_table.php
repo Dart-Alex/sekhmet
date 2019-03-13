@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePasswordResetsTable extends Migration
+class CreateIrcNamesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,13 @@ class CreatePasswordResetsTable extends Migration
      */
     public function up()
     {
-        Schema::create('password_resets', function (Blueprint $table) {
-            $table->string('email')->index();
-            $table->string('token');
-			$table->timestamp('created_at')->nullable();
-			$table->foreign('email')
-				->references('email')->on('users')
+        Schema::create('irc_names', function (Blueprint $table) {
+			$table->bigIncrements('id');
+			$table->string('name')->unique()->index();
+			$table->unsignedBigInteger('user_id')->index();
+			$table->timestamps();
+			$table->foreign('user_id')
+				->references('id')->on('users')
 				->onDelete('cascade');
         });
     }
@@ -30,6 +31,6 @@ class CreatePasswordResetsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('password_resets');
+        Schema::dropIfExists('irc_names');
     }
 }

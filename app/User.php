@@ -16,7 +16,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password','admin'
     ];
 
     /**
@@ -34,10 +34,20 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+		'email_verified_at' => 'datetime',
+		'created_at' => 'datetime',
+		'updated_at' => 'datetime'
 	];
 
 	public function isAdmin() {
 		return $this->admin;
+	}
+
+	public function ircNames() {
+		return $this->hasMany(IrcName::class);
+	}
+
+	public function chanUsers() {
+		return $this->hasMany(ChanUser::class);
 	}
 }
