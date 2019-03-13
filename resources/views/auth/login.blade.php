@@ -25,7 +25,7 @@
 
                         <div class="field is-horizontal">
                             <div class="field-label">
-                                <label class="label">E-Mail Address</label>
+                                <label class="label">Adresse Email</label>
                             </div>
 
                             <div class="field-body">
@@ -46,7 +46,7 @@
 
                         <div class="field is-horizontal">
                             <div class="field-label">
-                                <label class="label">Password</label>
+                                <label class="label">Mot de passe</label>
                             </div>
 
                             <div class="field-body">
@@ -72,7 +72,7 @@
                                     <p class="control">
                                         <label class="checkbox">
                                             <input type="checkbox"
-                                                   name="remember" {{ old('remember') ? 'checked' : '' }}> Remember Me
+                                                   name="remember" {{ old('remember') ? 'checked' : '' }}> Se souvenir de moi
                                         </label>
                                     </p>
                                 </div>
@@ -85,12 +85,12 @@
                             <div class="field-body">
                                 <div class="field is-grouped">
                                     <div class="control">
-                                        <button type="submit" class="button is-primary">Login</button>
+                                        <button type="submit" class="button is-primary">Connexion</button>
                                     </div>
 
                                     <div class="control">
                                         <a href="{{ route('password.request') }}">
-                                            Forgot Your Password?
+                                            Mot de passe oublié ?
                                         </a>
                                     </div>
                                 </div>

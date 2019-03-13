@@ -5,7 +5,7 @@
         <div class="hero-body">
             <div class="container">
                 <h1 class="title">
-                    Register
+                    Inscription
                 </h1>
             </div>
         </div>
@@ -15,7 +15,7 @@
         <div class="column is-5">
             <div class="card">
                 <header class="card-header">
-                    <p class="card-header-title">Register</p>
+                    <p class="card-header-title">Inscription</p>
                 </header>
 
                 <div class="card-content">
@@ -25,7 +25,7 @@
 
                         <div class="field is-horizontal">
                             <div class="field-label">
-                                <label class="label">Name</label>
+                                <label class="label">Nom</label>
                             </div>
 
                             <div class="field-body">
@@ -46,7 +46,7 @@
 
                         <div class="field is-horizontal">
                             <div class="field-label">
-                                <label class="label">E-mail Address</label>
+                                <label class="label">Adresse Email</label>
                             </div>
 
                             <div class="field-body">
@@ -63,11 +63,32 @@
                                     @endif
                                 </div>
                             </div>
+						</div>
+
+						<div class="field is-horizontal">
+                            <div class="field-label">
+                                <label class="label">Confirmation de l'adresse Email</label>
+                            </div>
+
+                            <div class="field-body">
+                                <div class="field">
+                                    <p class="control">
+                                        <input class="input" id="email_confirmation" type="email" name="email_confirmation"
+                                               value="{{ old('email_confirmation') }}" required autofocus>
+                                    </p>
+
+                                    @if ($errors->has('email_confirmation'))
+                                        <p class="help is-danger">
+                                            {{ $errors->first('email_confirmation') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
 
                         <div class="field is-horizontal">
                             <div class="field-label">
-                                <label class="label">Password</label>
+                                <label class="label">Mot de passe</label>
                             </div>
 
                             <div class="field-body">
@@ -87,7 +108,7 @@
 
                         <div class="field is-horizontal">
                             <div class="field-label">
-                                <label class="label">Confirm Password</label>
+                                <label class="label">Confirmation du mot de passe</label>
                             </div>
 
                             <div class="field-body">
@@ -106,7 +127,7 @@
                             <div class="field-body">
                                 <div class="field is-grouped">
                                     <div class="control">
-                                        <button type="submit" class="button is-primary">Register</button>
+                                        <button type="submit" class="button is-primary">S'inscrire</button>
                                     </div>
                                 </div>
                             </div>

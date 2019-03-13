@@ -7,7 +7,7 @@
         <div class="hero-body">
             <div class="container">
                 <h1 class="title">
-                    Reset Password
+					Réinitialisation du mot de passe
                 </h1>
             </div>
         </div>
@@ -17,7 +17,7 @@
         <div class="column is-5">
             <div class="card">
                 <header class="card-header">
-                    <p class="card-header-title">Reset Password</p>
+                    <p class="card-header-title">Réinitialisation du mot de passe</p>
                 </header>
 
                 <div class="card-content">
@@ -33,7 +33,7 @@
 
                         <div class="field is-horizontal">
                             <div class="field-label">
-                                <label class="label">E-Mail Address</label>
+                                <label class="label">Adresse Email</label>
                             </div>
 
                             <div class="field-body">
@@ -58,7 +58,7 @@
                             <div class="field-body">
                                 <div class="field is-grouped">
                                     <div class="control">
-                                        <button type="submit" class="button is-primary">Send Password Reset Link
+                                        <button type="submit" class="button is-primary">Envoyer le lien de réinitialisation
                                         </button>
                                     </div>
                                 </div>
