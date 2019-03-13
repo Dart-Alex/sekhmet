@@ -22,9 +22,7 @@
 
                 <div class="card-content">
                     @if (session('status'))
-                        <div class="notification">
-                            {{ session('status') }}
-                        </div>
+                            {{ success(session('status')) }}
                     @endif
 
                     <form class="forgot-password-form" method="POST" action="{{ route('password.email') }}">

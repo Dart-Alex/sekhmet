@@ -11,10 +11,7 @@
 
                 <div class="card-content">
                     @if (session('resent'))
-                        <div class="notification is-success">
-                            <button class="delete"></button>
-                            {{ __('A fresh verification link has been sent to your email address.') }}
-                        </div>
+                            {{ success(__('A fresh verification link has been sent to your email address.')) }}
                     @endif
 
                     {{ __('Before proceeding, please check your email for a verification link.') }}

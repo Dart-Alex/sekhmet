@@ -22,9 +22,7 @@
 
                 <div class="card-content">
                     @if (session('status'))
-                        <div class="notification is-info">
-                            {{ session('status') }}
-                        </div>
+                            {{ success(session('status')) }}
                     @endif
 
                     <form class="password-reset-form" method="POST" action="{{ route('password.request') }}">
