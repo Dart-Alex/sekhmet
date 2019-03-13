@@ -2,7 +2,7 @@
 	<div class="content" v-if="notEmpty">
 		<p>Utilisateurs connectés :</p>
 		<ul>
-			<li v-for="user in users" v-text="user"></li>
+			<li v-for="user in users" :key="user" v-text="user"></li>
 		</ul>
 	</div>
 </template>
