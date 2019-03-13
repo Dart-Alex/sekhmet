@@ -2,7 +2,7 @@
 /vendor
 npm-debug.log
 
-
+/public/vendor
 /public/hot
 /public/storage
 /public/css
