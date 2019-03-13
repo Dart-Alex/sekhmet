@@ -66,6 +66,7 @@
 		],
 		"post-install-cmd": [
 			"npm install",
+			"npm run prod",
 			"@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
 			"@php artisan key:generate --ansi",
 			"./install-bot-dependencies.sh"
