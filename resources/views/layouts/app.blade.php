@@ -26,7 +26,7 @@
 <body class="has-navbar-fixed-top">
 	<div id="app">
 	@include('layouts.navbar')
-	@yield('breadcrumbs', '')
+	{{Breadcrumbs::render()}}
 		<main class="container">
 			@yield('content')
 		</main>

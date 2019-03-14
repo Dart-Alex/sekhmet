@@ -1,5 +1,4 @@
 @extends('layouts.app')
-@section('breadcrumbs', Breadcrumbs::render('chans.create'))
 @section('content')
 <div class="box">
 	<form action="{{route('chans.store')}}" method="POST">

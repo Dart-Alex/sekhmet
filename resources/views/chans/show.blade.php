@@ -1,5 +1,4 @@
 @extends('layouts.app')
-@section('breadcrumbs', Breadcrumbs::render('chans.show', $chan))
 @section('content')
 <div class="content">
 
