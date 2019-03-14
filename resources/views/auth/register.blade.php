@@ -114,7 +114,7 @@
                             <div class="field-body">
                                 <div class="field">
                                     <p class="control">
-                                        <input class="input" id="password-confirm" type="password"
+                                        <input class="input" id="password_confirmation" type="password"
                                                name="password_confirmation" required>
                                     </p>
                                 </div>
