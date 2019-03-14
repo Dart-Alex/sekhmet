@@ -28,13 +28,42 @@ const app = new Vue({
 	el: '#app',
 	components: {
 		"message": Message,
-		"logged-in":LoggedIn
+		"logged-in": LoggedIn
 	}
 });
 
 
-// Bulma NavBar Burger Script
+
 document.addEventListener('DOMContentLoaded', function () {
+
+	// Confirmation field validation
+
+	const $inputTexts = Array.prototype.slice.call(document.querySelectorAll('form input'), 0);
+
+	if ($inputTexts.length > 0) {
+		function validateConfirmation($el, $elConfirm) {
+			if($el.value != $elConfirm.value) {
+				$elConfirm.setCustomValidity("Les champs ne sont pas identiques.");
+			} else {
+				$elConfirm.setCustomValidity('');
+			}
+		}
+		$inputTexts.forEach($elConfirm => {
+			let $position = $elConfirm.name.search('_confirmation');
+			if($position != -1) {
+				let name = $elConfirm.name.substring(0, $position);
+				let $el = document.querySelectorAll('input[name="'+name+'"')[0];
+				$el.addEventListener('change', () => {
+					validateConfirmation($el, $elConfirm);
+				});
+				$elConfirm.addEventListener('keyup', () => {
+					validateConfirmation($el, $elConfirm);
+				});
+			}
+		})
+	}
+
+	// Bulma NavBar Burger Script
     // Get all "navbar-burger" elements
     const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
 
