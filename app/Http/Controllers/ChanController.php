@@ -14,7 +14,8 @@ class ChanController extends Controller
      */
     public function index()
     {
-        //
+		$chans = Chan::where('hidden', false)->orderBy('name', 'ASC')->get();
+		return view('chans.index', compact('chans'));
     }
 
     /**
@@ -24,7 +25,7 @@ class ChanController extends Controller
      */
     public function create()
     {
-        //
+        return view('chans.create');
     }
 
     /**
@@ -35,7 +36,15 @@ class ChanController extends Controller
      */
     public function store(Request $request)
     {
-        //
+		$request->merge(['name' => strtolower($request->name)]);
+        $validated = $request->validate([
+            'name' => 'required|unique:chans|alpha_dash',
+            'description' => 'required'
+        ]);
+        $validated['hidden'] = $request->has('hidden');
+        $chan = Chan::create($validated);
+        success("Le chan #".ucfirst($chan->name)." a été créé.");
+        return redirect()->route('home');
     }
 
     /**
@@ -46,7 +55,7 @@ class ChanController extends Controller
      */
     public function show(Chan $chan)
     {
-        //
+        return view('chans.show', compact('chan'));
     }
 
     /**

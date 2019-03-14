@@ -17,6 +17,7 @@ class CreateChansTable extends Migration
 			$table->bigIncrements('id');
 			$table->string('name')->unique()->index();
 			$table->text('description');
+			$table->boolean('hidden')->default(true);
             $table->timestamps();
         });
     }
