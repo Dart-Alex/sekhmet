@@ -3,7 +3,7 @@
 @section('content')
 <div class="content">
 
-	<h1>#{{ ucfirst($chan->name) }}</h1>
+	<h1>{{ $chan->displayName() }}</h1>
 	<p>{{ $chan->description }}</p>
 	<ul>
 		<li><a href="">Evenements</a></li>

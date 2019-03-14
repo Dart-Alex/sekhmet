@@ -14,7 +14,9 @@ class ChanController extends Controller
      */
     public function index()
     {
-		$chans = Chan::where('hidden', false)->orderBy('name', 'ASC')->get();
+		$query = Chan::orderBy('name', 'ASC');
+		if(auth()->guest() || !auth()->user()->isAdmin()) $query->where('hidden', false);
+		$chans = $query->get();
 		return view('chans.index', compact('chans'));
     }
 
@@ -25,6 +27,7 @@ class ChanController extends Controller
      */
     public function create()
     {
+		$this->authorize('create');
         return view('chans.create');
     }
 
@@ -36,6 +39,7 @@ class ChanController extends Controller
      */
     public function store(Request $request)
     {
+		$this->authorize('create');
 		$request->merge(['name' => strtolower($request->name)]);
         $validated = $request->validate([
             'name' => 'required|unique:chans|alpha_dash',
@@ -43,7 +47,7 @@ class ChanController extends Controller
         ]);
         $validated['hidden'] = $request->has('hidden');
         $chan = Chan::create($validated);
-        success("Le chan #".ucfirst($chan->name)." a été créé.");
+        success("Le chan ".$chan->displayName()." a été créé.");
         return redirect()->route('home');
     }
 
@@ -55,6 +59,7 @@ class ChanController extends Controller
      */
     public function show(Chan $chan)
     {
+		$this->authorize('view', $chan);
         return view('chans.show', compact('chan'));
     }
 
@@ -78,7 +83,27 @@ class ChanController extends Controller
      */
     public function update(Request $request, Chan $chan)
     {
-        //
+		$this->authorize('update', $chan);
+		$validated = [];
+		$validated['hidden'] = $request->has('hidden');
+		if($request->has('name'))
+		{
+			$request->merge(['name' => strtolower($request->name)]);
+			if($request->name != $chan->name) {
+				$validated = array_merge($validated, $this->validate($request, [
+					"name" => 'required|unique:chans|alpha_dash'
+				]));
+			}
+		}
+		if($request->has('description') && $request->description != $chan->description)
+		{
+			$validated = array_merge($validated, $this->validate($request, [
+				"description" => 'required'
+			]));
+		}
+		$chan->update($validated);
+		success("Le chan ".$chan->displayName()." a été modifié.");
+		return redirect()->back();
     }
 
     /**
@@ -89,6 +114,10 @@ class ChanController extends Controller
      */
     public function destroy(Chan $chan)
     {
-        //
+		$this->authorize('delete', $chan);
+		$chan->delete();
+		success("Le chan ".$chan->displayName()." a été supprimé.");
+		return redirect()->back();
+
     }
 }

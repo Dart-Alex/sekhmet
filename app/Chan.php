@@ -40,4 +40,15 @@ class Chan extends Model
 	{
 		return $this->hasMany(ChanUsers::class);
 	}
+	public function hasAdmin(User $user) {
+		$admins = ChanUser::where('admin', true)
+			->where('chan_id', $this->id)
+			->get()
+			->pluck('user_id')
+			->toArray();
+		return in_array($user->id, $admins);
+	}
+	public function displayName() {
+		return '#'.ucfirst($this->name);
+	}
 }

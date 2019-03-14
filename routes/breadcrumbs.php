@@ -10,7 +10,7 @@ Breadcrumbs::for('home', function ($trail) {
 // Home > {chan}
 BreadCrumbs::for('chans.show', function($trail, Chan $chan) {
 	$trail->parent('home');
-	$trail->push('#'.ucfirst($chan->name), route('chans.show', ['chan' => $chan->name]));
+	$trail->push($chan->displayName(), route('chans.show', ['chan' => $chan->name]));
 });
 
 // Home > create
