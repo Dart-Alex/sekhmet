@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
 		$this->call(UsersTableSeeder::class);
 		$this->call(IrcNamesTableSeeder::class);
 		$this->call(ChanUsersTableSeeder::class);
+		$this->call(PostsTableSeeder::class);
+		$this->call(CommentsTableSeeder::class);
 
 		Model::reguard();
     }
