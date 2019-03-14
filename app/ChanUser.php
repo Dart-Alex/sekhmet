@@ -39,6 +39,6 @@ class ChanUser extends Model
 	}
 
 	public function chan() {
-		return $this->belongsTo(Chan::class);
+		return $this->belongsTo(Chan::class, 'chan_id', 'id');
 	}
 }
