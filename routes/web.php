@@ -10,15 +10,17 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Auth::routes(['verify' => true]);
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/', 'ChanController@index')->name('home');
+/**
+ * GET /chans (index)
+ * GET /chans/create (create)
+ * GET /chans/bla (show)
+ * POST /chans (store)
+ * GET /chans/bla/edit (edit)
+ * PATCH /chans/bla (update)
+ * DELETE /projects/1 (destroy)
+ */
+Route::resource('chans', 'ChanController');
 
-Route::get('/verified', function () {
-	return view('welcome');
-})->middleware('verified');
