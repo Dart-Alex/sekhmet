@@ -15,8 +15,9 @@ class PostController extends Controller
      */
     public function index(Chan $chan)
     {
-		$posts = Post::whereDate('date', '>=', now()->toDateTimeString())->orderBy('date', 'ASC')->get();
-		return view('posts.index', compact('chan', 'posts'));
+		$posts = Post::where('chan_id', $chan->id)->whereDate('date', '>=', now()->toDateTimeString())->orderBy('date', 'ASC')->get();
+		$oldPosts = Post::where('chan_id', $chan->id)->whereDate('date', '<', now()->toDateTimeString())->orderBy('date', 'ASC')->get();
+		return view('posts.index', compact('chan', 'posts', 'oldPosts'));
     }
 
     /**
