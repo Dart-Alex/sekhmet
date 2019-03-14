@@ -47,7 +47,7 @@ class ChanPolicy
      */
     public function update(User $user, Chan $chan)
     {
-        return ($chan->hasAdmin($user) || $user->isAdmin());
+        return ($chan->isAdmin($user) || $user->isAdmin());
     }
 
     /**

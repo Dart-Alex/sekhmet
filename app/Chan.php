@@ -38,9 +38,9 @@ class Chan extends Model
 	}
 	public function chanUsers()
 	{
-		return $this->hasMany(ChanUsers::class);
+		return $this->hasMany(ChanUser::class);
 	}
-	public function hasAdmin(User $user) {
+	public function isAdmin(User $user) {
 		$admins = ChanUser::where('admin', true)
 			->where('chan_id', $this->id)
 			->get()
@@ -49,6 +49,6 @@ class Chan extends Model
 		return in_array($user->id, $admins);
 	}
 	public function displayName() {
-		return '#'.ucfirst($this->name);
+		return '#'.ucfirst($this->name).(($this->hidden)?' (caché)':'');
 	}
 }

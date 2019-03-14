@@ -71,7 +71,7 @@ Breadcrumbs::for('chans.show', function($trail, Chan $chan) {
 // Home > chans.index > {chan} > posts.index
 Breadcrumbs::for('posts.index', function($trail, Chan $chan) {
 	$trail->parent('chans.show', $chan);
-	$trail->push("&Eacute;vénements", route('posts.index', ["chan" => $chan->name]));
+	$trail->push("Événements", route('posts.index', ["chan" => $chan->name]));
 });
 
 // Home > chans.index > {chan} > posts.index > posts.create
@@ -89,5 +89,5 @@ Breadcrumbs::for('posts.show', function($trail, Chan $chan, Post $post) {
 // Home > chans.index > {chan} > posts.index > {post} > posts.edit
 Breadcrumbs::for('posts.edit', function($trail, Chan $chan, Post $post) {
 	$trail->parent('post.show', $chan, $post);
-	$trail->push("&Eacute;diter", route('posts.edit', ["chan" => $chan->name, "post" => $post->id]));
+	$trail->push("Éditer", route('posts.edit', ["chan" => $chan->name, "post" => $post->id]));
 });

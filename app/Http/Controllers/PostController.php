@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Post;
 use Illuminate\Http\Request;
+use App\Chan;
 
 class PostController extends Controller
 {
@@ -12,9 +13,10 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Chan $chan)
     {
-        //
+		$posts = Post::whereDate('date', '>=', now()->toDateTimeString())->orderBy('date', 'ASC')->get();
+		return view('posts.index', compact('chan', 'posts'));
     }
 
     /**
@@ -22,7 +24,7 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Chan $chan)
     {
         //
     }
@@ -33,7 +35,7 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Chan $chan)
     {
         //
     }
@@ -44,9 +46,9 @@ class PostController extends Controller
      * @param  \App\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function show(Post $post)
+    public function show(Chan $chan, Post $post)
     {
-        //
+        return view('posts.show', compact('chan', 'post'));
     }
 
     /**
@@ -55,7 +57,7 @@ class PostController extends Controller
      * @param  \App\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function edit(Post $post)
+    public function edit(Chan $chan, Post $post)
     {
         //
     }
@@ -67,7 +69,7 @@ class PostController extends Controller
      * @param  \App\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function update(Request $request, Chan $chan, Post $post)
     {
         //
     }

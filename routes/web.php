@@ -12,7 +12,7 @@
 */
 Auth::routes(['verify' => true]);
 
-
+Route::get('/', 'HomeController@index')->name('home');
 /**
  * Chans
  * GET		/chans				(index)		chans.index
@@ -23,7 +23,6 @@ Auth::routes(['verify' => true]);
  * PATCH	/chans/{chan}		(update)	chans.update
  * DELETE	/chans/{chan}		(destroy)	chans.destroy
  */
-Route::get('/', 'ChanController@index')->name('home');
 Route::resource('chans', 'ChanController');
 
 /**

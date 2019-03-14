@@ -12,7 +12,7 @@
 	<meta name="user" content="{{ json_encode(auth()->user()) }}">
 	@endif
 
-	<title>{{ config('app.name', 'Laravel') }}</title>
+	<title>@yield('title', config('app.name', 'Laravel'))</title>
 
 	<!-- Fonts -->
 	<link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -39,6 +39,7 @@
 	<script src="{{ mix('js/manifest.js') }}"></script>
 	<script src="{{ mix('js/vendor.js') }}"></script>
 	<script src="{{ mix('js/app.js') }}"></script>
+	@yield('scripts', '');
 </body>
 
 </html>

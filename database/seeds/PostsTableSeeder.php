@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use App\Chan;
 
 class PostsTableSeeder extends Seeder
 {
@@ -11,6 +12,9 @@ class PostsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(App\Post::class, 20)->create();
+		$chans = Chan::all()->pluck('id')->toArray();
+		foreach($chans as $chan) {
+			factory(App\Post::class, 20)->create(["chan_id" => $chan]);
+		}
     }
 }

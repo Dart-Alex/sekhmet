@@ -5,7 +5,7 @@
 	<h1>{{ $chan->displayName() }}</h1>
 	<p>{{ $chan->description }}</p>
 	<ul>
-		<li><a href="">Evenements</a></li>
+		<li><a href="{{route('posts.index', ['chan' => $chan->name])}}">Evenements</a></li>
 		<li><a href="">Youtube</a></li>
 		<li><a href="">Contacter les administrateurs</a></li>
 	</ul>
