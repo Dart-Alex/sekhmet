@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Comment;
 use Illuminate\Http\Request;
 use App\Post;
+use App\Events\CommentAdded;
+use App\Events\CommentUpdated;
+use App\Events\CommentDeleted;
 
 class CommentController extends Controller
 {
@@ -20,16 +23,6 @@ class CommentController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -37,29 +30,26 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Comment $comment)
-    {
-        //
+		//$this->authorize('create');
+        $validated = $this->validate($request, [
+			'name' => 'required|string',
+			'content' => 'required|string',
+			'reply_to' => 'nullable|numeric|exists:comments,id',
+			'post_id' => 'required|numeric|exists:posts,id'
+		]);
+		$repliedToComment = Comment::findOrFail($validated['reply_to']);
+		if($repliedToComment->post_id != $validated['post_id']) {
+			return ["message" => 'Le commentaire auquel vous essayez de répondre n\'appartient pas au même événement.'];
+		}
+		$comment = Comment::create($validated);
+		event(new CommentAdded($comment));
+		return [
+			'message' => [
+				'type' => 'success',
+				'content' => 'Commentaire ajouté.'
+			],
+			'comment' => $comment
+		];
     }
 
     /**
@@ -71,8 +61,21 @@ class CommentController extends Controller
      */
     public function update(Request $request, Comment $comment)
     {
-        //
-    }
+		//$this->authorize('update', $comment);
+		$validated = $this->validate($request, [
+			'name' => 'required|string',
+			'content' => 'required|string'
+		]);
+		$comment->update($validated);
+		event(new CommentUpdated($comment));
+		return [
+			'message' => [
+				'type' => 'success',
+				'content' => 'Commentaire modifié.'
+			],
+			'comment' => $comment
+		];
+	}
 
     /**
      * Remove the specified resource from storage.
@@ -82,6 +85,16 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        //
+		//$this->authorize('delete', $comment);
+		$commentCopy = $comment->toArray();
+		$comment->delete();
+		event(new CommentDeleted($commentCopy));
+		return [
+			'message' => [
+				'type' => 'success',
+				'content' => 'Commentaire supprimé.'
+			],
+			'comment' => $commentCopy
+		];
     }
 }

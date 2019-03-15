@@ -28,15 +28,15 @@ window.Vue = require('vue');
  */
 import Message from './components/Message.vue';
 import Comments from './components/Comments.vue';
-Vue.prototype.$http = axios;
-
+Vue.prototype.$get = axios.get;
+Vue.prototype.$post = axios.post;
+Vue.component('message', Message);
 const app = new Vue({
 	el: '#app',
 	data: {
 		user: user
 	},
 	components: {
-		"message": Message,
 		"comments": Comments
 	}
 });

@@ -1,13 +1,14 @@
 <template>
   <div id="message" :class="classes" v-show="isVisible">
     <button class="delete" @click="hideMessage"></button>
-    <slot></slot>
+    {{content}}
   </div>
 </template>
 
 <script>
 export default {
-	props: ['type'],
+	name: 'message',
+	props: ['type', 'content'],
 	data() {
 		return {
 			isVisible: true,
