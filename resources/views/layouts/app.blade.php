@@ -17,7 +17,7 @@
 	<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
 
 	<!-- Styles -->
-	<link href="{{ mix('css/bulma.css') }}" rel="stylesheet">
+	<link href="{{ mix('css/vendor.css') }}" rel="stylesheet">
 	<link href="{{ mix('css/app.css') }}" rel="stylesheet">
 </head>
 
@@ -30,7 +30,7 @@
 		</main>
 		<!-- Scripts -->
 		@if(session('message'))
-		<message type="{{ session('message')["type"] }}">{{ session('message')["content"] }}</message>
+		<message type="{{ session('message')["type"] }}" content="{{ session('message')["content"] }}"></message>
 		@endif
 	</div>
 	<script src="{{ mix('js/manifest.js') }}"></script>
