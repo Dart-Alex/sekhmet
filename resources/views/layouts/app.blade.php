@@ -8,9 +8,7 @@
 	<!-- CSRF Token -->
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<!-- User for javascript -->
-	@if(Auth::check())
 	<meta name="user" content="{{ json_encode(auth()->user()) }}">
-	@endif
 
 	<title>@yield('title', config('app.name', 'Laravel'))</title>
 
@@ -34,12 +32,11 @@
 		@if(session('message'))
 		<message type="{{ session('message')["type"] }}">{{ session('message')["content"] }}</message>
 		@endif
-		<logged-in></logged-in>
 	</div>
 	<script src="{{ mix('js/manifest.js') }}"></script>
 	<script src="{{ mix('js/vendor.js') }}"></script>
 	<script src="{{ mix('js/app.js') }}"></script>
-	@yield('scripts', '');
+	@yield('scripts', '')
 </body>
 
 </html>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Comment;
 use Illuminate\Http\Request;
+use App\Post;
 
 class CommentController extends Controller
 {
@@ -12,9 +13,10 @@ class CommentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Post $post)
     {
-        //
+		$comments = Comment::where('post_id', $post->id)->orderBy('created_at', 'ASC')->get();
+		return response()->json($comments);
     }
 
     /**

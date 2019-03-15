@@ -43,3 +43,4 @@ Route::get('/chans/{chan}/posts/{post}/edit', "PostController@edit")->name('post
 Route::patch('/chans/{chan}/posts/{post}', "PostController@update")->name('posts.update');
 Route::delete('/chans/{chan}/posts/{post}', "PostController@delete")->name('posts.delete');
 
+Route::get('/api/comments/{post}', "CommentController@index")->name('api.comments.index');

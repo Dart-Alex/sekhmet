@@ -14,7 +14,7 @@ class PostsTableSeeder extends Seeder
     {
 		$chans = Chan::all()->pluck('id')->toArray();
 		foreach($chans as $chan) {
-			factory(App\Post::class, 20)->create(["chan_id" => $chan]);
+			factory(App\Post::class)->create(["chan_id" => $chan]);
 		}
     }
 }

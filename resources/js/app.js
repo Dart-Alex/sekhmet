@@ -11,6 +11,12 @@ let userMeta = document.head.querySelector('meta[name="user"]');
 let user;
 if (userMeta) {
 	user = JSON.parse(userMeta.content);
+	if(user == null) {
+		user = {"guest": true};
+	}
+	else {
+		user["guest"] = false;
+	}
 }
 
 window.Vue = require('vue');
@@ -21,14 +27,17 @@ window.Vue = require('vue');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 import Message from './components/Message.vue';
-import LoggedIn from './components/LoggedIn.vue';
-
+import Comments from './components/Comments.vue';
+Vue.prototype.$http = axios;
 
 const app = new Vue({
 	el: '#app',
+	data: {
+		user: user
+	},
 	components: {
 		"message": Message,
-		"logged-in": LoggedIn
+		"comments": Comments
 	}
 });
 
