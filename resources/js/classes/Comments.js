@@ -16,7 +16,7 @@ export default class Comments {
 			this.delete(this.list[replyId]);
 		});
 		if(comment.reply_to) {
-			this.list[reply_to].replies.splice(this.list[reply_to].replies.indexOf(comment.id),1);
+			this.list[comment.reply_to].replies.splice(this.list[comment.reply_to].replies.indexOf(comment.id),1);
 		}
 		window.Vue.delete(this.list, comment.id);
 	}
