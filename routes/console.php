@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Carbon;
+use App\YoutubeVideo;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +18,20 @@ use Illuminate\Foundation\Inspiring;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->describe('Display an inspiring quote');
+
+Artisan::command('importYoutube', function () {
+	$path = base_path('bot/youtube.json');
+	$content = json_decode(file_get_contents($path), true);
+	foreach($content as $chan => $videos) {
+		foreach($videos as $yid => $video) {
+			$chanName = strtolower(str_replace('#', '', $chan));
+			$date = Carbon::createFromTimestamp($video['timestamp']);
+			YoutubeVideo::create([
+				'chan_name' => $chanName,
+				'name' => $video['nick'],
+				'created_at' => $date,
+				'yid' => $yid
+			]);
+		}
+	}
+})->describe('Imports youtube json to database');

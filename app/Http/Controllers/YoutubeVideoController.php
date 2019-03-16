@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\YoutubeVideos;
+use App\YoutubeVideo;
 use Illuminate\Http\Request;
 
-class YoutubeVideosController extends Controller
+class YoutubeVideoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -44,7 +44,7 @@ class YoutubeVideosController extends Controller
      * @param  \App\YoutubeVideos  $youtubeVideos
      * @return \Illuminate\Http\Response
      */
-    public function show(YoutubeVideos $youtubeVideos)
+    public function show(YoutubeVideo $youtubeVideo)
     {
         //
     }
@@ -55,7 +55,7 @@ class YoutubeVideosController extends Controller
      * @param  \App\YoutubeVideos  $youtubeVideos
      * @return \Illuminate\Http\Response
      */
-    public function edit(YoutubeVideos $youtubeVideos)
+    public function edit(YoutubeVideo $youtubeVideo)
     {
         //
     }
@@ -67,7 +67,7 @@ class YoutubeVideosController extends Controller
      * @param  \App\YoutubeVideos  $youtubeVideos
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, YoutubeVideos $youtubeVideos)
+    public function update(Request $request, YoutubeVideo $youtubeVideo)
     {
         //
     }
@@ -78,7 +78,7 @@ class YoutubeVideosController extends Controller
      * @param  \App\YoutubeVideos  $youtubeVideos
      * @return \Illuminate\Http\Response
      */
-    public function destroy(YoutubeVideos $youtubeVideos)
+    public function destroy(YoutubeVideo $youtubeVideo)
     {
         //
     }

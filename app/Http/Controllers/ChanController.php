@@ -27,7 +27,7 @@ class ChanController extends Controller
      */
     public function create()
     {
-		$this->authorize('create');
+				$this->authorize('create', Chan::class);
         return view('chans.create');
     }
 
@@ -39,7 +39,7 @@ class ChanController extends Controller
      */
     public function store(Request $request)
     {
-		$this->authorize('create');
+		$this->authorize('create', Chan::class);
 		$request->merge(['name' => strtolower($request->name)]);
         $validated = $request->validate([
             'name' => 'required|unique:chans|alpha_dash',
@@ -59,7 +59,7 @@ class ChanController extends Controller
      */
     public function show(Chan $chan)
     {
-		$this->authorize('view', $chan);
+			$this->authorize('view', Chan::class, $chan);
         return view('chans.show', compact('chan'));
     }
 
@@ -83,7 +83,7 @@ class ChanController extends Controller
      */
     public function update(Request $request, Chan $chan)
     {
-		$this->authorize('update', $chan);
+		$this->authorize('update', Chan::class, $chan);
 		$validated = [];
 		$validated['hidden'] = $request->has('hidden');
 		if($request->has('name'))
@@ -114,7 +114,7 @@ class ChanController extends Controller
      */
     public function destroy(Chan $chan)
     {
-		$this->authorize('delete', $chan);
+		$this->authorize('delete', Chan::class, $chan);
 		$chan->delete();
 		success("Le chan ".$chan->displayName()." a été supprimé.");
 		return redirect()->back();

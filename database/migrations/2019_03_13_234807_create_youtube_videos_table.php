@@ -32,6 +32,6 @@ class CreateYoutubeVideosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('youtube_videos');
+        //Schema::dropIfExists('youtube_videos');
     }
 }

@@ -36,6 +36,12 @@ class Chan extends Model
 	{
 		return 'name';
 	}
+
+	public function setNameAttribute($value)
+	{
+		$this->attributes['name'] = strtolower($value);
+	}
+
 	public function chanUsers()
 	{
 		return $this->hasMany(ChanUser::class);
