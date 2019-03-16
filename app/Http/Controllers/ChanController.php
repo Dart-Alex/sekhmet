@@ -59,7 +59,7 @@ class ChanController extends Controller
      */
     public function show(Chan $chan)
     {
-			$this->authorize('view', Chan::class, $chan);
+			$this->authorize('view', $chan);
         return view('chans.show', compact('chan'));
     }
 
@@ -83,7 +83,7 @@ class ChanController extends Controller
      */
     public function update(Request $request, Chan $chan)
     {
-		$this->authorize('update', Chan::class, $chan);
+		$this->authorize('update', $chan);
 		$validated = [];
 		$validated['hidden'] = $request->has('hidden');
 		if($request->has('name'))
@@ -114,7 +114,7 @@ class ChanController extends Controller
      */
     public function destroy(Chan $chan)
     {
-		$this->authorize('delete', Chan::class, $chan);
+		$this->authorize('delete', $chan);
 		$chan->delete();
 		success("Le chan ".$chan->displayName()." a été supprimé.");
 		return redirect()->back();
