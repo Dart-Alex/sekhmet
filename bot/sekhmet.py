@@ -216,7 +216,6 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			irc.bot.SingleServerIRCBot.on_ctcp(self, c, e)
 
 	def _on_disconnect(self, c, e):
-		print "Disconnected"
 		self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
 	def on_whoischannels(self, c, e):
 		pass
