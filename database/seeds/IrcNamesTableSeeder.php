@@ -11,6 +11,6 @@ class IrcNamesTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(App\IrcName::class, 20)->create();
+        factory(App\IrcName::class, 50)->create();
     }
 }

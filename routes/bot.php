@@ -5,8 +5,8 @@
  * GET	/bot/config	(index)		bot.config.index
  * POST	/bot/config	(update)	bot.config.update
  */
-//Route::get('/bot/config', "BotConfigController@index")->name('bot.config.index');
-//Route::post('/bot/config', "BotConfigController@update")->name('bot.config.update');
+Route::get('/bot/config', "BotConfigController@index")->name('bot.config.index');
+Route::post('/bot/config', "BotConfigController@update")->name('bot.config.update');
 
 /**
  * Youtube routes, controller App\Bot\YoutubeVideoController

@@ -27,9 +27,7 @@ class CommentsModified
     public function handle($event)
     {
 		$comment = $event->comment;
-        if(Cache::has('comments-'.$comment->post_id)) {
-			Cache::forget('comments-'.$comment->post_id);
-		}
+		Cache::forget('comments-'.$comment->post_id);
 		return true;
     }
 }
