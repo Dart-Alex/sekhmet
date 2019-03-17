@@ -26,22 +26,22 @@ Route::get('/', 'HomeController@index')->name('home');
 Route::resource('chans', 'ChanController');
 
 /**
- * Posts
- * GET		/chans/{chan}/posts				(index)		posts.index
- * GET		/chans/{chan}/posts/create		(create)	posts.create
- * GET		/chans/{chan}/posts/{post}		(show)		posts.show
- * POST		/chans/{chan}/posts				(store)		posts.store
- * GET		/chans/{chan}/posts/{post}/edit	(edit)		posts.edit
- * PATCH	/chans/{chan}/posts/{post}		(update)	posts.update
- * DELETE	/chans/{chan}/posts/{post}		(destroy)	posts.destroy
+ * Events
+ * GET		/chans/{chan}/events				(index)		posts.index
+ * GET		/chans/{chan}/events/create			(create)	posts.create
+ * GET		/chans/{chan}/events/{post}			(show)		posts.show
+ * POST		/chans/{chan}/events				(store)		posts.store
+ * GET		/chans/{chan}/events/{post}/edit	(edit)		posts.edit
+ * PATCH	/chans/{chan}/events/{post}			(update)	posts.update
+ * DELETE	/chans/{chan}/events/{post}			(destroy)	posts.destroy
  */
-Route::get('/chans/{chan}/posts', "PostController@index")->name('posts.index');
-Route::get('/chans/{chan}/posts/create', "PostController@create")->name('posts.create');
-Route::get('/chans/{chan}/posts/{post}', "PostController@show")->name('posts.show');
-Route::post('/chans/{chan}/posts', "PostController@store")->name('posts.store');
-Route::get('/chans/{chan}/posts/{post}/edit', "PostController@edit")->name('posts.edit');
-Route::patch('/chans/{chan}/posts/{post}', "PostController@update")->name('posts.update');
-Route::delete('/chans/{chan}/posts/{post}', "PostController@destroy")->name('posts.destroy');
+Route::get('/chans/{chan}/events', "PostController@index")->name('posts.index');
+Route::get('/chans/{chan}/events/create', "PostController@create")->name('posts.create');
+Route::get('/chans/{chan}/events/{post}', "PostController@show")->name('posts.show');
+Route::post('/chans/{chan}/events', "PostController@store")->name('posts.store');
+Route::get('/chans/{chan}/events/{post}/edit', "PostController@edit")->name('posts.edit');
+Route::patch('/chans/{chan}/events/{post}', "PostController@update")->name('posts.update');
+Route::delete('/chans/{chan}/events/{post}', "PostController@destroy")->name('posts.destroy');
 
 /**
  * Comments
