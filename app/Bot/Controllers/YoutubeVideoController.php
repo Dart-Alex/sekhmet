@@ -39,6 +39,7 @@ class YoutubeVideoController extends Controller
 			]);
 		}
 		if(!$videoInfo = $video->getInfo()) {
+			$video->delete();
 			return [
 				"error" => true,
 				"message" => "Aucune vidéo trouvée.",
@@ -123,12 +124,12 @@ class YoutubeVideoController extends Controller
 	}
 
 	public function search(Request $request, Chan $chan) {
-		$query = $request->search;
+		$query = $request->search_query;
 		$name = $request->name;
 		if(YoutubeVideo::where('chan_name', $chan->name)->where('name', $query)->exists()) {
 			return $this->getRandomByUser($chan, $query);
 		}
-		$yid = YoutubeVideo::search($query);
+		$yid = YoutubeVideo::search($query)->id;
 		if(!$yid) {
 			return [
 				"error" => true,
