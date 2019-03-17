@@ -84,33 +84,41 @@ class YoutubeVideoController extends Controller
 
 	public function count(Chan $chan) {
 		$count = YoutubeVideo::where('chan_name', $chan->name)->count();
+		if($count == 0) {
+			return [
+				'error' => true,
+				'message' => 'Aucune vidéo n\'a été partagée sur #'.$chan->name
+			];
+		}
 		$return = [
 			"error" => false,
 			"count" => $count
 		];
-		if($count > 0) {
-			$return['oldest'] = YoutubeVideo::where('chan_name', $chan->name)
-				->orderBy('created_at', 'ASC')
-				->first()
-				->created_at
-				->format('d/m/Y');
-		}
+		$return['oldest'] = YoutubeVideo::where('chan_name', $chan->name)
+			->orderBy('created_at', 'ASC')
+			->first()
+			->created_at
+			->format('d/m/Y');
 		return $return;
 	}
 
 	public function countByUser(Chan $chan, $name) {
 		$count = YoutubeVideo::where('chan_name', $chan->name)->where('name', $name)->count();
+		if($count == 0) {
+			return [
+				'error' => true,
+				'message' => 'Aucune vidéo n\'a été partagée par '.$name.' sur #'.$chan->name
+			];
+		}
 		$return = [
 			"error" => false,
 			"count" => $count
 		];
-		if($count > 0) {
-			$return['oldest'] = YoutubeVideo::where('chan_name', $chan->name)->where('name', $name)
-				->orderBy('created_at', 'ASC')
-				->first()
-				->created_at
-				->format('d/m/Y');
-		}
+		$return['oldest'] = YoutubeVideo::where('chan_name', $chan->name)->where('name', $name)
+			->orderBy('created_at', 'ASC')
+			->first()
+			->created_at
+			->format('d/m/Y');
 		return $return;
 	}
 
