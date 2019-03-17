@@ -138,7 +138,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 	def our_start(self):
 		try:
-			server = [(self.config["server"]["address"],self.config["server"]["port"],self.config["server"]["password"])]
+			server = [(self.config["server"]["address"],int(self.config["server"]["port"]),self.config["server"]["password"])]
 		except:
 			server = [(self.config["server"]["address"],self.config["server"]["port"])]
 		irc.bot.SingleServerIRCBot.__init__(self,server , self.config["myname"], self.config["realname"], 2)
