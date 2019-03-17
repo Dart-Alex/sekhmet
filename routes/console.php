@@ -23,17 +23,19 @@ Artisan::command('importYoutube', function () {
 	$path = base_path('bot/youtube.json');
 	$content = json_decode(file_get_contents($path), true);
 	$count = 0;
-	foreach($content as $videos) {
+	$yids = [];
+	foreach($content as $chan => $videos) {
+		$chanName = strtolower(str_replace('#', '', $chan));
+		$yids[$chanName] = [];
 		$count += count($videos);
 	}
 	$bar = $this->output->createProgressBar($count);
 	$bar->start();
 	foreach($content as $chan => $videos) {
-		$yids = [];
+		$chanName = strtolower(str_replace('#', '', $chan));
 		foreach($videos as $yid => $video) {
-			if(!in_array($yid, $yids)) {
-				$yids[] = $yid;
-				$chanName = strtolower(str_replace('#', '', $chan));
+			if(!in_array($yid, $yids[$chanName])) {
+				$yids[$chanName][] = $yid;
 				$date = Carbon::createFromTimestamp($video['timestamp']);
 				YoutubeVideo::create([
 					'chan_name' => $chanName,
