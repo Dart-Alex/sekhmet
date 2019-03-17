@@ -17,11 +17,11 @@ class CreateYoutubeVideosTable extends Migration
 			$table->bigIncrements('id');
 			$table->string('chan_name')->index();
 			$table->string('name');
-			$table->string('yid');
+			$table->string('yid')->charset('utf8')->collate('utf8_cs');
 			$table->timestamps();
 			$table->index(['chan_name', 'name']);
 			$table->index(['chan_name', 'yid']);
-			$table->unique(['chan_name', 'yid']);
+			$table->unique(['chan_name', 'yid'])->charset('utf8')->collate('utf8_cs');
         });
     }
 

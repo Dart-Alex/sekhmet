@@ -25,7 +25,7 @@ Artisan::command('importYoutube', function () {
 	$count = 0;
 	$yids = [];
 	foreach($content as $chan => $videos) {
-		$chanName = strtolower(str_replace('#', '', $chan));
+		$chanName = strtolower(str_replace(' ', '', str_replace('#', '', $chan)));
 		$yids[$chanName] = [];
 		$count += count($videos);
 	}
