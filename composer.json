@@ -76,7 +76,7 @@
 			"python -m pip install datetime",
 			"python -m pip install BeautifulSoup",
 			"python -m pip install requests",
-			"./install-bot-dependencies.sh"
+			"python -m pip install irc"
 		]
 	}
 }
