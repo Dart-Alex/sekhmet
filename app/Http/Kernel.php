@@ -42,7 +42,7 @@ class Kernel extends HttpKernel
             'bindings',
 		],
 		'bot' => [
-			\App\Bot\Middleware\Localhost::class,
+			// \App\Bot\Middleware\Localhost::class,
 			\Illuminate\Routing\Middleware\SubstituteBindings::class,
 		],
     ];
