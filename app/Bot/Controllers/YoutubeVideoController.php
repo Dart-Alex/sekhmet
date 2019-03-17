@@ -123,8 +123,8 @@ class YoutubeVideoController extends Controller
 	}
 
 	public function search(Request $request, Chan $chan) {
-		$query = $request->input('search');
-		$name = $request->input('name');
+		$query = $request->search;
+		$name = $request->name;
 		if(YoutubeVideo::where('chan_name', $chan->name)->where('name', $query)->exists()) {
 			return $this->getRandomByUser($chan, $query);
 		}
@@ -140,8 +140,8 @@ class YoutubeVideoController extends Controller
 	}
 
 	public function fetch(Request $request, Chan $chan) {
-		$name = $request->input('name');
-		$yid = $request->input('yid');
+		$name = $request->name;
+		$yid = $request->yid;
 		return $this->returnByYid($chan, $name, $yid);
 	}
 }
