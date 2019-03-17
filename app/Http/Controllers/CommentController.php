@@ -8,6 +8,7 @@ use App\Post;
 use App\Events\CommentAdded;
 use App\Events\CommentUpdated;
 use App\Events\CommentDeleted;
+use Illuminate\Support\Facades\Cache;
 
 class CommentController extends Controller
 {
@@ -18,7 +19,14 @@ class CommentController extends Controller
      */
 	public function index(Post $post)
 	{
-		$comments = Comment::where('post_id', $post->id)->orderBy('created_at', 'ASC')->get();
+		if(Cache::has('comments-'.$post->id)) {
+			$comments = Cache::get('comments-'.$post->id);
+		}
+		else {
+			$comments = Comment::where('post_id', $post->id)->orderBy('created_at', 'ASC')->get()->toArray();
+			Cache::put('comments-'.$post->id, $comments, now()->addDay());
+		}
+
 		return response()->json($comments);
 	}
 
@@ -37,9 +45,11 @@ class CommentController extends Controller
 			'reply_to' => 'nullable|numeric|exists:comments,id',
 			'post_id' => 'required|numeric|exists:posts,id'
 		]);
-		$repliedToComment = Comment::findOrFail($validated['reply_to']);
-		if ($repliedToComment->post_id != $validated['post_id']) {
-			return ["message" => 'Le commentaire auquel vous essayez de répondre n\'appartient pas au même événement.'];
+		if(array_key_exists('reply_to', $validated)) {
+			$repliedToComment = Comment::findOrFail($validated['reply_to']);
+			if ($repliedToComment->post_id != $validated['post_id']) {
+				return ["message" => 'Le commentaire auquel vous essayez de répondre n\'appartient pas au même événement.'];
+			}
 		}
 		$comment = Comment::create($validated);
 		event(new CommentAdded($comment));

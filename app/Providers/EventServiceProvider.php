@@ -17,7 +17,16 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
-        ],
+		],
+		'App\Events\CommentAdded' => [
+			'App\Listeners\CommentsModified'
+		],
+		'App\Events\CommentDeleted' => [
+			'App\Listeners\CommentsModified'
+		],
+		'App\Events\CommentUpdated' => [
+			'App\Listeners\CommentsModified'
+		],
     ];
 
     /**
