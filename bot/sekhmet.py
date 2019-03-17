@@ -13,16 +13,9 @@ import random
 import os
 import time
 import traceback
-import thread
-from threading import Timer
-from threading import Thread, RLock
-import operator
-import codecs
-import urllib2
+from threading import Thread, RLock, Timer
 import requests
-import datetime
-from BeautifulSoup import BeautifulSoup
-timerslurk = 0
+
 sendLock = RLock()
 
 def nm_to_n(s):
