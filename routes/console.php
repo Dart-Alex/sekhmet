@@ -29,16 +29,21 @@ Artisan::command('importYoutube', function () {
 	$bar = $this->output->createProgressBar($count);
 	$bar->start();
 	foreach($content as $chan => $videos) {
+		$yids = [];
 		foreach($videos as $yid => $video) {
-			$chanName = strtolower(str_replace('#', '', $chan));
-			$date = Carbon::createFromTimestamp($video['timestamp']);
-			YoutubeVideo::create([
-				'chan_name' => $chanName,
-				'name' => $video['nick'],
-				'created_at' => $date,
-				'yid' => $yid
-			]);
+			if(!in_array($yid, $yids)) {
+				$yids[] = $yid;
+				$chanName = strtolower(str_replace('#', '', $chan));
+				$date = Carbon::createFromTimestamp($video['timestamp']);
+				YoutubeVideo::create([
+					'chan_name' => $chanName,
+					'name' => $video['nick'],
+					'created_at' => $date,
+					'yid' => $yid
+				]);
+			}
 			$bar->advance();
+
 		}
 	}
 	$bar->finish();
