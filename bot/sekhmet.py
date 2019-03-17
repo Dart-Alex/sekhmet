@@ -174,7 +174,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 	def shutdown(self):
 		try:
 			self.die() # disconnect from server
-		except AttributeError, e:
+		except:
 			# already disconnected probably (pingout or whatever)
 			pass
 
