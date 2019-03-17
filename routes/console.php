@@ -22,6 +22,12 @@ Artisan::command('inspire', function () {
 Artisan::command('importYoutube', function () {
 	$path = base_path('bot/youtube.json');
 	$content = json_decode(file_get_contents($path), true);
+	$count = 0;
+	foreach($content as $videos) {
+		$count += count($videos);
+	}
+	$bar = $this->output->createProgressBar($count);
+	$bar->start();
 	foreach($content as $chan => $videos) {
 		foreach($videos as $yid => $video) {
 			$chanName = strtolower(str_replace('#', '', $chan));
@@ -32,6 +38,13 @@ Artisan::command('importYoutube', function () {
 				'created_at' => $date,
 				'yid' => $yid
 			]);
+			$bar->advance();
 		}
 	}
+	$bar->finish();
+	$this->info('Les entrées ont été importées');
 })->describe('Imports youtube json to database');
+
+Artisan::command('bot:start', function () {
+
+});
