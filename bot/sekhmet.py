@@ -1,69 +1,58 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
 import re
 
 
 
-try:
-	from ircbot import *
-	from irclib import *
-except:
-	print "ERROR !!!!\nircbot.py and irclib.py not found, please install them\n( http://python-irclib.sourceforge.net/ )"
-	sys.exit(1)
-
-#overide irclib function
-def my_remove_connection(self, connection):
-	if self.fn_to_remove_socket:
-		self.fn_to_remove_socket(connection._get_socket())
-
-IRC._remove_connection = my_remove_connection
+import irc.bot
+import irc.strings
+from irc.client import ip_numstr_to_quad, ip_quad_to_numstr
 
 import random
 import os
-import json
 import time
 import traceback
 import thread
 from threading import Timer
+from threading import Thread, RLock
 import operator
-import google
 import codecs
-import urllib
 import urllib2
+import requests
 import datetime
-from os import listdir
-from os.path import isfile, join
 from BeautifulSoup import BeautifulSoup
 timerslurk = 0
-def json_load_byteified(file_handle):
-    return _byteify(
-        json.load(file_handle, object_hook=_byteify),
-        ignore_dicts=True
-    )
+sendLock = RLock()
 
-def json_loads_byteified(json_text):
-    return _byteify(
-        json.loads(json_text, object_hook=_byteify),
-        ignore_dicts=True
-    )
+def nm_to_n(s):
+    """Get the nick part of a nickmask.
 
-def _byteify(data, ignore_dicts = False):
-    # if this is a unicode string, return its string representation
-    if isinstance(data, unicode):
-        return data.encode('utf-8')
-    # if this is a list of values, return list of byteified values
-    if isinstance(data, list):
-        return [ _byteify(item, ignore_dicts=True) for item in data ]
-    # if this is a dictionary, return dictionary of byteified keys and values
-    # but only if we haven't already byteified it
-    if isinstance(data, dict) and not ignore_dicts:
-        return {
-            _byteify(key, ignore_dicts=True): _byteify(value, ignore_dicts=True)
-            for key, value in data.iteritems()
-        }
-    # if it's anything else, return it in its original form
-    return data
+    (The source of an Event is a nickmask.)
+    """
+    return s.split("!")[0]
+
+def nm_to_uh(s):
+    """Get the userhost part of a nickmask.
+
+    (The source of an Event is a nickmask.)
+    """
+    return s.split("!")[1]
+
+def nm_to_h(s):
+    """Get the host part of a nickmask.
+
+    (The source of an Event is a nickmask.)
+    """
+    return s.split("@")[1]
+
+def nm_to_u(s):
+    """Get the user part of a nickmask.
+
+    (The source of an Event is a nickmask.)
+    """
+    s = s.split("!")[1]
+    return s.split("@")[0]
 
 def get_time():
 	"""
@@ -71,7 +60,36 @@ def get_time():
 	"""
 	return time.strftime("%H:%M:%S", time.localtime(time.time()))
 
-class ModIRC(SingleServerIRCBot):
+def noHL(nick):
+	newNick = ''
+	for letter in nick:
+		newNick += letter + '\xE2\x80\x8B'
+	return newNick
+
+class FetchYoutube(Thread):
+	def __init__(self, bot, target, source, yid):
+		Thread.__init__(self)
+		self.bot = bot
+		self.target = target
+		self.source = source
+		self.yid = yid
+
+	def run(self):
+		request = requests.post(self.bot.baseAddress + 'bot/yt/fetch/' + self.target, data={'yid':self.yid,'name':self.source})
+		video = request.json()
+		if video['error']:
+			message = '[yt] Erreur : '+video['message']
+		else:
+			if video['new']:
+				message = '[yt] '
+			else:
+				message = '[yt(n°' + video['index'] + ')] le ' + video['date'] + ' par ' + noHL(video['name']) + ' - '
+			message += video['title'] + ' [' + video['duration']+']'
+		self.bot.msg(self.target, message)
+
+
+
+class ModIRC(irc.bot.SingleServerIRCBot):
 	"""
 	Module to interface IRC input and output with the PyBorg learn
 	and reply modules.
@@ -80,11 +98,6 @@ class ModIRC(SingleServerIRCBot):
 	# message is only used if the user doesn't have a part message.
 	join_msg = "%s"# is here"
 	part_msg = "%s"# has left"
-
-	# For security the owner's host mask is stored
-	# DON'T CHANGE THIS
-	owner_mask = []
-
 
 	# Command list for this module
 	commandlist = "Commandes utilisateur : !yt, !ytcount"
@@ -105,148 +118,58 @@ class ModIRC(SingleServerIRCBot):
 		"yt": "Affiche une vidéo youtube (aléatoire si aucun argument). Syntaxe : !yt (pseudo/numéro de vidéo/recherche)",
 		"ytcount": "Affiche le nombre de vidéos partagées sur le canal, ou par un utilisateur. Syntaxe : !ytcount (<pseudo> (<pseudo2> <pseudo3> ...))",
 		"ytdel": "Supprime une vidéo de la liste. Syntaxe : !ytdel <numéro de la vidéo>"
-		
 	}
 
 	def __init__(self, args):
 		"""
 		Args will be sys.argv (command prompt arguments)
 		"""
+		if len(sys.argv) != 2:
+			print('Usage: sekhmet <address>')
+			sys.exit(1)
+		self.baseAddress = args[1]
 		# load settings
+		request = requests.get(self.baseAddress + 'bot/config')
 		try:
-			with codecs.open("settings.json","r", encoding="utf-8") as file:
-				self.config = json_loads_byteified(file.read())
-				file.close()
+			self.config = request.json()
 		except:
-			self.config = {
-				"owners" : [
-					"Darko"
-				],
-				"realname" : "Sekhmet",
-				"myname" : "Sekhmet",
-				"timer" : 14400,
-				"hostWhitelist" : [],
-				"chans" : [],
-				"nickWhitelist" : [
-				],
-				"quitmsg" : "Bye :-(",
-				"server" : {
-					"address" : "irc.epiknet.org",
-					"port" : 6667
-				},
-				"ytChans" : [],
-				"ytAPI" : "CLEAPIGOOLEARENSEIGNER",
-				"quietChans" : [],
-				"usersBlacklist" : [],
-				"spamChans" : [],
-				"badwords" : []
-			}
-		try:
-			with codecs.open("data.json","r", encoding="utf-8") as file:
-				self.data = json_loads_byteified(file.read())
-				file.close()
-		except:
-			self.data = { "raw":{}}
-		try:
-			with codecs.open("youtube.json","r", encoding="utf-8") as file:
-				self.youtube = json_loads_byteified(file.read())
-		except:
-			self.youtube = {}
+			print('No config returned')
+			sys.exit(1)
 
-		self.message = ""
-		self.owners = self.config["owners"][:]
-		self.chans = self.config["chans"][:]
-		self.startedSpam = {}
-		self.spamTimer = {}
+		self.lastMsg = {}
 		self.whois = {}
-		self.hostWhitelist = self.config["hostWhitelist"][:]
-		self.nickWhitelist = self.config["nickWhitelist"][:]
 		self.bans = {}
 		self.lastWhois = {}
-		self.timerYt = {}
-		self.ytUsers = {}
-		self.ytSorted = {}
-		self.lastMsg = {}
-		for chan in self.config["chans"]:
+		for chan in self.config["chans"].keys():
 			self.lastMsg[chan] = []
-		for chan in self.config["ytChans"]:
-			self.activateYt(chan)
-
-
-					
-		
 
 	def our_start(self):
-		print "Connecting to server..."
 		try:
 			server = [(self.config["server"]["address"],self.config["server"]["port"],self.config["server"]["password"])]
 		except:
 			server = [(self.config["server"]["address"],self.config["server"]["port"])]
-		SingleServerIRCBot.__init__(self,server , self.config["myname"], self.config["realname"], 2)
+		irc.bot.SingleServerIRCBot.__init__(self,server , self.config["myname"], self.config["realname"], 2)
 		self.start()
 
+	def msg(self, target, message):
+		c = self.connection
+		with sendLock:
+			c.privmsg(target, message)
+
+	def notice(self, target, message):
+		c = self.connection
+		with sendLock:
+			c.notice(target, message)
+
 	def on_welcome(self, c, e):
-		for i in self.chans:
-			c.join(i)
+		for i in self.config["chans"].keys():
+			c.join('#'+i)
 
 	def on_nick(self, c, e):
-		nick = e.target()
-		source = e.source()
-		host = nm_to_h(source)
-		user = nm_to_u(source)
-		usermask = nm_to_uh(source)
-		newsource = nick+'!'+usermask
-		try:
-			self.data["raw"][newsource]
-		except:
-			self.data["raw"][newsource] = {}
-		try:
-			self.data["raw"][newsource]["chans"]
-		except:
-			self.data["raw"][newsource]["chans"] = []
-		try:
-			self.data["raw"][newsource]["count"] += 1
-		except:
-			self.data["raw"][newsource]["count"] = 1
-		try:
-			for chan in self.data["raw"][source]["chans"]:
-				if not(chan in self.data["raw"][newsource]["chans"]):
-					self.data["raw"][newsource]["chans"].append(chan)
-		except:
-			pass
-		self.saveData()
-		
+		pass
 
 	def on_join(self,c,e):
-		ch = e.target().lower()
-		source = e.source()
-		nick = nm_to_n(source)
-		host = nm_to_h(source)
-		user = nm_to_u(source)
-
-		try:
-			doWhois = ((time.time() - self.lastWhois[source]) >= 5)
-		except:
-			doWhois = True
-		try:
-			if (self.whois[nick.lower()] != source):
-				self.whois[nick.lower()] = source
-		except:
-			self.whois[nick.lower()] = source
-		if (doWhois) or (ch == "#edenya"):
-			self.lastWhois[source] = time.time()
-			c.send_raw("WHOIS " + nick)
-			c.send_raw("PRIVMSG Themis info "+nick)
-			
-		if ((time.time()-timerslurk) <= 600) or user in self.config["usersBlacklist"]:
-			if host.find("sfr.net") != -1:
-				for hostW in self.hostWhitelist:
-					if host.find(hostW) != -1: return
-				for nickW in self.nickWhitelist:
-					if nick.lower().find(nickW) != -1: return
-				self.kickbanall(nick, "Tu es banni du serveur slurk. Comportement à revoir.", c, False)
-
-
+		pass
 
 	def shutdown(self):
 		try:
@@ -256,7 +179,7 @@ class ModIRC(SingleServerIRCBot):
 			pass
 
 	def get_version(self):
-		return "Bleh"
+		return self.baseAddress
 
 	def on_kick(self, c, e):
 		"""
@@ -264,21 +187,16 @@ class ModIRC(SingleServerIRCBot):
 		"""
 		# Parse Nickname!username@host.mask.net to Nickname
 		kicked = e.arguments()[0]
-		kicker = e.source().split("!")[0]
+		kicker = nm_to_n(e.source())
 		target = e.target() #channel
 		if len(e.arguments()) >= 2:
 			reason = e.arguments()[1]
 		else:
 			reason = ""
-		if (reason.find("slurk") != -1):
-			global timerslurk
-			timerslurk = time.time()
 		if kicked == self.config["myname"]:
 			print "[%s] <-- %s was kicked off %s by %s (%s)" % (get_time(), kicked, target, kicker, reason)
 			try:
-				self.chans.remove(target.lower())
 				c.join(target)
-				self.chans.append(target.lower())
 			finally:
 				pass
 	def on_privnotice(self,c,e):
@@ -287,7 +205,7 @@ class ModIRC(SingleServerIRCBot):
 		self.on_msg(c,e)
 	def on_privmsg(self, c, e):
 		self.on_msg(c, e)
-	
+
 	def on_pubmsg(self, c, e):
 		self.on_msg(c, e)
 
@@ -296,73 +214,21 @@ class ModIRC(SingleServerIRCBot):
 		if ctcptype == "ACTION":
 			self.on_msg(c, e)
 		else:
-			SingleServerIRCBot.on_ctcp(self, c, e)
+			irc.bot.SingleServerIRCBot.on_ctcp(self, c, e)
 
 	def _on_disconnect(self, c, e):
 		print "Disconnected"
 		self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
 	def on_whoischannels(self, c, e):
-		results = e.arguments()
-		chans = results[1].lower().replace('@#','#').replace('%#','#').replace('+#','#').split(' ')[:-1]
-		nick = results[0]
-		try:
-			source = self.whois[nick.lower()]
-			host = nm_to_h(source)
-			user = nm_to_u(source)
-			modified = False
-			try:
-				self.data["raw"][source]
-			except:
-				self.data["raw"][source] = {}
-			try:
-				self.data["raw"][source]["chans"]
-			except:
-				self.data["raw"][source]["chans"] = []
-			try:
-				self.data["raw"][source]["count"] += 1
-			except:
-				self.data["raw"][source]["count"] = 1
-			self.data["raw"][source]["timestamp"] = time.time()
-			for chan in chans:
-				if not(chan in self.data["raw"][source]["chans"]):
-					self.data["raw"][source]["chans"].append(chan)
-			self.saveData()
-
-
-		
-			if (results[1].lower().find("#clowns") != -1) and (host.find("sfr.net") != -1) and not(host in self.hostWhitelist):
-				for nickW in self.nickWhitelist:
-					if nick.lower().find(nickW) != -1: return
-				self.kickbanall(nick, "Tu es banni du serveur slurk. Comportement à revoir.", c, False)
-			if (user == "~nothing" or host.find(".3A78AC7D.IP") != -1 or host.find(".A238F1D5.IP") != -1) and not (host in self.hostWhitelist or nick in self.nickWhitelist):
-				self.kickbanall(nick, "Tu es banni du serveur khris. Comportement à revoir.", c, False)
-		except:
-			pass
-		if ((results[1].lower().find("#pokemonfrance") != -1) or (results[1].lower().find("#espace_zen") != -1)) and (results[1].lower().find("#edenya") != -1):
-			self.kickbanall(nick, "Autobots, roll out !", c, False)
+		pass
 
 	def on_msg(self, c, e):
 		"""
 		Process messages.
 		"""
 		# Parse Nickname!username@host.mask.net to Nickname
-		source = e.source().split("!")[0]
-		target = e.target()
-
-
-		# First message from owner 'locks' the owner host mask
-		if (target.lower() in self.config["spamChans"]):
-			try:
-				self.startedSpam[target.lower()]
-			except:
-				self.startedSpam[target.lower()] = False
-			if not self.startedSpam[target.lower()]:
-				self.startedSpam[target.lower()] = True
-				self.spamTimer[target.lower()] = Timer(self.config["timer"], self.spam, ("<none>", source, target, c, e))
-				self.spamTimer[target.lower()].start()
-
-		if not e.source() in self.owner_mask and source in self.owners:
-			self.owner_mask.append(e.source())
+		source = nm_to_n(e.source())
+		target = e.target().replace('#', '').lower()
 
 		# Message text
 		if len(e.arguments()) == 1:
@@ -377,28 +243,10 @@ class ModIRC(SingleServerIRCBot):
 				return
 		# Ignore self.
 		if source == self.config["myname"]: return
-		if (e.eventtype() == "privnotice" or e.eventtype() == "pubnotice") and source == "Themis":
-			retour = body.split(' ')
-			update = False
-			registered = 0
-			nick = ''
-			if(retour[1] == "est"):
-				nick = retour[0].replace('\x02','').replace('\\x02','')
-				update = True
-				registered = 1
-			if(retour[1] == "pseudo"):
-				nick = retour[2].replace('\x02','').replace('\\x02','')
-				update = True
-				registered = 0
-			if update:
-				try:
-					sourcens = self.whois[nick.lower()]
-					self.data["raw"][sourcens]["registered"] = registered
-				except:
-					pass
+
 		if e.eventtype() == "pubmsg" or e.eventtype() == "privmsg":
-			
-			if (body.find("youtu") != -1) and (target.lower() in self.config["ytChans"]):
+
+			if (body.find("youtu") != -1) and (self.config['chans'][target]['youtube']['active']):
 				isVideo = False
 				if body.find("youtube.com") != -1:
 					try:
@@ -415,70 +263,13 @@ class ModIRC(SingleServerIRCBot):
 					except:
 						pass
 				if isVideo:
-					chan = target.lower()
-					if yid in self.youtube[chan]:
-						nick = ""
-						for letter in self.youtube[chan][yid]["nick"]:
-							nick += letter + '\xE2\x80\x8B'
-						ts = int(self.youtube[chan][yid]["timestamp"])
-						date = time.strftime('%d/%m/%Y',time.localtime(ts))
-						index = str(self.ytSorted[chan].index(yid) + 1)
-						titre = self.afficheyt(yid,True)
-						retour = '\x02'+"[yt(n°"+index+")]"+'\x02'+" le "+date+" par "+ '\x1D' + nick + '\x1D' +" - "+titre
-					
-					else:
-						retour = '\x02'+"[yt]"+'\x02'+" "+self.afficheyt(yid, False)
-					self.output(retour, ("<none>", source, target, c, e))
-					if retour != "[Erreur]":
-						
-						try:
-							self.youtube[chan]
-						except:
-							self.youtube[chan] = {}
-						if not(yid in self.youtube[chan]):
-							self.youtube[chan][yid] = {}
-							self.youtube[chan][yid]["nick"] = source
-							self.youtube[chan][yid]["timestamp"] = time.time()
-							self.saveYoutube()
-							try:
-								self.ytSorted[chan].append(yid)
-							except:
-								self.ytSorted[chan] = [yid]
-							try:
-								self.ytUsers[chan][source.lower()].append(yid)
-							except:
-								self.ytUsers[chan][source.lower()] = [yid]
-			elif (body.lower().find("http://") != -1 or body.lower().find("https://") != -1) and target.lower() in self.config["ytChans"]:
-				try:
-					url = body[body.find("http"):].split(' ')[0]
-					retour = self.urlTitle(url)
-					if len(retour) > 100:
-						retour = retour[:100] + " ..."
-					if retour != "Erreur":
-						self.output(retour, ("<none>", source, target, c, e))
-				except:
-					pass
-			if (target.lower() in self.config["ytChans"]):
-				try:
-					self.timerYt[target.lower()].cancel()
-					del self.timerYT[target.lower()]
-				except:
-					pass
-				self.timerYt[target.lower()] = Timer(1200, self.spamYt, (body, source, target, c, e))
-				self.timerYt[target.lower()].start()
-				if body[0] != "!":
-					self.lastMsg[target.lower()] = [source + " " + body] + self.lastMsg[target.lower()][0:9]
-			
+					FetchYoutube(self, target, source, yid).start()
 
-						
-					# except:
-					# 	self.output("Erreur.", ("<none>", source, target, c, e))
-					# 	pass
 			if body[0] == "!":
 				if self.irc_commands(body, source, target, c, e) == 1: return
 
 		if body == "": return
-	
+
 	def irc_commands(self, body, source, target, c, e):
 		"""
 		Special IRC commands.
@@ -488,7 +279,7 @@ class ModIRC(SingleServerIRCBot):
 		command_list = body.split()
 		command_list[0] = command_list[0].lower()
 		### Owner commands
-		if (source in self.owners) or (source == "Darko"):
+		if (source.lower() in self.config['owners']):
 
 			# Change nick
 			if command_list[0] == "!nick":
@@ -498,7 +289,7 @@ class ModIRC(SingleServerIRCBot):
 				except:
 					pass
 
-			
+
 			elif command_list[0] == "!spam":
 				if len(command_list) == 1:
 					self.output(self.message, ("<none>", source, target, c, e))
@@ -674,7 +465,7 @@ class ModIRC(SingleServerIRCBot):
 						msg += "removed from badwords list"
 				except:
 					pass
-						
+
 
 
 
@@ -682,7 +473,7 @@ class ModIRC(SingleServerIRCBot):
 			elif command_list[0] == "!join":
 				for x in range(1, len(command_list)):
 					msg = "J'essaye de rejoindre "+command_list[x].lower()
-					if not(command_list[x].lower() in self.chans): 
+					if not(command_list[x].lower() in self.chans):
 						c.join(command_list[x].lower())
 						self.chans.append(command_list[x].lower())
 						self.config["chans"].append(command_list[x].lower())
@@ -738,12 +529,12 @@ class ModIRC(SingleServerIRCBot):
 							pass
 				except:
 					self.output("Mais je suis pas en train de spammer !", ("<none>", source, target, c, e))
-				
+
 			# Change timer
 			elif command_list[0] == "!timer":
 				try:
 					self.config["timer"] = int(command_list[1])
-					msg = "Le timer est maintenant de "+command_list[1]+" secondes." 
+					msg = "Le timer est maintenant de "+command_list[1]+" secondes."
 				except:
 					msg = "Le timer est de "+str(self.config["timer"])+" secondes."
 			elif command_list[0] == "!quit":
@@ -845,7 +636,7 @@ class ModIRC(SingleServerIRCBot):
 						query += command_list[x]+" "
 					query = query[:-1]
 
-							
+
 				if archive and not error:
 					nick = ""
 					for letter in self.youtube[chan][yid]["nick"]:
@@ -912,7 +703,7 @@ class ModIRC(SingleServerIRCBot):
 						except:
 							retour = '\x02'+"[ytCount]"+'\x02'+ " "+nickAff+" n'a partagé aucune vidéo sur "+chan+"."
 						self.output(retour, ("<none>", source, target, c, e))
-				
+
 
 
 
@@ -927,36 +718,6 @@ class ModIRC(SingleServerIRCBot):
 			#self.output(msg, ("<none>", source, target, c, e))
 			c.notice(source,msg)
 			return 1
-	def output(self, message, args):
-		"""
-		Output a line of text. args = (body, source, target, c, e)
-		"""
-		if not self.connection.is_connected():
-			print "Can't send reply : not connected to server"
-			return
-
-		# Unwrap arguments
-		body, source, target, c, e = args
-		# Decide. should we do a ctcp action?
-		if string.find(message, string.lower(self.config["myname"])+" ") == 0:
-			action = 1
-			message = message[len(self.config["myname"])+1:]
-		else:
-			action = 0
-		# Joins replies and public messages
-		if e.eventtype() == "pubmsg" or e.eventtype() == "ctcp":
-			if action == 0:
-				c.privmsg(target, message)
-			else:
-				c.action(target, message)
-		# Private messages
-		elif e.eventtype() == "privmsg":
-			# normal private msg
-			if action == 0:
-				c.privmsg(source, message)
-			# ctcp action priv msg
-			else:
-				c.action(source, message)
 	def spam(self, body, source, target, c, e):
 		msg = self.message
 		self.spamTimer[target.lower()] = Timer(self.config["timer"], self.spam, (body, source, target, c, e))
@@ -973,7 +734,7 @@ class ModIRC(SingleServerIRCBot):
 		date = time.strftime('%d/%m/%Y',time.localtime(ts))
 		index = str(self.ytSorted[chan].index(yid) + 1)
 		titre = self.afficheyt(yid, True)
-		msg = '\x02'+"[ytAuto(n°"+index+")]"+'\x02'+" le "+date+" par "+'\x1D'+nick+'\x1D'+" - "+'\x1F'+"https://youtu.be/"+yid+'\x1F'+" - "+titre 
+		msg = '\x02'+"[ytAuto(n°"+index+")]"+'\x02'+" le "+date+" par "+'\x1D'+nick+'\x1D'+" - "+'\x1F'+"https://youtu.be/"+yid+'\x1F'+" - "+titre
 		if titre == "Erreur":
 			del self.youtube[chan][yid]
 			self.saveYoutube()
@@ -1028,7 +789,6 @@ class ModIRC(SingleServerIRCBot):
 			jsonyt = json_loads_byteified(video)
 			titre = jsonyt['items'][0]['snippet']['title']
 			temps = jsonyt['items'][0]['contentDetails']['duration'][2:].lower()
-			auteur = jsonyt['items'][0]['snippet']['channelTitle']
 			if bold:
 				b = '\x02'
 			else:
@@ -1050,7 +810,7 @@ class ModIRC(SingleServerIRCBot):
 		self.ytSorted[chan] = []
 		temp = {}
 		toDelete = []
-		
+
 		modified = False
 		try:
 			self.youtube[chan]
@@ -1070,14 +830,14 @@ class ModIRC(SingleServerIRCBot):
 				else:
 					timestamp = int(self.youtube[chan][yid]["timestamp"])
 					temp[yid] = timestamp
-					
+
 		if deleted:
 			for yid in toDelete:
 				del self.youtube[chan][yid]
 			modified = True
 		if modified:
 			self.saveYoutube()
-		self.ytSorted[chan] = sorted(temp, key=temp.__getitem__) 
+		self.ytSorted[chan] = sorted(temp, key=temp.__getitem__)
 		for yid in self.ytSorted[chan]:
 			nick = self.youtube[chan][yid]["nick"].lower()
 			try:
@@ -1096,7 +856,7 @@ class ModIRC(SingleServerIRCBot):
 		return retour
 
 if __name__ == "__main__":
-	
+
 	# start the bot
 	bot = ModIRC(sys.argv)
 	try:
