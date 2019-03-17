@@ -19,8 +19,8 @@ Route::post('/bot/config', "BotConfigController@update")->name('bot.config.updat
  */
 Route::get('/bot/yt/{chan}', 'YoutubeVideoController@getRandom')->name('bot.yt.getRandom');
 Route::get('/bot/yt/{chan}/{name}', 'YoutubeVideoController@getRandomByUser')->name('bot.yt.getRandomByUser');
-Route::get('/bot/yt/count/{chan}', 'YoutubeVideoController@count')->name('bot.yt.count');
-Route::get('/bot/yt/count/{chan}/{name}', 'YoutubeVideoController@countByUser')->name('bot.yt.countByUser');
-Route::post('/bot/yt/search/{chan}', 'YoutubeVideoController@search')->name('bot.yt.countByUser');
-Route::post('/bot/yt/fetch/{chan}', 'YoutubeVideoController@fetch')->name('bot.yt.fetch');
+Route::get('/bot/ytcount/{chan}', 'YoutubeVideoController@count')->name('bot.yt.count');
+Route::get('/bot/ytcount/{chan}/{name}', 'YoutubeVideoController@countByUser')->name('bot.yt.countByUser');
+Route::post('/bot/ytsearch/{chan}', 'YoutubeVideoController@search')->name('bot.yt.countByUser');
+Route::post('/bot/ytfetch/{chan}', 'YoutubeVideoController@fetch')->name('bot.yt.fetch');
 
