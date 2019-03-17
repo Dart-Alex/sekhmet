@@ -8,7 +8,8 @@ import re
 import irc.bot
 import irc.strings
 from irc.client import ip_numstr_to_quad, ip_quad_to_numstr
-
+from jaraco.stream import buffer
+irc.client.ServerConnection.buffer_class = buffer.LenientDecodingLineBuffer
 import random
 import os
 import time
