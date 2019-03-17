@@ -276,4 +276,4 @@ if __name__ == "__main__":
 		bot.our_start()
 	except:
 		traceback.print_exc()
-	bot.disconnect(bot.config["quitmsg"])
+	bot.disconnect("Bye :(")
