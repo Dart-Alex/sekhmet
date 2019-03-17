@@ -48,10 +48,7 @@ class YoutubeVideo extends Model
 	}
 
 	public function getIndex() {
-		if(Cache::has('yt-video-index-'.$this->id)) {
-			$index = Cache::get('yt-video-index-'.$this->id);
-		}
-		else {
+		if(!$index = Cache::get('yt-video-index-'.$this->id)) {
 			$index = static::where('chan_name', $this->chan_name)->where('created_at', '<=', $this->created_at)->count();
 			Cache::put('yt-video-index-'.$this->id, $index, now()->addMonth());
 		}
@@ -60,11 +57,10 @@ class YoutubeVideo extends Model
 
 	static function fetchInfo($yid) {
 		if(!$yid) return false;
-		if(Cache::has('yid-'.$yid)) {
-			return Cache::get('yid-'.$yid);
+		if(!$result = Cache::get('yid-'.$yid)) {
+			$result = \Youtube::getVideoInfo($yid);
+			Cache::put('yid-'.$yid, $result, now()->addMonth());
 		}
-		$result = \Youtube::getVideoInfo($yid);
-		Cache::put('yid-'.$yid, $result, now()->addMonth());
 		return $result;
 	}
 
