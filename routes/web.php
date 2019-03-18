@@ -43,14 +43,4 @@ Route::get('/chans/{chan}/events/{post}/edit', "PostController@edit")->name('pos
 Route::patch('/chans/{chan}/events/{post}', "PostController@update")->name('posts.update');
 Route::delete('/chans/{chan}/events/{post}', "PostController@destroy")->name('posts.destroy');
 
-/**
- * Comments
- * GET		/api/comments/{post}	(index)		api.comments.index
- * POST		/api/comments/	(store)		api.comments.store
- * PATCH	/api/comments/{comment}	(update)	api.comments.update
- * DELETE	/api/comments/{comment}	(destroy)	api.comments.destroy
- */
-Route::get('/api/comments/{post}', "CommentController@index")->name('api.comments.index');
-Route::post('/api/comments', "CommentController@store")->name('api.comments.store');
-Route::patch('/api/comments/{comment}', 'CommentController@update')->name('api.comments.update');
-Route::delete('/api/comments/{comment}', 'CommentController@destroy')->name('api.comments.destroy');
+

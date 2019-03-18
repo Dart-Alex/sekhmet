@@ -39,11 +39,18 @@ class Kernel extends HttpKernel
 
         'api' => [
             'throttle:60,1',
-            'bindings',
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \App\Http\Middleware\VerifyCsrfToken::class,
+			\Illuminate\Routing\Middleware\SubstituteBindings::class,
+			\App\Http\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+			\Illuminate\Session\Middleware\StartSession::class,
+			\App\Http\Middleware\EnforceJson::class,
 		],
 		'bot' => [
 			// \App\Bot\Middleware\Localhost::class,
 			\Illuminate\Routing\Middleware\SubstituteBindings::class,
+			\App\Http\Middleware\EnforceJson::class,
 		],
     ];
 
@@ -80,6 +87,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\Authenticate::class,
         \Illuminate\Session\Middleware\AuthenticateSession::class,
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        \Illuminate\Auth\Middleware\Authorize::class,
+		\Illuminate\Auth\Middleware\Authorize::class,
+		\App\Http\Middleware\EnforceJson::class,
     ];
 }
