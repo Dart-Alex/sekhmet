@@ -21,7 +21,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         $this->hideSensitiveRequestDetails();
 
         Telescope::filter(function (IncomingEntry $entry) {
-            if ($this->app->isLocal() || env(TELESCOPE_ENABLED)) {
+            if ($this->app->isLocal() || config('telescope.enabled', true)) {
                 return true;
             }
 
