@@ -13,7 +13,7 @@ class YoutubeVideoController extends Controller
 	protected function returnVideo(YoutubeVideo $video, $videoInfo, $new = false) {
 		$return = [
 			"url" => "https://youtu.be/".$videoInfo->id,
-			"title" => $videoInfo->snippet->title,
+			"title" => preg_replace('/[\p{Cyrillic}]/u', '?', $videoInfo->snippet->title),
 			"duration" => CarbonInterval::create($videoInfo->contentDetails->duration)->forHumans(),
 			"error" => false,
 			"new" => $new,
