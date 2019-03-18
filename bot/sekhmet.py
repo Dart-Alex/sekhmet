@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# Lookup antimixedutf8 if bot banned "Possible mixed character spam"
 import sys
 import re
-
-
 
 import irc.bot
 import irc.strings
@@ -14,10 +13,11 @@ import random
 import os
 import time
 import traceback
+from multiprocessing import Process
 from threading import Thread, RLock, Timer
 import requests
+from bs4 import BeautifulSoup
 
-sendLock = RLock()
 
 def noHL(nick):
 	newNick = ''
@@ -25,93 +25,7 @@ def noHL(nick):
 		newNick += letter + u"\u200B"
 	return newNick
 
-class FetchYoutube(Thread):
-	def __init__(self, bot, target, source, yid):
-		Thread.__init__(self)
-		self.bot = bot
-		self.target = target
-		self.source = source
-		self.yid = yid
 
-	def run(self):
-		request = requests.post(self.bot.baseAddress + 'bot/ytfetch/' + self.target, data={'yid':self.yid,'name':self.source})
-		video = request.json()
-		if video['error']:
-			message = '[yt] ' + video['message']
-		else:
-			if video['new']:
-				message = '[yt] '
-			else:
-				message = '[yt(n°' + str(video['index']) + ')] le ' + video['date'] + ' par ' + noHL(video['name']) + ' - '
-			message += video['title'] + ' [' + video['duration']+']'
-		self.bot.msg('#' + self.target, message)
-
-class SearchYoutube(Thread):
-	def __init__(self, bot, target, source, search):
-		Thread.__init__(self)
-		self.bot = bot
-		self.target = target
-		self.source = source
-		self.search = search
-
-	def run(self):
-		request = requests.post(self.bot.baseAddress + 'bot/ytsearch/' + self.target, data={'search_query':self.search, 'name':self.source})
-		result = request.json()
-		if result['error']:
-			message = '[ytSearch] ' + result['message']
-		else:
-			if result['new']:
-				message = '[ytSearch] '
-			else:
-				message = '[ytSearch(n°' + str(result['index']) + ')] le ' + result['date'] + ' par ' + noHL(result['name']) + ' - '
-
-			message += result['url'] + ' - ' + result['title'] + ' [' + result['duration'] + ']'
-		self.bot.msg('#' + self.target, message)
-
-class RandomYoutube(Thread):
-	def __init__(self, bot, target):
-		Thread.__init__(self)
-		self.bot = bot
-		self.target = target
-	def run(self):
-		request = requests.get(self.bot.baseAddress + 'bot/yt/' + self.target)
-		result = request.json()
-		if result['error']:
-			message = '[ytSearch] ' + result['message']
-		else:
-			message = '[ytSearch(n°' + str(result['index']) + ')] le ' + result['date'] + ' par ' + noHL(result['name']) + ' - ' + result['url'] + ' - ' + result['title'] + ' [' + result['duration'] + ']'
-		self.bot.msg('#' + self.target, message)
-
-class CountYoutubeVideos(Thread):
-	def __init__(self, bot, target):
-		Thread.__init__(self)
-		self.bot = bot
-		self.target = target
-
-	def run(self):
-		request = requests.get(self.bot.baseAddress + 'bot/ytcount/' + self.target)
-		result = request.json()
-		if result['error']:
-			message = '[ytCount] ' + result['message']
-		else:
-			message = '[ytCount] ' + str(result['count']) + ' vidéos ont été partagées sur #'+self.target+' depuis le '+result['oldest']
-		self.bot.msg('#' + self.target, message)
-
-class CountYoutubeVideosByName(Thread):
-	def __init__(self, bot, target, name):
-		Thread.__init__(self)
-		self.bot = bot
-		self.target = target
-		self.name = name
-
-	def run(self):
-		request = requests.get(self.bot.baseAddress + 'bot/ytcount/' + self.target + '/' + self.name)
-		result = request.json()
-		if result['error']:
-			message = '[ytCount] ' + result['message']
-		else:
-			message = '[ytCount] ' + str(result['count']) + ' vidéos ont été partagées par '+ noHL(self.name) + ' sur #'+self.target+' depuis le '+result['oldest']
-		self.bot.msg('#' + self.target, message)
 
 
 class ModIRC(irc.bot.SingleServerIRCBot):
@@ -149,22 +63,24 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		"""
 		Args will be sys.argv (command prompt arguments)
 		"""
-		# if len(sys.argv) != 2:
-		# 	print('Usage: sekhmet <address>')
-		# 	sys.exit(1)
-		self.baseAddress = ''
+		if len(args) != 2:
+			print('Usage: sekhmet <address>')
+			sys.exit(1)
+		self.baseAddress = args[1]
 		# load settings
 		request = requests.get(self.baseAddress + 'bot/config')
 		try:
 			self.config = request.json()
 		except:
+			print(request.text)
 			print('No config returned')
 			sys.exit(1)
-
+		self.sendLock = RLock()
 		self.lastMsg = {}
 		self.whois = {}
 		self.bans = {}
 		self.lastWhois = {}
+		self.spamYtProcess = {}
 		for chan in self.config["chans"].keys():
 			self.lastMsg[chan] = []
 
@@ -178,12 +94,12 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 	def msg(self, target, message):
 		c = self.connection
-		with sendLock:
+		with self.sendLock:
 			c.privmsg(target, message)
 
 	def notice(self, target, message):
 		c = self.connection
-		with sendLock:
+		with self.sendLock:
 			c.notice(target, message)
 
 	def on_welcome(self, c, e):
@@ -264,28 +180,40 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		if source == self.config["myname"]: return
 
 		if e.type == "pubmsg" or e.type == "privmsg":
+			if target in self.config['chans'].keys():
+				if self.config['chans'][target]['youtube']['active']:
+					if self.config['chans'][target]['youtube']['timer'] > 0:
+						try:
+							self.spamYtProcess[target].terminate()
+							self.spamYtProcess[target].join()
+						except:
+							pass
+						self.spamYtProcess[target] = Process(target=self.spamYoutube, args=(target,))
+						self.spamYtProcess[target].daemon = True
+						self.spamYtProcess[target].start()
+					if (body.find("youtu") != -1):
+						isVideo = False
+						if body.find("youtube.com") != -1:
+							try:
+								ylen = body.find("v=") + 2
+								yid = body[ylen:ylen+11]
+								isVideo = True
+							except:
+								pass
+						elif body.find("youtu.be") != -1:
+							try:
+								ylen = body.find("youtu.be") + 9
+								yid = body[ylen:ylen+11]
+								isVideo = True
+							except:
+								pass
+						if isVideo:
+							Process(target=self.fetchYoutube, args=(target, source, yid,)).start()
 
-			if (body.find("youtu") != -1) and (self.config['chans'][target]['youtube']['active']):
-				isVideo = False
-				if body.find("youtube.com") != -1:
-					try:
-						ylen = body.find("v=") + 2
-						yid = body[ylen:ylen+11]
-						isVideo = True
-					except:
-						pass
-				elif body.find("youtu.be") != -1:
-					try:
-						ylen = body.find("youtu.be") + 9
-						yid = body[ylen:ylen+11]
-						isVideo = True
-					except:
-						pass
-				if isVideo:
-					FetchYoutube(self, target, source, yid).start()
-
-			if body[0] == "!":
-				if self.irc_commands(body, source, target, c, e) == 1: return
+				if body[0] == "!":
+					if self.irc_commands(body, source, target, c, e) == 1: return
+				else:
+					self.lastMsg[target] = [source + " " + body] + self.lastMsg[target][0:9]
 
 		if body == "": return
 
@@ -300,18 +228,103 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		elif command_list[0] == "!ytcount":
 			if self.config['chans'][target]['youtube']['active']:
 				if len(command_list) == 1:
-					CountYoutubeVideos(self, target).start()
+					Process(target=self.countYoutubeVideos, args=(target,)).start()
+					pass
 				else:
 					for nick in command_list[1:]:
-						CountYoutubeVideosByName(self, target, nick).start()
+						Process(target=self.countYoutubeVideosByName, args=(target, nick,)).start()
 		elif command_list[0] == "!yt":
 			if self.config['chans'][target]['youtube']['active']:
 				if len(command_list) == 1:
-					RandomYoutube(self, target).start()
+					Process(target=self.randomYoutube, args=(target,)).start()
 				else:
-					SearchYoutube(self, target, source, ' '.join(command_list[1:])).start()
+					Process(target=self.searchYoutube, args=(target, source, ' '.join(command_list[1:]),)).start()
+		elif command_list[0] == "!err":
+			Process(target=self.errCommand, args=(target, body, self.lastMsg[target])).start()
 
 		return 1
+	def errCommand(self, target, body, lastMsgs):
+		try:
+			toReplace = body.replace('!err ','').split('/')[0]
+			replaced = body.replace('!err','').split('/')[1]
+			found = False
+			for message in lastMsgs:
+				nick = message.split(' ')[0]
+				message = message.replace(nick+' ','')
+				if message.find(toReplace) != -1 and not found:
+					retour = noHL(nick) + ' voulait dire "' + message.replace(toReplace,replaced) + '"'
+					found = True
+			for badword in self.config['chans'][target]['badwords']:
+				if retour.lower().find(badword.lower()) != -1:
+					found = False
+			if found:
+				self.msg('#'+target, retour)
+		except:
+			pass
+
+	def fetchYoutube(self, target, source, yid):
+		request = requests.post(self.baseAddress + 'bot/ytfetch/' + target, data={'yid':yid,'name':source})
+		video = request.json()
+		if video['error']:
+			message = '[yt] ' + video['message']
+		else:
+			if video['new']:
+				message = '[yt] '
+			else:
+				message = '[yt(n°' + str(video['index']) + ')] le ' + video['date'] + ' par ' + noHL(video['name']) + ' - '
+			message += video['title'] + ' [' + video['duration']+']'
+		self.msg('#' + target, message)
+
+	def searchYoutube(self, target, source, search):
+		request = requests.post(self.baseAddress + 'bot/ytsearch/' + target, data={'search_query':search, 'name':source})
+		result = request.json()
+		if result['error']:
+			message = '[ytSearch] ' + result['message']
+		else:
+			if result['new']:
+				message = '[ytSearch] '
+			else:
+				message = '[ytSearch(n°' + str(result['index']) + ')] le ' + result['date'] + ' par ' + noHL(result['name']) + ' - '
+
+			message += result['url'] + ' - ' + result['title'] + ' [' + result['duration'] + ']'
+		self.msg('#' + target, message)
+
+	def randomYoutube(self, target, auto=False):
+		request = requests.get(self.baseAddress + 'bot/yt/' + target)
+		result = request.json()
+		if auto:
+			messageType = 'ytAuto'
+		else:
+			messageType = 'ytSearch'
+		if result['error']:
+			if auto: return
+			message = '[' + messageType + '] ' + result['message']
+		else:
+			message = '['+ messageType + '(n°' + str(result['index']) + ')] le ' + result['date'] + ' par ' + noHL(result['name']) + ' - ' + result['url'] + ' - ' + result['title'] + ' [' + result['duration'] + ']'
+		self.msg('#' + target, message)
+
+	def countYoutubeVideos(self, target):
+		request = requests.get(self.baseAddress + 'bot/ytcount/' + target)
+		result = request.json()
+		if result['error']:
+			message = '[ytCount] ' + result['message']
+		else:
+			message = '[ytCount] ' + str(result['count']) + ' vidéos ont été partagées sur #'+target+' depuis le '+result['oldest']
+		self.msg('#' + target, message)
+
+	def countYoutubeVideosByName(self, target, name):
+		request = requests.get(self.baseAddress + 'bot/ytcount/' + target + '/' + name)
+		result = request.json()
+		if result['error']:
+			message = '[ytCount] ' + result['message']
+		else:
+			message = '[ytCount] ' + str(result['count']) + ' vidéos ont été partagées par '+ noHL(name) + ' sur #'+target+' depuis le '+result['oldest']
+		self.msg('#' + target, message)
+
+	def spamYoutube(self, target):
+		while True:
+			time.sleep(self.config['chans'][target]['youtube']['timer'])
+			self.randomYoutube(target, True)
 
 
 if __name__ == "__main__":
