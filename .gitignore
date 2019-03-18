@@ -14,3 +14,4 @@ npm-debug.log
 .env
 .phpunit.result.cache
 
+.vscode/settings.json
