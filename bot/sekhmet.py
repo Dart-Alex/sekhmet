@@ -19,45 +19,10 @@ import requests
 
 sendLock = RLock()
 
-def nm_to_n(s):
-    """Get the nick part of a nickmask.
-
-    (The source of an Event is a nickmask.)
-    """
-    return s.split("!")[0]
-
-def nm_to_uh(s):
-    """Get the userhost part of a nickmask.
-
-    (The source of an Event is a nickmask.)
-    """
-    return s.split("!")[1]
-
-def nm_to_h(s):
-    """Get the host part of a nickmask.
-
-    (The source of an Event is a nickmask.)
-    """
-    return s.split("@")[1]
-
-def nm_to_u(s):
-    """Get the user part of a nickmask.
-
-    (The source of an Event is a nickmask.)
-    """
-    s = s.split("!")[1]
-    return s.split("@")[0]
-
-def get_time():
-	"""
-	Return time as a nice yummy string
-	"""
-	return time.strftime("%H:%M:%S", time.localtime(time.time()))
-
 def noHL(nick):
 	newNick = ''
 	for letter in nick:
-		newNick += letter + '\xE2\x80\x8B'
+		newNick += letter + u"\u200B"
 	return newNick
 
 class FetchYoutube(Thread):
@@ -69,18 +34,84 @@ class FetchYoutube(Thread):
 		self.yid = yid
 
 	def run(self):
-		request = requests.post(self.bot.baseAddress + 'bot/yt/fetch/' + self.target, data={'yid':self.yid,'name':self.source})
+		request = requests.post(self.bot.baseAddress + 'bot/ytfetch/' + self.target, data={'yid':self.yid,'name':self.source})
 		video = request.json()
 		if video['error']:
-			message = '[yt] Erreur : '+video['message']
+			message = '[yt] ' + video['message']
 		else:
 			if video['new']:
 				message = '[yt] '
 			else:
-				message = '[yt(n°' + video['index'] + ')] le ' + video['date'] + ' par ' + noHL(video['name']) + ' - '
+				message = '[yt(n°' + str(video['index']) + ')] le ' + video['date'] + ' par ' + noHL(video['name']) + ' - '
 			message += video['title'] + ' [' + video['duration']+']'
-		self.bot.msg(self.target, message)
+		self.bot.msg('#' + self.target, message)
 
+class SearchYoutube(Thread):
+	def __init__(self, bot, target, source, search):
+		Thread.__init__(self)
+		self.bot = bot
+		self.target = target
+		self.source = source
+		self.search = search
+
+	def run(self):
+		request = requests.post(self.bot.baseAddress + 'bot/ytsearch/' + self.target, data={'search_query':self.search, 'name':self.source})
+		result = request.json()
+		if result['error']:
+			message = '[ytSearch] ' + result['message']
+		else:
+			if result['new']:
+				message = '[ytSearch] '
+			else:
+				message = '[ytSearch(n°' + str(result['index']) + ')] le ' + result['date'] + ' par ' + noHL(result['name']) + ' - '
+
+			message += result['url'] + ' - ' + result['title'] + ' [' + result['duration'] + ']'
+		self.bot.msg('#' + self.target, message)
+
+class RandomYoutube(Thread):
+	def __init__(self, bot, target):
+		Thread.__init__(self)
+		self.bot = bot
+		self.target = target
+	def run(self):
+		request = requests.get(self.bot.baseAddress + 'bot/yt/' + self.target)
+		result = request.json()
+		if result['error']:
+			message = '[ytSearch] ' + result['message']
+		else:
+			message = '[ytSearch(n°' + str(result['index']) + ')] le ' + result['date'] + ' par ' + noHL(result['name']) + ' - ' + result['url'] + ' - ' + result['title'] + ' [' + result['duration'] + ']'
+		self.bot.msg('#' + self.target, message)
+
+class CountYoutubeVideos(Thread):
+	def __init__(self, bot, target):
+		Thread.__init__(self)
+		self.bot = bot
+		self.target = target
+
+	def run(self):
+		request = requests.get(self.bot.baseAddress + 'bot/ytcount/' + self.target)
+		result = request.json()
+		if result['error']:
+			message = '[ytCount] ' + result['message']
+		else:
+			message = '[ytCount] ' + str(result['count']) + ' vidéos ont été partagées sur #'+self.target+' depuis le '+result['oldest']
+		self.bot.msg('#' + self.target, message)
+
+class CountYoutubeVideosByName(Thread):
+	def __init__(self, bot, target, name):
+		Thread.__init__(self)
+		self.bot = bot
+		self.target = target
+		self.name = name
+
+	def run(self):
+		request = requests.get(self.bot.baseAddress + 'bot/ytcount/' + self.target + '/' + self.name)
+		result = request.json()
+		if result['error']:
+			message = '[ytCount] ' + result['message']
+		else:
+			message = '[ytCount] ' + str(result['count']) + ' vidéos ont été partagées par '+ noHL(self.name) + ' sur #'+self.target+' depuis le '+result['oldest']
+		self.bot.msg('#' + self.target, message)
 
 
 class ModIRC(irc.bot.SingleServerIRCBot):
@@ -118,10 +149,10 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		"""
 		Args will be sys.argv (command prompt arguments)
 		"""
-		if len(sys.argv) != 2:
-			print('Usage: sekhmet <address>')
-			sys.exit(1)
-		self.baseAddress = args[1]
+		# if len(sys.argv) != 2:
+		# 	print('Usage: sekhmet <address>')
+		# 	sys.exit(1)
+		self.baseAddress = ''
 		# load settings
 		request = requests.get(self.baseAddress + 'bot/config')
 		try:
@@ -180,11 +211,11 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		Process leaving
 		"""
 		# Parse Nickname!username@host.mask.net to Nickname
-		kicked = e.arguments()[0]
-		kicker = nm_to_n(e.source())
-		target = e.target() #channel
-		if len(e.arguments()) >= 2:
-			reason = e.arguments()[1]
+		kicked = e.arguments[0]
+		kicker = e.source.nick
+		target = e.target #channel
+		if len(e.arguments) >= 2:
+			reason = e.arguments[1]
 		else:
 			reason = ""
 		if kicked == self.config["myname"]:
@@ -203,14 +234,11 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		self.on_msg(c, e)
 
 	def on_ctcp(self, c, e):
-		ctcptype = e.arguments()[0]
+		ctcptype = e.arguments[0]
 		if ctcptype == "ACTION":
 			self.on_msg(c, e)
 		else:
 			irc.bot.SingleServerIRCBot.on_ctcp(self, c, e)
-
-	def _on_disconnect(self, c, e):
-		self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
 	def on_whoischannels(self, c, e):
 		pass
 
@@ -218,25 +246,24 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		"""
 		Process messages.
 		"""
-		# Parse Nickname!username@host.mask.net to Nickname
-		source = nm_to_n(e.source())
-		target = e.target().replace('#', '').lower()
+		source = e.source.nick
+		target = e.target.replace('#', '').lower()
 
 		# Message text
-		if len(e.arguments()) == 1:
+		if len(e.arguments) == 1:
 			# Normal message
-			body = e.arguments()[0]
+			body = e.arguments[0]
 		else:
 			# A CTCP thing
-			if e.arguments()[0] == "ACTION":
-				body = "+"+e.arguments()[1]
+			if e.arguments[0] == "ACTION":
+				body = "+"+e.arguments[1]
 			else:
 				# Ignore all the other CTCPs
 				return
 		# Ignore self.
 		if source == self.config["myname"]: return
 
-		if e.eventtype() == "pubmsg" or e.eventtype() == "privmsg":
+		if e.type == "pubmsg" or e.type == "privmsg":
 
 			if (body.find("youtu") != -1) and (self.config['chans'][target]['youtube']['active']):
 				isVideo = False
@@ -266,6 +293,24 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		"""
 		Special IRC commands.
 		"""
+		command_list = body.split()
+		command_list[0] = command_list[0].lower()
+		if command_list[0] == "!ping":
+			self.msg('#'+target, 'pong !')
+		elif command_list[0] == "!ytcount":
+			if self.config['chans'][target]['youtube']['active']:
+				if len(command_list) == 1:
+					CountYoutubeVideos(self, target).start()
+				else:
+					for nick in command_list[1:]:
+						CountYoutubeVideosByName(self, target, nick).start()
+		elif command_list[0] == "!yt":
+			if self.config['chans'][target]['youtube']['active']:
+				if len(command_list) == 1:
+					RandomYoutube(self, target).start()
+				else:
+					SearchYoutube(self, target, source, ' '.join(command_list[1:])).start()
+
 		return 1
 
 
