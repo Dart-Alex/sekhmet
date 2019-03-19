@@ -76,11 +76,14 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			print('No config returned')
 			sys.exit(1)
 		self.sendLock = RLock()
+		self.updateLock = RLock()
 		self.lastMsg = {}
 		self.whois = {}
 		self.bans = {}
 		self.lastWhois = {}
 		self.spamYtProcess = {}
+		self.spamProcess = {}
+		self.spamEventProcess = {}
 		for chan in self.config["chans"].keys():
 			self.lastMsg[chan] = []
 
@@ -105,6 +108,11 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 	def on_welcome(self, c, e):
 		for i in self.config["chans"].keys():
 			c.join('#'+i)
+
+	def on_nicknameinuse(self, c, e):
+		with self.updateLock:
+			self.config['myname'] += "_"
+			c.nick(self.config['myname'])
 
 	def on_nick(self, c, e):
 		pass
@@ -162,60 +170,61 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		"""
 		Process messages.
 		"""
-		source = e.source.nick
-		target = e.target.replace('#', '').lower()
+		with self.updateLock:
+			source = e.source.nick
+			target = e.target.replace('#', '').lower()
 
-		# Message text
-		if len(e.arguments) == 1:
-			# Normal message
-			body = e.arguments[0]
-		else:
-			# A CTCP thing
-			if e.arguments[0] == "ACTION":
-				body = "+"+e.arguments[1]
+			# Message text
+			if len(e.arguments) == 1:
+				# Normal message
+				body = e.arguments[0]
 			else:
-				# Ignore all the other CTCPs
-				return
-		# Ignore self.
-		if source == self.config["myname"]: return
-
-		if e.type == "pubmsg" or e.type == "privmsg":
-			if target in self.config['chans'].keys():
-				if self.config['chans'][target]['youtube']['active']:
-					if self.config['chans'][target]['youtube']['timer'] > 0:
-						try:
-							self.spamYtProcess[target].terminate()
-							self.spamYtProcess[target].join()
-						except:
-							pass
-						self.spamYtProcess[target] = Process(target=self.spamYoutube, args=(target,))
-						self.spamYtProcess[target].daemon = True
-						self.spamYtProcess[target].start()
-					if (body.find("youtu") != -1):
-						isVideo = False
-						if body.find("youtube.com") != -1:
-							try:
-								ylen = body.find("v=") + 2
-								yid = body[ylen:ylen+11]
-								isVideo = True
-							except:
-								pass
-						elif body.find("youtu.be") != -1:
-							try:
-								ylen = body.find("youtu.be") + 9
-								yid = body[ylen:ylen+11]
-								isVideo = True
-							except:
-								pass
-						if isVideo:
-							Process(target=self.fetchYoutube, args=(target, source, yid,)).start()
-
-				if body[0] == "!":
-					if self.irc_commands(body, source, target, c, e) == 1: return
+				# A CTCP thing
+				if e.arguments[0] == "ACTION":
+					body = "+"+e.arguments[1]
 				else:
-					self.lastMsg[target] = [source + " " + body] + self.lastMsg[target][0:9]
+					# Ignore all the other CTCPs
+					return
+			# Ignore self.
+			if source == self.config["myname"]: return
 
-		if body == "": return
+			if e.type == "pubmsg" or e.type == "privmsg":
+				if target in self.config['chans'].keys():
+					if self.config['chans'][target]['youtube']['active']:
+						if self.config['chans'][target]['youtube']['timer'] > 0:
+							try:
+								self.spamYtProcess[target].terminate()
+								self.spamYtProcess[target].join()
+							except:
+								pass
+							self.spamYtProcess[target] = Process(target=self.spamYoutube, args=(target,))
+							self.spamYtProcess[target].daemon = True
+							self.spamYtProcess[target].start()
+						if (body.find("youtu") != -1):
+							isVideo = False
+							if body.find("youtube.com") != -1:
+								try:
+									ylen = body.find("v=") + 2
+									yid = body[ylen:ylen+11]
+									isVideo = True
+								except:
+									pass
+							elif body.find("youtu.be") != -1:
+								try:
+									ylen = body.find("youtu.be") + 9
+									yid = body[ylen:ylen+11]
+									isVideo = True
+								except:
+									pass
+							if isVideo:
+								Process(target=self.fetchYoutube, args=(target, source, yid,)).start()
+
+					if body[0] == "!":
+						if self.irc_commands(body, source, target, c, e) == 1: return
+					else:
+						self.lastMsg[target] = [source + " " + body] + self.lastMsg[target][0:9]
+
+			if body == "": return
 
 	def irc_commands(self, body, source, target, c, e):
 		"""
@@ -243,6 +252,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			Process(target=self.errCommand, args=(target, body, self.lastMsg[target])).start()
 
 		return 1
+
 	def errCommand(self, target, body, lastMsgs):
 		try:
 			toReplace = body.replace('!err ','').split('/')[0]
@@ -325,6 +335,45 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		while True:
 			time.sleep(self.config['chans'][target]['youtube']['timer'])
 			self.randomYoutube(target, True)
+
+	def checkConfig(self):
+		while True:
+			time.sleep(10)
+			request = requests.get(self.baseAddress + 'bot/config/check')
+			result = request.json()
+			if((not result['error']) and (result['lastUpdate'] != self.config['lastUpdate'])):
+				request = requests.get(self.baseAddress + 'bot/config')
+				result = request.json()
+				with self.updateLock:
+					self.config['lastUpdate'] = result['lastUpdate']
+					self.config['owners'] = result['owners']
+					self.config['realname'] = result['realname']
+					if(self.config['myname'] != result['myname']):
+						self.connection.nick(result['myname'])
+						self.config['myname'] = result['myname']
+					for key in self.spamYtProcess.keys():
+						self.spamYtProcess[key].terminate()
+						self.spamYtProcess[key].join()
+						del self.spamYtProcess[key]
+
+					for key in self.spamProcess.keys():
+						self.spamProcess[key].terminate()
+						self.spamProcess[key].join()
+						del self.spamProcess[key]
+					for key in self.spamEventProcess.keys():
+						self.spamEventProcess[key].terminate()
+						self.spamEventProcess[key].join()
+						del self.spamEventProcess[key]
+					for chan in result['chans'].keys():
+						if chan not in self.config['chans'].keys():
+							self.lastMsg[chan] = []
+							self.connection.join('#'+chan)
+					for chan in self.config['chans'].keys():
+						if chan not in result['chans'].keys():
+							del self.lastMsg[chan]
+							self.connection.part('#'+chan, 'Leaving')
+					self.config['chans'] = result['chans']
+
 
 
 if __name__ == "__main__":

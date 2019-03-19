@@ -48,9 +48,9 @@ class BotConfigController extends Controller
 		// 		'address' => env('BOT_ADDRESS')
 		// 	];
 		// });
-		$last_update = Cache::get('bot-config-last-modified', function() {
+		$last_update = Cache::get('bot-config-last-update', function() {
 			$now = Carbon::now();
-			Cache::put('bot-config-last-modified', $now);
+			Cache::put('bot-config-last-update', $now);
 			return $now;
 		});
 		return [
@@ -74,8 +74,20 @@ class BotConfigController extends Controller
      * @param  \App\BotConfig  $botConfig
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, BotConfig $botConfig)
+    public function update(Request $request)
     {
         //
-    }
+	}
+
+	public function check() {
+		$last_update = Cache::get('bot-config-last-update', function() {
+			$now = Carbon::now();
+			Cache::put('bot-config-last-update', $now);
+			return $now;
+		});
+		return [
+			'lastUpdate' => $last_update,
+			'error' => false
+		];
+	}
 }
