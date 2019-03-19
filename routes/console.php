@@ -56,8 +56,7 @@ Artisan::command('importYoutube', function () {
 
 Artisan::command('bot:start', function () {
 	if(!Cache::has('bot-process-pid')) {
-		exec('python3 '.base_path('bot/sekhmet.py').' '.env('BOT_URL').' > '.base_path('storage/logs/bot.log').' &', $output);
-		$pid = preg_replace('/\[\d+\] (\d+)/', '$1', $output[0]);
+		$pid = exec('python3 '.base_path('bot/sekhmet.py').' '.env('BOT_URL').' > '.base_path('storage/logs/bot.log').' 2>&1 & echo $!; ');
 		Cache::put('bot-process-pid', $pid);
 		$this->info('Bot started (PID:'.$pid.')');
 	}
