@@ -8,7 +8,16 @@
 	<!-- CSRF Token -->
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<!-- User for javascript -->
-	<meta name="user" content="{{ json_encode(auth()->user()) }}">
+	<?php
+	$user = auth()->user();
+	$userMeta = (($user)?[
+		'id' => $user->id,
+		'name' => $user->name,
+		'admin' => $user->admin,
+		'chan_admin' => (($chan)?$chan->isAdmin($user):false),
+	]:null);
+	?>
+	<meta name="user" content="{{ json_encode($userMeta) }}">
 
 	<title>@yield('title', config('app.name', 'Laravel'))</title>
 
