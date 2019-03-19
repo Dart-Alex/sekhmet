@@ -55,17 +55,23 @@ Artisan::command('importYoutube', function () {
 })->describe('Imports youtube json to database');
 
 Artisan::command('bot:start', function () {
-	$process = new Process(['python3',base_path('bot/sekhmet.py'),env('BOT_URL'),'>',base_path('storage/bot.log')]);
-	$process->setTimeout(null);
-	$process->setIdleTimeout(null);
-	$process->start();
-	Cache::put('bot-process-pid', $process->getPid());
-	$this->info('Bot started (PID:'+$process->getPid()+')');
+	if(!Cache::has('bot-process-pid')) {
+		$process = new Process(['python3',base_path('bot/sekhmet.py'),env('BOT_URL'),'>',base_path('storage/bot.log')]);
+		$process->setTimeout(null);
+		$process->setIdleTimeout(null);
+		$process->start();
+		Cache::put('bot-process-pid', $process->getPid());
+		$this->info('Bot started (PID:'.$process->getPid().')');
+	}
+	else $this->info('Bot already started');
 });
 
 Artisan::command('bot:stop', function() {
-	$processPid = Cache::get('bot-process-pid');
-	$process = new Process(['kill', '-SIGKILL', $processPid]);
-	$process->run();
-	$this->info('Bot stopped (PID:'+$processPid+')');
+	if(Cache::has('bot-process-pid')) {
+		$processPid = Cache::pull('bot-process-pid');
+		$process = new Process(['kill', '-SIGKILL', $processPid]);
+		$process->run();
+		$this->info('Bot stopped (PID:'.$processPid.')');
+	}
+	else $this->info('No bot pid found');
 });
