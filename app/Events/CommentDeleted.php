@@ -20,7 +20,7 @@ class CommentDeleted implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct($comment)
+    public function __construct(Comment $comment)
     {
 		$this->comment = $comment;
 		$this->dontBroadcastToCurrentUser();
