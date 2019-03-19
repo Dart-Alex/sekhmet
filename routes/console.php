@@ -56,13 +56,16 @@ Artisan::command('importYoutube', function () {
 
 Artisan::command('bot:start', function () {
 	$process = new Process(['python3',base_path('bot/sekhmet.py'),env('BOT_URL'),'>',base_path('storage/bot.log')]);
+	$process->setTimeout(null);
+	$process->setIdleTimeout(null);
 	$process->start();
-	Cache::put('bot-process', $process);
-	$this->info('Bot started');
+	Cache::put('bot-process-pid', $process->getPid());
+	$this->info('Bot started (PID:'+$process->getPid()+')');
 });
 
 Artisan::command('bot:stop', function() {
-	$process = Cache::get('bot-process');
-	$process->stop();
-	$this->info('Bot stopped');
+	$processPid = Cache::get('bot-process-pid');
+	$process = new Process(['kill', '-SIGKILL', $processPid]);
+	$process->run();
+	$this->info('Bot stopped (PID:'+$processPid+')');
 });
