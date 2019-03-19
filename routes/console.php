@@ -55,6 +55,12 @@ Artisan::command('importYoutube', function () {
 
 Artisan::command('bot:start', function () {
 	$process = new Process(['python3',base_path('bot/sekhmet.py'),env('BOT_URL')]);
-	$process->run();
-	$this->info($process->getOutput());
+	$process->run(function ($type, $buffer) {
+		if (Process::ERR === $type) {
+			$this->info('ERR > '+$buffer);
+		} else {
+			$this->info($buffer);
+		}
+	});
+
 });
