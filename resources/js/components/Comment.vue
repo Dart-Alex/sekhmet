@@ -3,13 +3,13 @@
 		<message v-if="deleteForm.message.any()" :type="deleteForm.message.type" :content="deleteForm.message.content"></message>
 		<div style="margin-bottom:24px;" v-if="!editing">
 			<span class="comment-buttons">
-				<a class='fas fa-trash' title='Supprimer' @click='onDelete'></a>
-				<a class='fas fa-edit' title='Editer' @click='toggleEdit'></a>
+				<a v-if='canModify' class='fas fa-trash' title='Supprimer' @click='onDelete'></a>
+				<a v-if='canModify' class='fas fa-edit' title='Editer' @click='toggleEdit'></a>
 			</span>
-			<p>{{comment.name}} - {{id}} - {{comment.reply_to}}</p>
-			<p>{{comment.created_at}}</p>
+			<p>Par {{comment.name}}</p>
+			<p>{{createdAt}}</p>
 			<p>{{comment.content}}</p>
-			<p v-if="comment.created_at != comment.updated_at">{{comment.updated_at}}</p>
+			<p v-if="comment.created_at != comment.updated_at">{{updatedAt}}</p>
 		</div>
 		<message v-if="editForm.message.any()" :type="editForm.message.type" :content="editForm.message.content"></message>
 		<form style="margin-bottom:24px;" v-if="editing" :method='editForm.method' :action='editForm.action' @submit.prevent='onModify' @keydown='editForm.errors.clear($event.target.name)'>
@@ -71,6 +71,7 @@
 
 <script>
 import Form from "../classes/Form.js";
+import dateFormat from "../functions/dateFormat.js";
 export default {
 	name: "comment",
 	props: ['id'],
@@ -102,6 +103,19 @@ export default {
 	computed: {
 		comment() {
 			return this.comments.get(this.id);
+		},
+		canModify() {
+			if(this.user.guest) return false;
+			if(this.user.admin) return true;
+			if(this.user.chanAdmin) return true;
+			if(this.comment.user_id = this.user.id) return true;
+			return false;
+		},
+		createdAt() {
+			return 'Le '+dateFormat(this.comment.created_at);
+		},
+		updatedAt() {
+			return 'Modifié le '+dateFormat(this.comment.updated_at);
 		}
 	},
 	methods: {
