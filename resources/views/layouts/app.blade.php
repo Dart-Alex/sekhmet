@@ -14,7 +14,7 @@
 		'id' => $user->id,
 		'name' => $user->name,
 		'admin' => $user->admin,
-		'chan_admin' => (($chan)?$chan->isAdmin($user):false),
+		'chan_admin' => ((isset($chan))?$chan->isAdmin($user):false),
 	]:null);
 	?>
 	<meta name="user" content="{{ json_encode($userMeta) }}">
