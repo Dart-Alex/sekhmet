@@ -4,6 +4,7 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Carbon;
 use App\YoutubeVideo;
 use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Cache;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,13 +55,14 @@ Artisan::command('importYoutube', function () {
 })->describe('Imports youtube json to database');
 
 Artisan::command('bot:start', function () {
-	$process = new Process(['python3',base_path('bot/sekhmet.py'),env('BOT_URL')]);
-	$process->run(function ($type, $buffer) {
-		if (Process::ERR === $type) {
-			$this->info('ERR > '.$buffer);
-		} else {
-			$this->info($buffer);
-		}
-	});
+	$process = new Process(['python3',base_path('bot/sekhmet.py'),env('BOT_URL'),'>',base_path('storage/bot.log')]);
+	$process->start();
+	Cache::put('bot-process', $process);
+	$this->info('Bot started');
+});
 
+Artisan::command('bot:stop', function() {
+	$process = Cache::get('bot-process');
+	$process->stop();
+	$this->info('Bot stopped');
 });
