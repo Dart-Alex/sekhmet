@@ -16,7 +16,6 @@ class CommentController extends Controller
      */
 	public function index(Post $post)
 	{
-		$this->authorize('view', Comment::class);
 		if(!$comments = Cache::get('comments-'.$post->id)) {
 			$comments = Comment::where('post_id', $post->id)->orderBy('created_at', 'ASC')->get()->toArray();
 			Cache::put('comments-'.$post->id, $comments, now()->addDay());
