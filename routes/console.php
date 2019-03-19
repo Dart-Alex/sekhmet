@@ -75,7 +75,7 @@ Artisan::command('bot:stop', function() {
 
 Artisan::command('bot:restart', function() {
 	if(Cache::has('bot-process-pgid')) {
-		Artisan::call('bot:stop');
-		Artisan::call('bot:start');
+		$this->info(Artisan::call('bot:stop'));
+		$this->info(Artisan::call('bot:start'));
 	} else $this->info('Bot not started');
 });
