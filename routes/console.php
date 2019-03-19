@@ -59,7 +59,7 @@ Artisan::command('bot:start', function () {
 		$pid = exec('python3 '.base_path('bot/sekhmet.py').' '.env('BOT_URL').' > '.base_path('storage/logs/bot.log').' 2>&1 & echo $!; ');
 		$pgid = exec('ps -o pgid= '.$pid);
 		Cache::put('bot-process-pgid', $pgid);
-		$this->info("Bot started (PID:$pid,PGID:$pgid");
+		$this->info("Bot started (PID:$pid,PGID:$pgid)");
 	}
 	else $this->info('Bot already started');
 });
