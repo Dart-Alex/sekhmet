@@ -3,6 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Events\ChanAdded;
+use App\Events\ChanUpdated;
+use App\Events\ChanDeleted;
 
 class Chan extends Model
 {
