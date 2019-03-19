@@ -73,6 +73,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		try:
 			self.config = request.json()
 		except:
+			print(request.url)
 			print(request.text)
 			print('No config returned')
 			sys.exit(1)
