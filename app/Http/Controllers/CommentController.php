@@ -5,9 +5,6 @@ namespace App\Http\Controllers;
 use App\Comment;
 use Illuminate\Http\Request;
 use App\Post;
-use App\Events\CommentAdded;
-use App\Events\CommentUpdated;
-use App\Events\CommentDeleted;
 use Illuminate\Support\Facades\Cache;
 
 class CommentController extends Controller
@@ -19,6 +16,7 @@ class CommentController extends Controller
      */
 	public function index(Post $post)
 	{
+		$this->authorize('view', Comment::class);
 		if(!$comments = Cache::get('comments-'.$post->id)) {
 			$comments = Comment::where('post_id', $post->id)->orderBy('created_at', 'ASC')->get()->toArray();
 			Cache::put('comments-'.$post->id, $comments, now()->addDay());
