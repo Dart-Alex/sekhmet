@@ -77,6 +77,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			sys.exit(1)
 		self.sendLock = RLock()
 		self.updateLock = RLock()
+		self.printLock = RLock()
 		self.lastMsg = {}
 		self.whois = {}
 		self.bans = {}
@@ -92,12 +93,14 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			server = [(self.config["server"]["address"],int(self.config["server"]["port"]),self.config["server"]["password"])]
 		except:
 			server = [(self.config["server"]["address"],self.config["server"]["port"])]
+		self.print('Connecting to '+self.config['server']['address']+':'+str(self.config['server']['port']))
 		irc.bot.SingleServerIRCBot.__init__(self,server , self.config["myname"], self.config["realname"], 2)
 		self.start()
 
 	def msg(self, target, message):
 		c = self.connection
 		with self.sendLock:
+			self.print('(PRIVMSG)['+target+']<' + self.config['myname'] + '> => ' + message)
 			c.privmsg(target, message)
 
 	def notice(self, target, message):
@@ -105,9 +108,17 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		with self.sendLock:
 			c.notice(target, message)
 
+	def print(self, message):
+		if(self.config['debug']):
+			with self.printLock:
+				print(message)
+
 	def on_welcome(self, c, e):
+		self.print('Connected')
 		for i in self.config["chans"].keys():
+			self.print('Joining #'+i)
 			c.join('#'+i)
+		self.checkConfigProcess = self.startProcess(target=self.checkConfig, args=(c,))
 
 	def on_nicknameinuse(self, c, e):
 		with self.updateLock:
@@ -143,7 +154,9 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		else:
 			reason = ""
 		if kicked == self.config["myname"]:
+			self.print('Kicked from '+target+' by '+kicker)
 			try:
+				self.print('Rejoining '+target)
 				c.join(target)
 			finally:
 				pass
@@ -171,6 +184,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		Process messages.
 		"""
 		with self.updateLock:
+
 			source = e.source.nick
 			target = e.target.replace('#', '').lower()
 
@@ -187,19 +201,18 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 					return
 			# Ignore self.
 			if source == self.config["myname"]: return
-
+			self.print('('+e.type+')'+'['+e.target+']<'+source+'> <= '+body)
 			if e.type == "pubmsg" or e.type == "privmsg":
 				if target in self.config['chans'].keys():
 					if self.config['chans'][target]['youtube']['active']:
 						if self.config['chans'][target]['youtube']['timer'] > 0:
 							try:
+								self.print('Reseting Youtube timer for #'+target)
 								self.spamYtProcess[target].terminate()
 								self.spamYtProcess[target].join()
 							except:
 								pass
-							self.spamYtProcess[target] = Process(target=self.spamYoutube, args=(target,))
-							self.spamYtProcess[target].daemon = True
-							self.spamYtProcess[target].start()
+							self.spamYtProcess[target] = self.startProcess(target=self.spamYoutube, args=(target,))
 						if (body.find("youtu") != -1):
 							isVideo = False
 							if body.find("youtube.com") != -1:
@@ -217,7 +230,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 								except:
 									pass
 							if isVideo:
-								Process(target=self.fetchYoutube, args=(target, source, yid,)).start()
+								self.print('')
+								self.startProcess(target=self.fetchYoutube, args=(target, source, yid,))
 
 					if body[0] == "!":
 						if self.irc_commands(body, source, target, c, e) == 1: return
@@ -225,6 +239,12 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 						self.lastMsg[target] = [source + " " + body] + self.lastMsg[target][0:9]
 
 			if body == "": return
+
+	def startProcess(self, target, args):
+		process = Process(target=target, args=args)
+		process.daemon = True
+		process.start()
+		return process
 
 	def irc_commands(self, body, source, target, c, e):
 		"""
@@ -237,19 +257,19 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		elif command_list[0] == "!ytcount":
 			if self.config['chans'][target]['youtube']['active']:
 				if len(command_list) == 1:
-					Process(target=self.countYoutubeVideos, args=(target,)).start()
+					self.startProcess(target=self.countYoutubeVideos, args=(target,))
 					pass
 				else:
 					for nick in command_list[1:]:
-						Process(target=self.countYoutubeVideosByName, args=(target, nick,)).start()
+						self.startProcess(target=self.countYoutubeVideosByName, args=(target, nick,))
 		elif command_list[0] == "!yt":
 			if self.config['chans'][target]['youtube']['active']:
 				if len(command_list) == 1:
-					Process(target=self.randomYoutube, args=(target,)).start()
+					self.startProcess(target=self.randomYoutube, args=(target,))
 				else:
-					Process(target=self.searchYoutube, args=(target, source, ' '.join(command_list[1:]),)).start()
+					self.startProcess(target=self.searchYoutube, args=(target, source, ' '.join(command_list[1:]),))
 		elif command_list[0] == "!err":
-			Process(target=self.errCommand, args=(target, body, self.lastMsg[target])).start()
+			self.startProcess(target=self.errCommand, args=(target, body, self.lastMsg[target]))
 
 		return 1
 
@@ -336,21 +356,25 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			time.sleep(self.config['chans'][target]['youtube']['timer'])
 			self.randomYoutube(target, True)
 
-	def checkConfig(self):
+	def checkConfig(self, c):
 		while True:
 			time.sleep(10)
 			request = requests.get(self.baseAddress + 'bot/config/check')
 			result = request.json()
+			self.print('Checking config')
 			if((not result['error']) and (result['lastUpdate'] != self.config['lastUpdate'])):
+				self.print('Getting new config')
 				request = requests.get(self.baseAddress + 'bot/config')
 				result = request.json()
 				with self.updateLock:
 					self.config['lastUpdate'] = result['lastUpdate']
 					self.config['owners'] = result['owners']
 					self.config['realname'] = result['realname']
+
 					if(self.config['myname'] != result['myname']):
 						self.connection.nick(result['myname'])
 						self.config['myname'] = result['myname']
+
 					for key in self.spamYtProcess.keys():
 						self.spamYtProcess[key].terminate()
 						self.spamYtProcess[key].join()
@@ -360,6 +384,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 						self.spamProcess[key].terminate()
 						self.spamProcess[key].join()
 						del self.spamProcess[key]
+
 					for key in self.spamEventProcess.keys():
 						self.spamEventProcess[key].terminate()
 						self.spamEventProcess[key].join()
@@ -367,11 +392,14 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 					for chan in result['chans'].keys():
 						if chan not in self.config['chans'].keys():
 							self.lastMsg[chan] = []
-							self.connection.join('#'+chan)
+							self.print('Joining #'+chan)
+							c.join('#'+chan)
+
 					for chan in self.config['chans'].keys():
 						if chan not in result['chans'].keys():
 							del self.lastMsg[chan]
-							self.connection.part('#'+chan, 'Leaving')
+							self.print('Leaving #'+chan)
+							c.part('#'+chan, 'Leaving')
 					self.config['chans'] = result['chans']
 
 

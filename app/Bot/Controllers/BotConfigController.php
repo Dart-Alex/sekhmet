@@ -58,6 +58,7 @@ class BotConfigController extends Controller
 			'owners' => $owners,
 			'realname' => env('BOT_NAME', config('app.name', 'Sekhmet')),
 			'myname' => env('BOT_NAME', config('app.name', 'Sekhmet')),
+			'debug' => env('BOT_DEBUG', false),
 			'server' => [
 				'password' => env('BOT_PASSWORD'),
 				'port' => env('BOT_PORT'),
