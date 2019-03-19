@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Chan;
 use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
 
 class BotConfigController extends Controller
 {
@@ -47,7 +48,13 @@ class BotConfigController extends Controller
 		// 		'address' => env('BOT_ADDRESS')
 		// 	];
 		// });
+		$last_update = Cache::get('bot-config-last-modified', function() {
+			$now = Carbon::now();
+			Cache::put('bot-config-last-modified', $now);
+			return $now;
+		});
 		return [
+			'lastUpdate' => $last_update,
 			'owners' => $owners,
 			'realname' => env('BOT_NAME', config('app.name', 'Sekhmet')),
 			'myname' => env('BOT_NAME', config('app.name', 'Sekhmet')),
