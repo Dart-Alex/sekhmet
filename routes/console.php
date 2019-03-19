@@ -55,19 +55,20 @@ Artisan::command('importYoutube', function () {
 })->describe('Imports youtube json to database');
 
 Artisan::command('bot:start', function () {
-	if(!Cache::has('bot-process-pid')) {
+	if(!Cache::has('bot-process-pgid')) {
 		$pid = exec('python3 '.base_path('bot/sekhmet.py').' '.env('BOT_URL').' > '.base_path('storage/logs/bot.log').' 2>&1 & echo $!; ');
-		Cache::put('bot-process-pid', $pid);
-		$this->info('Bot started (PID:'.$pid.')');
+		$pgid = exec('ps -o pgid= '.$pid);
+		Cache::put('bot-process-pgid', $pgid);
+		$this->info("Bot started (PID:$pid,PGID:$pgid");
 	}
 	else $this->info('Bot already started');
 });
 
 Artisan::command('bot:stop', function() {
-	if(Cache::has('bot-process-pid')) {
-		$pid = Cache::pull('bot-process-pid');
-		exec('kill -TERM -'.$pid);
-		$this->info('Bot terminated (PID:'.$pid.')');
+	if(Cache::has('bot-process-pgid')) {
+		$pgid = Cache::pull('bot-process-pgid');
+		exec('pkill -9 -g '.$pgid);
+		$this->info('Bot terminated (PGID:'.$pgid.')');
 	}
 	else $this->info('No bot pid found');
 });
