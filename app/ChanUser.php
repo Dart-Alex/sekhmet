@@ -12,7 +12,7 @@ class ChanUser extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'admin'
+        'user_id', 'admin', 'chan_id'
     ];
 
     /**
