@@ -66,8 +66,8 @@ Artisan::command('bot:start', function () {
 Artisan::command('bot:stop', function() {
 	if(Cache::has('bot-process-pid')) {
 		$pid = Cache::pull('bot-process-pid');
-		exec('kill '.$pid);
-		$this->info('Bot killed (PID:'.$pid.')');
+		exec('kill -TERM -'.$pid);
+		$this->info('Bot terminated (PID:'.$pid.')');
 	}
 	else $this->info('No bot pid found');
 });
