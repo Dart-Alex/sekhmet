@@ -57,7 +57,7 @@ Artisan::command('bot:start', function () {
 	$process = new Process(['python3',base_path('bot/sekhmet.py'),env('BOT_URL')]);
 	$process->run(function ($type, $buffer) {
 		if (Process::ERR === $type) {
-			$this->info('ERR > '+$buffer);
+			$this->info('ERR > '.$buffer);
 		} else {
 			$this->info($buffer);
 		}
