@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Carbon;
 use App\YoutubeVideo;
+use Symfony\Component\Process\Process;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,5 +54,7 @@ Artisan::command('importYoutube', function () {
 })->describe('Imports youtube json to database');
 
 Artisan::command('bot:start', function () {
-
+	$process = new Process(['python3',base_path('bot/sekhmet.py'),env('BOT_URL')]);
+	$process->run();
+	$this->info($process->getOutput());
 });
