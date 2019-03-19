@@ -40,9 +40,12 @@ class CommentPolicy
      * @param  \App\Comment  $comment
      * @return mixed
      */
-    public function update(?User $user, Comment $comment)
+    public function update(User $user, Comment $comment)
     {
-        return true;
+		if ($user->isAdmin()) return true;
+		if ($comment->post->chan->isAdmin($user)) return true;
+		if ($comment->user_id == $user->id) return true;
+		return false;
     }
 
     /**
@@ -52,8 +55,11 @@ class CommentPolicy
      * @param  \App\Comment  $comment
      * @return mixed
      */
-    public function delete(?User $user, Comment $comment)
+    public function delete(User $user, Comment $comment)
     {
-        return true;
+		if ($user->isAdmin()) return true;
+		if ($comment->post->chan->isAdmin($user)) return true;
+		if ($comment->user_id == $user->id) return true;
+		return false;
     }
 }
