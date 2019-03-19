@@ -53,6 +53,17 @@ class Chan extends Model
 
 	];
 
+	/**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+        'saved' => ChanAdded::class,
+		'updated' => ChanUpdated::class,
+		'deleting' => ChanDeleted::class,
+    ];
+
 	public function getRouteKeyName()
 	{
 		return 'name';
