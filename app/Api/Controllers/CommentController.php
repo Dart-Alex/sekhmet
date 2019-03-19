@@ -5,9 +5,6 @@ namespace App\Api\Controllers;
 use App\Comment;
 use Illuminate\Http\Request;
 use App\Post;
-use App\Events\CommentAdded;
-use App\Events\CommentUpdated;
-use App\Events\CommentDeleted;
 use Illuminate\Support\Facades\Cache;
 
 class CommentController extends Controller
@@ -49,7 +46,6 @@ class CommentController extends Controller
 			}
 		}
 		$comment = Comment::create($validated);
-		event(new CommentAdded($comment));
 		return [
 			'message' => [
 				'type' => 'success',
@@ -74,7 +70,6 @@ class CommentController extends Controller
 			'content' => 'required|string'
 		]);
 		$comment->update($validated);
-		event(new CommentUpdated($comment));
 		return [
 			'message' => [
 				'type' => 'success',
@@ -95,7 +90,6 @@ class CommentController extends Controller
 		$this->authorize('delete', $comment);
 		$commentCopy = $comment->toArray();
 		$comment->delete();
-		event(new CommentDeleted($commentCopy));
 		return [
 			'message' => [
 				'type' => 'success',

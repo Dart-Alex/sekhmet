@@ -3,6 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Events\CommentAdded;
+use App\Events\CommentUpdated;
+use App\Events\CommentDeleted;
 
 class Comment extends Model
 {
@@ -31,6 +34,17 @@ class Comment extends Model
 		'created_at' => 'datetime',
 		'updated_at' => 'datetime'
 	];
+
+	/**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+        'saved' => CommentAdded::class,
+		'updated' => CommentUpdated::class,
+		'deleting' => CommentDeleted::class,
+    ];
 
 	public function post() {
 		return $this->belongsTo(Post::class);

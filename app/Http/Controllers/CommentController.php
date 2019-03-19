@@ -49,7 +49,6 @@ class CommentController extends Controller
 			}
 		}
 		$comment = Comment::create($validated);
-		event(new CommentAdded($comment));
 		return [
 			'message' => [
 				'type' => 'success',
@@ -74,7 +73,6 @@ class CommentController extends Controller
 			'content' => 'required|string'
 		]);
 		$comment->update($validated);
-		event(new CommentUpdated($comment));
 		return [
 			'message' => [
 				'type' => 'success',
@@ -95,7 +93,6 @@ class CommentController extends Controller
 		$this->authorize('delete', $comment);
 		$commentCopy = $comment->toArray();
 		$comment->delete();
-		event(new CommentDeleted($commentCopy));
 		return [
 			'message' => [
 				'type' => 'success',
