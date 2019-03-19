@@ -17,6 +17,7 @@ from multiprocessing import Process
 from threading import Thread, RLock, Timer
 import requests
 from bs4 import BeautifulSoup
+import datetime
 
 
 def noHL(nick):
@@ -72,8 +73,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		try:
 			self.config = request.json()
 		except:
-			print(request.text)
-			print('No config returned')
+			self.print(request.text)
+			self.print('No config returned')
 			sys.exit(1)
 		self.sendLock = RLock()
 		self.updateLock = RLock()
@@ -111,7 +112,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 	def print(self, message):
 		if(self.config['debug']):
 			with self.printLock:
-				print(message)
+				print("["+datetime.datetime.now().strftime("%Y-%m-%d %H:%M")+"] "+message)
 
 	def on_welcome(self, c, e):
 		self.print('Connected')
