@@ -26,6 +26,14 @@ def noHL(nick):
 		newNick += letter + u"\u200B"
 	return newNick
 
+def bold(string):
+	return '\x02'+string+'\x02'
+
+def underline(string):
+	return '\x1F'+string+'\x1F'
+
+def itallic(string):
+	return '\x1D'+string+'\x1D'
 
 
 
@@ -295,39 +303,41 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				self.msg('#'+target, retour)
 		except:
 			pass
+
 	def confirmNick(self, source, token):
 		request = requests.get(self.baseAddress + 'bot/confirm/'+source+'/'+token)
 		result = request.json()
 		message = ""
 		if result['error']:
-			message += 'Erreur : '
+			message += bold('Erreur : ')
 		message += result['message']
 		self.msg(source, message)
+
 	def fetchYoutube(self, target, source, yid):
 		request = requests.post(self.baseAddress + 'bot/ytfetch/' + target, data={'yid':yid,'name':source})
 		video = request.json()
 		if video['error']:
-			message = '[yt] ' + video['message']
+			message = bold('[yt] ') + video['message']
 		else:
 			if video['new']:
-				message = '[yt] '
+				message = bold('[yt] ')+video['title']
 			else:
-				message = '[yt(n°' + str(video['index']) + ')] le ' + video['date'] + ' par ' + noHL(video['name']) + ' - '
-			message += video['title'] + ' [' + video['duration']+']'
+				message = bold('[yt(n°' + str(video['index']) + ')]')+' le ' + video['date'] + ' par ' + itallic(noHL(video['name'])) + ' - ' + bold(video['title'])
+			message += ' [' + video['duration']+']'
 		self.msg('#' + target, message)
 
 	def searchYoutube(self, target, source, search):
 		request = requests.post(self.baseAddress + 'bot/ytsearch/' + target, data={'search_query':search, 'name':source})
 		result = request.json()
 		if result['error']:
-			message = '[ytSearch] ' + result['message']
+			message = bold('[ytSearch] ') + result['message']
 		else:
 			if result['new']:
-				message = '[ytSearch] '
+				message = bold('[ytSearch] ')
 			else:
-				message = '[ytSearch(n°' + str(result['index']) + ')] le ' + result['date'] + ' par ' + noHL(result['name']) + ' - '
+				message = bold('[ytSearch(n°' + str(result['index']) + ')]')+' le ' + result['date'] + ' par ' + itallic(noHL(result['name'])) + ' - '
 
-			message += result['url'] + ' - ' + result['title'] + ' [' + result['duration'] + ']'
+			message += underline(result['url']) + ' - ' + bold(result['title']) + ' [' + result['duration'] + ']'
 		self.msg('#' + target, message)
 
 	def randomYoutube(self, target, auto=False):
@@ -339,27 +349,27 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			messageType = 'ytSearch'
 		if result['error']:
 			if auto: return
-			message = '[' + messageType + '] ' + result['message']
+			message = bold('[' + messageType + '] ') + result['message']
 		else:
-			message = '['+ messageType + '(n°' + str(result['index']) + ')] le ' + result['date'] + ' par ' + noHL(result['name']) + ' - ' + result['url'] + ' - ' + result['title'] + ' [' + result['duration'] + ']'
+			message = bold('['+ messageType + '(n°' + str(result['index']) + ')]')+' le ' + result['date'] + ' par ' + itallic(noHL(result['name'])) + ' - ' + underline(result['url']) + ' - ' + bold(result['title']) + ' [' + result['duration'] + ']'
 		self.msg('#' + target, message)
 
 	def countYoutubeVideos(self, target):
 		request = requests.get(self.baseAddress + 'bot/ytcount/' + target)
 		result = request.json()
 		if result['error']:
-			message = '[ytCount] ' + result['message']
+			message = bold('[ytCount] ') + result['message']
 		else:
-			message = '[ytCount] ' + str(result['count']) + ' vidéos ont été partagées sur #'+target+' depuis le '+result['oldest']
+			message = bold('[ytCount] ') + underline(str(result['count'])) + ' vidéos ont été partagées sur #'+target+' depuis le '+result['oldest']
 		self.msg('#' + target, message)
 
 	def countYoutubeVideosByName(self, target, name):
 		request = requests.get(self.baseAddress + 'bot/ytcount/' + target + '/' + name)
 		result = request.json()
 		if result['error']:
-			message = '[ytCount] ' + result['message']
+			message = bold('[ytCount] ') + result['message']
 		else:
-			message = '[ytCount] ' + str(result['count']) + ' vidéos ont été partagées par '+ noHL(name) + ' sur #'+target+' depuis le '+result['oldest']
+			message = bold('[ytCount] ') + underline(str(result['count'])) + ' vidéos ont été partagées par '+ itallic(noHL(name)) + ' sur #'+target+' depuis le '+result['oldest']
 		self.msg('#' + target, message)
 
 	def spamYoutube(self, target):
