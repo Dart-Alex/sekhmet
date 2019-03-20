@@ -360,7 +360,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		if result['error']:
 			message = bold('[ytCount] ') + result['message']
 		else:
-			message = bold('[ytCount] ') + underline(str(result['count'])) + ' vidéos ont été partagées sur #'+target+' depuis le '+result['oldest']
+			message = bold('[ytCount] ') + bold(str(result['count'])) + ' vidéos ont été partagées sur '+bold('#'+target)+' depuis le '+underline(result['oldest'])
 		self.msg('#' + target, message)
 
 	def countYoutubeVideosByName(self, target, name):
@@ -369,7 +369,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		if result['error']:
 			message = bold('[ytCount] ') + result['message']
 		else:
-			message = bold('[ytCount] ') + underline(str(result['count'])) + ' vidéos ont été partagées par '+ itallic(noHL(name)) + ' sur #'+target+' depuis le '+result['oldest']
+			message = bold('[ytCount] ') + bold(str(result['count'])) + ' vidéos ont été partagées par '+ itallic(noHL(name)) + ' sur '+bold('#'+target)+' depuis le '+underline(result['oldest'])
 		self.msg('#' + target, message)
 
 	def spamYoutube(self, target):
