@@ -109,8 +109,42 @@
 	<h3>Pseudos irc</h3>
 	<ul>
 		@foreach($user->ircNames as $ircName)
-		<li>{{$ircName->name}}</li>
+		<li>
+			{{$ircName->name}}
+			<a title="Supprimer" class="fas fa-trash" href="{{route('ircNames.destroy', ['ircName' => $ircName->id])}}" onclick="event.preventDefault();document.getElementById('delete-form-{{$ircName->id}}').submit();">
+			</a>
+			<form id="delete-form-{{$ircName->id}}" action="{{route('ircNames.destroy', ['ircName' => $ircName->id])}}" method="POST">
+				@csrf
+				@method('DELETE')
+			</form>
+		</li>
 		@endforeach
+		<form action="{{route('ircNames.store')}}" method="POST">
+			@csrf
+			<input type='hidden' name='user_id' value='{{$user->id}}'/>
+			<div class="field is-grouped">
+				<div class='control'>
+					<input class='input' type='text' name='name' id='name' placeholder='Nouveau pseudo' value='{{old('name')}}' required/>
+				</div>
+				<div class="control">
+					<input type='submit' value='Ajouter' class='button is-primary'/>
+				</div>
+				@if ($errors->has('name'))
+				<p class='help is-danger'>
+					{{ $errors->first('name') }}
+				</p>
+				@endif
+			</div>
+		</form>
+		@if(Cache::has('ircName-validation-user-'.$user->id))
+		<?php $validated = Cache::get('ircName-validation-user-'.$user->id); ?>
+		<p>
+			Vous avez une validation en attente pour le pseudo {{$validated['name']}}. Envoyez le message suivant au bot pour le confirmer.
+		</p>
+		<p>
+			/msg {{env('BOT_NAME', config('app.name', 'Sekhmet'))}} confirm {{$validated['token']}}
+		</p>
+		@endif
 	</ul>
 </div>
 @endsection

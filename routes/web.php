@@ -59,3 +59,11 @@ Route::get('/users/{user}/edit', 'UserController@edit')->name('users.edit');
 Route::get('/users/{user}', 'UserController@show')->name('users.show');
 Route::patch('/users/{user}', 'UserController@update')->name('users.update');
 Route::delete('/users/{user}', 'UserController@destroy')->name('users.destroy');
+
+/**
+ * IrcNames
+ * POST		/ircNames			(store)		ircNames.store
+ * DELETE	/ircNames/{ircName}	(destroy)	ircNames.destroy
+ */
+Route::post('/ircNames', 'IrcNameController@store')->name('ircNames.store');
+Route::delete('/ircNames/{ircName}', 'IrcNameController@destroy')->name('ircNames.destroy');

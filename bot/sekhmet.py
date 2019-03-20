@@ -156,7 +156,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		else:
 			reason = ""
 		if kicked == self.config["myname"]:
-			self.print('Kicked from '+target+' by '+kicker)
+			self.print('Kicked from '+target+' by '+kicker+' : '+reason)
 			try:
 				self.print('Rejoining '+target)
 				c.join(target)
@@ -204,6 +204,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			# Ignore self.
 			if source == self.config["myname"]: return
 			self.print('('+e.type+')'+'['+e.target+']<'+source+'> <= '+body)
+			if e.type == "privmsg" and body.split(' ')[0] == 'confirm':
+				self.startProcess(target=self.confirmNick, args=(source.lower(), body.split(' ')[1]))
 			if e.type == "pubmsg" or e.type == "privmsg":
 				if target in self.config['chans'].keys():
 					if self.config['chans'][target]['youtube']['active']:
@@ -293,7 +295,14 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				self.msg('#'+target, retour)
 		except:
 			pass
-
+	def confirmNick(self, source, token):
+		request = requests.get(self.baseAddress + 'bot/confirm/'+source+'/'+token)
+		result = request.json()
+		message = ""
+		if result['error']:
+			message += 'Erreur : '
+		message += result['message']
+		self.msg(source, message)
 	def fetchYoutube(self, target, source, yid):
 		request = requests.post(self.baseAddress + 'bot/ytfetch/' + target, data={'yid':yid,'name':source})
 		video = request.json()

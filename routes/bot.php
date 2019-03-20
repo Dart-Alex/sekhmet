@@ -25,3 +25,8 @@ Route::get('/bot/ytcount/{chan}/{name}', 'YoutubeVideoController@countByUser')->
 Route::post('/bot/ytsearch/{chan}', 'YoutubeVideoController@search')->name('bot.yt.countByUser');
 Route::post('/bot/ytfetch/{chan}', 'YoutubeVideoController@fetch')->name('bot.yt.fetch');
 
+/**
+ * Name verification route
+ * GET	/bot/confirm/{name}/{token}	(confirm)	bot.confirm
+ */
+Route::get('/bot/confirm/{name}/{token}', 'IrcNameController@confirm')->name('bot.confirm');
