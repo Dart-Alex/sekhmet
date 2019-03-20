@@ -2,6 +2,7 @@
 
 use App\Chan;
 use App\Post;
+use App\User;
 
 // Home
 Breadcrumbs::for('home', function ($trail) {
@@ -48,6 +49,24 @@ Breadcrumbs::for('password.reset', function ($trail, $token) {
 Breadcrumbs::for('register', function ($trail) {
 	$trail->parent('home');
 	$trail->push("Inscription", route('register'));
+});
+
+// Home > users.index
+BreadCrumbs::for('users.index', function($trail) {
+	$trail->parent('home');
+	$trail->push('Utilisateurs', route('users.index'));
+});
+
+// Home > users.index > {user}
+BreadCrumbs::for('users.show', function($trail, User $user) {
+	$trail->parent('users.index');
+	$trail->push($user->name, route('users.show', ['user' => $user->id]));
+});
+
+// Home > users.index > {user} > users.edit
+BreadCrumbs::for('users.edit', function($trail, User $user) {
+	$trail->parent('users.show', $user);
+	$trail->push('Editer', route('users.edit', ['user' => $user->id]));
 });
 
 // Home > chans.index

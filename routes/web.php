@@ -44,3 +44,12 @@ Route::patch('/chans/{chan}/events/{post}', "PostController@update")->name('post
 Route::delete('/chans/{chan}/events/{post}', "PostController@destroy")->name('posts.destroy');
 
 
+/**
+ * Users
+ * GET /users				(index)	users.index
+ * GET /users/{user}/edit	(edit)	users.edit
+ * GET /users/{user}		(show)	users.show
+ */
+Route::get('/users', 'UserController@index')->name('users.index');
+Route::get('/users/{user}/edit', 'UserController@edit')->name('users.edit');
+Route::get('/users/{user}', 'UserController@show')->name('users.show');
