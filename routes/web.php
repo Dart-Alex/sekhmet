@@ -46,10 +46,16 @@ Route::delete('/chans/{chan}/events/{post}', "PostController@destroy")->name('po
 
 /**
  * Users
- * GET /users				(index)	users.index
- * GET /users/{user}/edit	(edit)	users.edit
- * GET /users/{user}		(show)	users.show
+ * GET		/profile			(edit)		profile
+ * GET 		/users				(index)		users.index
+ * GET 		/users/{user}/edit	(edit)		users.edit
+ * GET 		/users/{user}		(show)		users.show
+ * PATCH	/users/{user}		(update)	users.update
+ * DELETE	/users/{user}		(destroy)	users.destroy
  */
+Route::get('/profile/{user}', 'UserController@edit')->name('profile');
 Route::get('/users', 'UserController@index')->name('users.index');
 Route::get('/users/{user}/edit', 'UserController@edit')->name('users.edit');
 Route::get('/users/{user}', 'UserController@show')->name('users.show');
+Route::patch('/users/{user}', 'UserController@update')->name('users.update');
+Route::delete('/users/{user}', 'UserController@destroy')->name('users.destroy');

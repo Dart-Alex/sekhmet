@@ -38,7 +38,8 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        $this->authorize('update', $user);
+		$this->authorize('update', $user);
+		return view('users.edit', compact('user'));
     }
 
     /**
@@ -50,7 +51,25 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $this->authorize('update', $user);
+		$this->authorize('update', $user);
+		$validated = [];
+		if(auth()->user()->isAdmin()) {
+			$validated['admin'] = $request->has('admin');
+		}
+		if($request->has('email') && $request->email != $user->email) {
+			$validated = array_merge($validated, $this->validate($request, [
+				"email" => 'email|confirmed|unique:users,email'
+			]));
+			$validated['email_verified_at'] = null;
+		}
+		if($request->has('name') && $request->name != $user->name) {
+			$validated = array_merge($validated, $this->validate($request, [
+				"name" => 'unique:users,name'
+			]));
+		}
+		$user->update($validated);
+		success('Profil mis à jour.');
+		return redirect()->back();
     }
 
     /**
@@ -61,6 +80,12 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        $this->authorize('delete', $user);
+		$this->authorize('delete', $user);
+		$self = $user->id == auth()->user()->id;
+
+		if($self) {
+			return redirect()->route('logout');
+		}
+		return redirect()->route('users.index');
     }
 }

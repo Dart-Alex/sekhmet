@@ -51,6 +51,12 @@ Breadcrumbs::for('register', function ($trail) {
 	$trail->push("Inscription", route('register'));
 });
 
+// Home > profile
+Breadcrumbs::for('profile', function($trail, User $user) {
+	$trail->parent('home');
+	$trail->push('Votre profil', route('profile', ['user' => $user->id]));
+});
+
 // Home > users.index
 BreadCrumbs::for('users.index', function($trail) {
 	$trail->parent('home');

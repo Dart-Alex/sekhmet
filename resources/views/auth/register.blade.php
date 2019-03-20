@@ -11,8 +11,8 @@
         </div>
     </section>
 
-    <div class="columns is-marginless is-centered">
-        <div class="column is-5">
+    <div>
+        <div>
             <div class="card">
                 <header class="card-header">
                     <p class="card-header-title">Inscription</p>
@@ -23,103 +23,79 @@
 
                         {{ csrf_field() }}
 
-                        <div class="field is-horizontal">
-                            <div class="field-label">
-                                <label class="label">Nom</label>
-                            </div>
-
-                            <div class="field-body">
-                                <div class="field">
-                                    <p class="control">
-                                        <input class="input" id="name" type="name" name="name" value="{{ old('name') }}"
-                                               required autofocus>
-                                    </p>
-
-                                    @if ($errors->has('name'))
-                                        <p class="help is-danger">
-                                            {{ $errors->first('name') }}
-                                        </p>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="field is-horizontal">
-                            <div class="field-label">
-                                <label class="label">Adresse Email</label>
-                            </div>
-
-                            <div class="field-body">
-                                <div class="field">
-                                    <p class="control">
-                                        <input class="input" id="email" type="email" name="email"
-                                               value="{{ old('email') }}" required autofocus>
-                                    </p>
-
-                                    @if ($errors->has('email'))
-                                        <p class="help is-danger">
-                                            {{ $errors->first('email') }}
-                                        </p>
-                                    @endif
-                                </div>
-                            </div>
+                        <div class='field is-horizontal'>
+							<div class='field-label is-normal'>
+								<label for='name' class='label'>Nom</label>
+							</div>
+							<div class='field-body'>
+								<div class='field'>
+									<div class='control'>
+										<input class='input' type='text' name='name' id='name' placeholder='Nom' value='{{old('name')}}' required/>
+									</div>
+									@if($errors->has('name'))
+									<p class='help is-danger'>
+										{{ $errors->first('name') }}
+									</p>
+									@endif
+								</div>
+							</div>
 						</div>
 
-						<div class="field is-horizontal">
-                            <div class="field-label">
-                                <label class="label">Confirmation de l'adresse Email</label>
-                            </div>
+                        <div class='field is-horizontal'>
+							<div class='field-label is-normal'>
+								<label for='email' class='label'>Email</label>
+							</div>
+							<div class='field-body'>
+								<div class='field'>
+									<div class='control is-expanded'>
+										<input class='input' type='email' name='email' id='email' placeholder='Email' value='{{old('email')}}' required/>
+									</div>
+									@if($errors->has('email'))
+									<p class='help is-danger'>
+										{{ $errors->first('email') }}
+									</p>
+									@endif
+								</div>
+								<div class='field'>
+									<div class='control is-expanded'>
+										<input class='input' type='email' name='email_confirmation' id='email_confirmation' placeholder='Confirmation' value='{{old('email_confirmation')}}' required/>
+									</div>
+									@if($errors->has('email_confirmation'))
+									<p class='help is-danger'>
+										{{ $errors->first('email_confirmation') }}
+									</p>
+									@endif
+								</div>
+							</div>
+						</div>
 
-                            <div class="field-body">
-                                <div class="field">
-                                    <p class="control">
-                                        <input class="input" id="email_confirmation" type="email" name="email_confirmation"
-                                               value="{{ old('email_confirmation') }}" required autofocus>
-                                    </p>
-
-                                    @if ($errors->has('email_confirmation'))
-                                        <p class="help is-danger">
-                                            {{ $errors->first('email_confirmation') }}
-                                        </p>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="field is-horizontal">
-                            <div class="field-label">
-                                <label class="label">Mot de passe</label>
-                            </div>
-
-                            <div class="field-body">
-                                <div class="field">
-                                    <p class="control">
-                                        <input class="input" id="password" type="password" name="password" required>
-                                    </p>
-
-                                    @if ($errors->has('password'))
-                                        <p class="help is-danger">
-                                            {{ $errors->first('password') }}
-                                        </p>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="field is-horizontal">
-                            <div class="field-label">
-                                <label class="label">Confirmation du mot de passe</label>
-                            </div>
-
-                            <div class="field-body">
-                                <div class="field">
-                                    <p class="control">
-                                        <input class="input" id="password_confirmation" type="password"
-                                               name="password_confirmation" required>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                        <div class='field is-horizontal'>
+							<div class='field-label is-normal'>
+								<label for='password' class='label'>Mot de passe</label>
+							</div>
+							<div class='field-body'>
+								<div class='field'>
+									<div class='control is-expanded'>
+										<input class='input' type='password' name='password' id='password' placeholder='Mot de passe' value='{{old('password')}}' required/>
+									</div>
+									@if($errors->has('password'))
+									<p class='help is-danger'>
+										{{ $errors->first('password') }}
+									</p>
+									@endif
+								</div>
+								<div class='field'>
+									<div class='control is-expanded'>
+										<input class='input' type='password' name='password_confirmation' id='password_confirmation' placeholder='Confirmation' value='{{old('password_confirmation')}}' required/>
+									</div>
+									@if($errors->has('password_confirmation'))
+									<p class='help is-danger'>
+										{{ $errors->first('password_confirmation') }}
+									</p>
+									@endif
+								</div>
+							</div>
+						</div>
 
                         <div class="field is-horizontal">
                             <div class="field-label"></div>

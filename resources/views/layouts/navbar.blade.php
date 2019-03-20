@@ -31,6 +31,7 @@
 							<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
 									@csrf
 							</form>
+							<a href='{{ route('profile', ['user' => auth()->user()->id]) }}' class='navbar-item'>Profil</a>
 						</div>
 					</div>
 					@endguest
