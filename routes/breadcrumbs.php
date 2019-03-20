@@ -67,6 +67,11 @@ Breadcrumbs::for('chans.show', function($trail, Chan $chan) {
 	$trail->parent('chans.index');
 	$trail->push($chan->displayName(), route('chans.show', ['chan' => $chan->name]));
 });
+// Home > chans.index > {chan} > chans.edit
+Breadcrumbs::for('chans.edit', function($trail, Chan $chan) {
+	$trail->parent('chans.show', $chan);
+	$trail->push('Editer le chan', route('chans.edit', ['chan' => $chan->name]));
+});
 
 // Home > chans.index > {chan} > posts.index
 Breadcrumbs::for('posts.index', function($trail, Chan $chan) {

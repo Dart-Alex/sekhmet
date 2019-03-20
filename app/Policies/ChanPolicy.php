@@ -20,11 +20,8 @@ class ChanPolicy
     public function view(?User $user, Chan $chan)
     {
 		if(!$chan->hidden) return true;
-		else if(auth()->guest()) return false;
-		else
-		{
-			return ($chan->isAdmin($user) || $user->isAdmin());
-		}
+		if(auth()->guest()) return false;
+		return ($user->isAdmin() || $chan->isAdmin($user));
     }
 
     /**
@@ -47,7 +44,7 @@ class ChanPolicy
      */
     public function update(User $user, Chan $chan)
     {
-        return ($chan->isAdmin($user) || $user->isAdmin());
+        return ($user->isAdmin() || $chan->isAdmin($user));
     }
 
     /**
@@ -70,9 +67,8 @@ class ChanPolicy
 	 * @return mixed
 	 */
 	public function join(User $user, Chan $chan) {
-		if($chan->hidden) {
-			return $user->isAdmin();
-		}
-		return true;
+		if(!$chan->hidden) return true;
+		return $user->isAdmin();
+
 	}
 }
