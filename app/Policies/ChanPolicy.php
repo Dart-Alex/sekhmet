@@ -23,7 +23,7 @@ class ChanPolicy
 		else if(auth()->guest()) return false;
 		else
 		{
-			return ($chan->hasAdmin($user) || $user->isAdmin());
+			return ($chan->isAdmin($user) || $user->isAdmin());
 		}
     }
 
