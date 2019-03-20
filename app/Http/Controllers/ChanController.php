@@ -43,12 +43,18 @@ class ChanController extends Controller
 		$request->merge(['name' => strtolower($request->name)]);
         $validated = $request->validate([
             'name' => 'required|unique:chans|alpha_dash',
-            'description' => 'required'
+						'description' => 'required',
+						'config_youtube_timer' => 'numeric',
+						'config_spam_timer' => 'numeric',
+						'config_event_timer' => 'numeric'
         ]);
-        $validated['hidden'] = $request->has('hidden');
+				$validated['hidden'] = $request->has('hidden');
+				$validated['config_youtube_active'] = $request->has('config_youtube_active');
+				$validated['config_spam_active'] = $request->has('config_spam_active');
+				$validated['config_event_active'] = $request->has('config_event_active');
         $chan = Chan::create($validated);
         success("Le chan ".$chan->displayName()." a été créé.");
-        return redirect()->route('home');
+        return redirect()->route('chans.index');
     }
 
     /**
