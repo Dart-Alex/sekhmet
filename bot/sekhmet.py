@@ -547,23 +547,33 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 					self.config['realname'] = result['realname']
 
 					if(self.config['myname'] != result['myname']):
-						self.connection.nick(result['myname'])
+						c.nick(result['myname'])
 						self.config['myname'] = result['myname']
 
 					for key in self.spamYtProcess.keys():
-						self.spamYtProcess[key].terminate()
-						self.spamYtProcess[key].join()
-						del self.spamYtProcess[key]
+						try:
+							self.spamYtProcess[key].terminate()
+							self.spamYtProcess[key].join()
+							del self.spamYtProcess[key]
+						except:
+							pass
 
 					for key in self.spamProcess.keys():
-						self.spamProcess[key].terminate()
-						self.spamProcess[key].join()
-						del self.spamProcess[key]
+						try:
+							self.spamProcess[key].terminate()
+							self.spamProcess[key].join()
+							del self.spamProcess[key]
+						except:
+							pass
 
 					for key in self.spamEventProcess.keys():
-						self.spamEventProcess[key].terminate()
-						self.spamEventProcess[key].join()
-						del self.spamEventProcess[key]
+						try:
+							self.spamEventProcess[key].terminate()
+							self.spamEventProcess[key].join()
+							del self.spamEventProcess[key]
+						except:
+							pass
+
 					for chan in result['chans'].keys():
 						if chan not in self.config['chans'].keys():
 							self.lastMsg[chan] = []
