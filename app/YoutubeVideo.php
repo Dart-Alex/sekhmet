@@ -55,6 +55,17 @@ class YoutubeVideo extends Model
 		return $index;
 	}
 
+	static function getYidByIndex(int $index, Chan $chan) {
+		if($yid = Cache::get("yt-video-yidByIndex-$chan->id-$index")) {
+			return $yid;
+		}
+		if($video = YoutubeVideo::where('chan_name', $chan->name)->orderBy('created_at', 'ASC')->offset($index-1)->first()) {
+			Cache::put("yt-video-yidByIndex-$chan->id-$index", $video->yid, now()->addMonth());
+			return $video->yid;
+		}
+		return null;
+	}
+
 	static function fetchInfo($yid) {
 		if(!$yid) return false;
 		if(!$result = Cache::get('yid-'.$yid)) {

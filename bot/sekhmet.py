@@ -47,25 +47,19 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 	join_msg = "%s"# is here"
 	part_msg = "%s"# has left"
 
-	# Command list for this module
-	commandlist = "Commandes utilisateur : !yt, !ytcount"
-	commandlistowner = "Commandes admin : !nick, !join, !part, !chans, !start, !stop, !timer, !quit, !owners, !hostwl, !nickwl, !quietchan, !ytchan, !ytdel"
 	# Detailed command description dictionary
-	commanddict = {
-		"join": "Rejoint un ou plusieurs canaux. Syntaxe : !join <#chan1> (<#chan2> <#chan3> ...)",
-		"part": "Part d'un ou plusieurs canaux. Syntaxe : !part <#chan1> (<#chan2> <#chan3> ...)",
-		"chans": "Affiche la liste des canaux ou je suis présent",
-		"start": "Démarre le spam",
-		"stop": "Arrête le spam",
-		"timer": "Affiche ou change la durée du timer (en secondes). Syntaxe : !timer <temps>",
-		"owners": "Affiche ou modifie la liste des propriétaires. Syntaxe : !owners (add/remove) <username> (<username2> <username3> ...) ",
-		"hostwl": "Affiche ou modifie la whitelist d'hosts. Syntaxe : !hostwl (add/remove) <host> (<host2> <host3> ...)",
-		"nickwl": "Affiche ou modifie la whitelist de pseudos. Syntaxe : !nickwl (add/remove) <username> (<username2> <username3> ...)",
-		"quietchan": "Affiche ou modifie la liste de canaux ou slurk sera quiet et non ban. Syntaxe : !quietchan (add/remove) <chan> (<chan2> <chan3> ...)",
-		"ytchan": "Affiche ou modifie la liste des canaux ou la fonction youtube est activée. Syntaxe : !ytchan (add/remove) <chan> (<chan2> <chan3> ...)",
+	commandDict = {
 		"yt": "Affiche une vidéo youtube (aléatoire si aucun argument). Syntaxe : !yt (pseudo/numéro de vidéo/recherche)",
-		"ytcount": "Affiche le nombre de vidéos partagées sur le canal, ou par un utilisateur. Syntaxe : !ytcount (<pseudo> (<pseudo2> <pseudo3> ...))",
-		"ytdel": "Supprime une vidéo de la liste. Syntaxe : !ytdel <numéro de la vidéo>"
+		"ytcount": "Affiche le nombre de vidéos partagées sur le canal, ou par un utilisateur. Syntaxe : !ytcount (<pseudo> (<pseudo2> <pseudo3> ...))"
+	}
+	commandDictAdmin = {
+		"admin": "Affiche ou modifie la liste des admins du bot sur le salon. Syntaxe : !admin (add/remove) <pseudo1> (<pseudo2> ...)",
+		"youtube": "Change les paramètres du module Youtube. Syntaxe : !youtube start/stop / !youtube timer <timer en secondes>",
+		"spam": "Change les paramètres du module Spam. Syntaxe : !spam start/stop / !spam timer <timer en secondes>",
+		"event": "Change les paramètres du module Event. Syntaxe : !event start/stop / !event timer <timer en secondes>"
+	}
+	commandDictOwner = {
+		"owner": "Affiche ou modifie la liste des owners du bot. Syntaxe : !owner (add/remove) <pseudo1> (<pseudo2> ...)"
 	}
 
 	def __init__(self, args):
@@ -170,6 +164,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				c.join(target)
 			finally:
 				pass
+
 	def on_privnotice(self,c,e):
 		self.on_msg(c,e)
 	def on_pubnotice(self,c,e):

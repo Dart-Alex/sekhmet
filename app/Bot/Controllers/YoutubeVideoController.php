@@ -129,7 +129,10 @@ class YoutubeVideoController extends Controller
 		if(YoutubeVideo::where('chan_name', $chan->name)->where('name', $query)->exists()) {
 			return $this->getRandomByUser($chan, $query);
 		}
-		$yid = YoutubeVideo::search($query)->id;
+		else if (preg_match('/^\d+$/', $query)) {
+			$yid = YoutubeVideo::getYidByIndex((int) $query, $chan);
+		}
+		else $yid = YoutubeVideo::search($query)->id;
 		if(!$yid) {
 			return [
 				"error" => true,
