@@ -314,51 +314,53 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		"""
 		Admin commands
 		"""
-
-		if (source.lower() in self.config['owners']) or sourceIsAdmin or (source.lower() in self.config['chans'][target]['admins']):
-			if command_list[0] in ['!youtube', '!spam', '!event']:
-				try:
-					command = command_list[0].replace('!','')
-					subCommand = command_list[1].lower()
-					if subCommand == 'timer':
-						self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'timer', [int(command_list[2])], target,))
-					elif subCommand == 'start':
-						self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'active', [True], target,))
-					elif subCommand == 'stop':
-						self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'active', [False], target,))
-					else:
-						self.msg(source, "Commande "+command_list[1]+" inconnue pour "+command_list[0]+".")
-				except:
-					self.msg(source, "Pas assez d'arguments.")
-			elif command_list[0] == '!admin':
-				if len(command_list) == 1:
-					self.msg(source, "Administrateurs pour #"+target+": "+", ".join(self.config['chans'][target]['admins']))
-				else:
+		try:
+			if (source.lower() in self.config['owners']) or sourceIsAdmin or (source.lower() in self.config['chans'][target]['admins']):
+				if command_list[0] in ['!youtube', '!spam', '!event']:
 					try:
-						command = 'admin'
+						command = command_list[0].replace('!','')
 						subCommand = command_list[1].lower()
-						if subCommand in ['add', 'remove']:
-							self.startProcess(target=self.sendConfig, args=(e.type, source, command, subCommand, command_list[2:], target,))
+						if subCommand == 'timer':
+							self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'timer', [int(command_list[2])], target,))
+						elif subCommand == 'start':
+							self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'active', [True], target,))
+						elif subCommand == 'stop':
+							self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'active', [False], target,))
 						else:
-							self.msg(source, "Commande "+subCommand+" inconnue pour "+command_list[0]+".")
+							self.msg(source, "Commande "+command_list[1]+" inconnue pour "+command_list[0]+".")
 					except:
 						self.msg(source, "Pas assez d'arguments.")
-			elif command_list[0] == "!aide":
-				if len(command_list) == 1:
-					message = "Commandes admin: "+", ".join(self.commandDictAdmin.keys())
-				else:
-					command = command_list[1].lower()
-					if command in self.commandDictAdmin.keys():
-						message = "!"+command+": "+self.commandDictAdmin[command]
-				try:
-					if e.type == "privmsg":
-						self.msg(source, message)
-					elif e.type == "pubmsg":
-						self.notice(source, message)
-					del message
-				except:
-					pass
-
+				elif command_list[0] == '!admin':
+					if len(command_list) == 1:
+						self.msg(source, "Administrateurs pour #"+target+": "+", ".join(self.config['chans'][target]['admins']))
+					else:
+						try:
+							command = 'admin'
+							subCommand = command_list[1].lower()
+							if subCommand in ['add', 'remove']:
+								self.startProcess(target=self.sendConfig, args=(e.type, source, command, subCommand, command_list[2:], target,))
+							else:
+								self.msg(source, "Commande "+subCommand+" inconnue pour "+command_list[0]+".")
+						except:
+							self.msg(source, "Pas assez d'arguments.")
+				elif command_list[0] == "!aide":
+					if len(command_list) == 1:
+						message = "Commandes admin: "+", ".join(self.commandDictAdmin.keys())
+					else:
+						command = command_list[1].lower()
+						if command in self.commandDictAdmin.keys():
+							message = "!"+command+": "+self.commandDictAdmin[command]
+					try:
+						if e.type == "privmsg":
+							self.msg(source, message)
+						elif e.type == "pubmsg":
+							self.notice(source, message)
+						del message
+					except:
+						pass
+		except:
+			self.print("Error caught on admin commands")
+			pass
 
 		"""
 		Owner commands
