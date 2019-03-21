@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Events\ChanUserAdminSet;
 
 class ChanUser extends Model
 {
@@ -31,7 +32,8 @@ class ChanUser extends Model
      */
     protected $casts = [
 		'created_at' => 'datetime',
-		'updated_at' => 'datetime'
+		'updated_at' => 'datetime',
+		'admin' => 'boolean'
 	];
 
 	public function user() {
@@ -40,5 +42,10 @@ class ChanUser extends Model
 
 	public function chan() {
 		return $this->belongsTo(Chan::class, 'chan_id', 'id');
+	}
+
+	public function setAdminAttribute($value) {
+		if($value != $this->admin) event(new ChanUserAdminSet());
+		$this->attributes['admin'] = $value;
 	}
 }

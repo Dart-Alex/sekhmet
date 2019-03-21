@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Events\UserAdminSet;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -50,5 +51,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
 	public function chanUsers() {
 		return $this->hasMany(ChanUser::class);
+	}
+
+	public function setAdminAttribute($value) {
+		if($value != $this->admin) event(new UserAdminSet());
+		$this->attributes['admin'] = $value;
 	}
 }

@@ -36,5 +36,7 @@ class BotConfigModified
 		$events->listen('App\Events\ChanAdded', 'App\Listeners\BotConfigModified');
 		$events->listen('App\Events\ChanDeleted', 'App\Listeners\BotConfigModified');
 		$events->listen('App\Events\ChanUpdated', 'App\Listeners\BotConfigModified');
+		$events->listen('App\Events\UserAdminSet', 'App\Listeners\BotConfigModified');
+		$events->listen('App\Events\ChanUserAdminSet', 'App\Listeners\BotConfigModified');
 	}
 }
