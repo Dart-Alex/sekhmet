@@ -317,19 +317,22 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		try:
 			if (source.lower() in self.config['owners']) or sourceIsAdmin or (source.lower() in self.config['chans'][target]['admins']):
 				if command_list[0] in ['!youtube', '!spam', '!event']:
-					try:
-						command = command_list[0].replace('!','')
-						subCommand = command_list[1].lower()
-						if subCommand == 'timer':
-							self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'timer', [int(command_list[2])], target,))
-						elif subCommand == 'start':
-							self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'active', [True], target,))
-						elif subCommand == 'stop':
-							self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'active', [False], target,))
-						else:
-							self.msg(source, "Commande "+command_list[1]+" inconnue pour "+command_list[0]+".")
-					except:
-						self.msg(source, "Pas assez d'arguments.")
+					command = command_list[0].replace('!','')
+					if len(command_list) == 1:
+						self.msg(source, "#"+target+" "+command+": "+str(self.config['chans'][target][command]))
+					else:
+						try:
+							subCommand = command_list[1].lower()
+							if subCommand == 'timer':
+								self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'timer', [int(command_list[2])], target,))
+							elif subCommand == 'start':
+								self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'active', [True], target,))
+							elif subCommand == 'stop':
+								self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'active', [False], target,))
+							else:
+								self.msg(source, "Commande "+command_list[1]+" inconnue pour "+command_list[0]+".")
+						except:
+							self.msg(source, "Pas assez d'arguments.")
 				elif command_list[0] == '!admin':
 					if len(command_list) == 1:
 						self.msg(source, "Administrateurs pour #"+target+": "+", ".join(self.config['chans'][target]['admins']))
