@@ -434,13 +434,14 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				'data': data
 			})
 			response = request.json()
-			if response['errors']:
+			try:
 				for error in response['errors']:
-					self.msg(source, bold('Erreur: ')+error[0])
-			elif response['error']:
-				self.msg(source, bold('Erreur: ')+response['message'])
-			else:
-				self.msg(source, response['message'])
+					self.msg(source, bold('Erreur: ')+error)
+			except:
+				if response['error']:
+					self.msg(source, bold('Erreur: ')+response['message'])
+				else:
+					self.msg(source, response['message'])
 
 	def fetchYoutube(self, target, source, yid):
 		request = requests.post(self.baseAddress + 'bot/ytfetch/' + target, data={'yid':yid,'name':source})
