@@ -4,6 +4,7 @@ namespace App\Bot\Middleware;
 
 use Closure;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class BotAlive
 {
