@@ -125,8 +125,9 @@ class BotConfigController extends Controller
 					break;
 				case 'active':
 					$data = $this->validate($request, [
-						'data' => 'required|boolean'
+						'data' => 'required'
 					])['data'];
+					$data = ($data == "True");
 					$chan->$field = $data;
 					$chan->save();
 					return [
