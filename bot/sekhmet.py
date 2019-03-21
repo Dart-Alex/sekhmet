@@ -542,13 +542,9 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				request = requests.get(self.baseAddress + 'bot/config')
 				result = request.json()
 				with self.updateLock:
-					self.config['lastUpdate'] = result['lastUpdate']
-					self.config['owners'] = result['owners']
-					self.config['realname'] = result['realname']
 
 					if(self.config['myname'] != result['myname']):
 						c.nick(result['myname'])
-						self.config['myname'] = result['myname']
 
 					for key in self.spamYtProcess.keys():
 						try:
@@ -585,7 +581,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 							del self.lastMsg[chan]
 							self.print('Leaving #'+chan)
 							c.part('#'+chan, 'Leaving')
-					self.config['chans'] = result['chans']
+					self.config = result
 
 
 
