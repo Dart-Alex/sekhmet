@@ -252,6 +252,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		"""
 		Special IRC commands.
 		"""
+		self.print("Command received : "+body)
 		command_list = body.split()
 		command_list[0] = command_list[0].lower()
 		sourceIsAdmin = False
@@ -259,10 +260,23 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		User commands
 		"""
 		if command_list[0] == "!ping":
-			if e.type == "pubmsg":
-				self.msg('#'+target, 'pong !')
-			else:
-				self.msg(source, "pong !")
+			self.msg('#'+target, 'pong !')
+		elif command_list[0] == "!ytcount":
+			if self.config['chans'][target]['youtube']['active']:
+				if len(command_list) == 1:
+					self.startProcess(target=self.countYoutubeVideos, args=(target,))
+					pass
+				else:
+					for nick in command_list[1:]:
+						self.startProcess(target=self.countYoutubeVideosByName, args=(target, nick,))
+		elif command_list[0] == "!yt":
+			if self.config['chans'][target]['youtube']['active']:
+				if len(command_list) == 1:
+					self.startProcess(target=self.randomYoutube, args=(target,))
+				else:
+					self.startProcess(target=self.searchYoutube, args=(target, source, ' '.join(command_list[1:]),))
+		elif command_list[0] == "!err":
+			self.startProcess(target=self.errCommand, args=(target, body, self.lastMsg[target]))
 		elif command_list[0] == "!aide":
 			if len(command_list) == 1:
 				message = "Commandes utilisateur: "+", ".join(self.commandDictUser.keys())
@@ -279,29 +293,6 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			except:
 				pass
 		"""
-		pubmsg user commands
-		"""
-		if e.type == "pubmsg":
-			try:
-				if command_list[0] == "!ytcount":
-					if self.config['chans'][target]['youtube']['active']:
-						if len(command_list) == 1:
-							self.startProcess(target=self.countYoutubeVideos, args=(target,))
-							pass
-						else:
-							for nick in command_list[1:]:
-								self.startProcess(target=self.countYoutubeVideosByName, args=(target, nick,))
-				elif command_list[0] == "!yt":
-					if self.config['chans'][target]['youtube']['active']:
-						if len(command_list) == 1:
-							self.startProcess(target=self.randomYoutube, args=(target,))
-						else:
-							self.startProcess(target=self.searchYoutube, args=(target, source, ' '.join(command_list[1:]),))
-				elif command_list[0] == "!err":
-					self.startProcess(target=self.errCommand, args=(target, body, self.lastMsg[target]))
-			except:
-				pass
-		"""
 		privmsg admin commands
 		"""
 		if e.type == "privmsg":
@@ -311,7 +302,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 					if target not in self.config['chans'].keys():
 						self.msg(source, 'Je ne connais pas le canal '+command_list[1])
 						return 1
-					command_list = command_list.pop(1)
+					command_list.pop(1)
+					self.print("Substituted command : "+" ".join(command_list)+" target="+target)
 				except:
 					self.msg(source, "Pas assez d'arguments.")
 			elif command_list[0] == "!aide":
@@ -322,53 +314,52 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		"""
 		Admin commands
 		"""
-		try:
-			if (source.lower() in self.config['owners']) or (source.lower() in self.config['chans'][target]['admins']) or sourceIsAdmin:
-				if command_list[0] in ['!youtube', '!spam', '!event']:
+
+		if (source.lower() in self.config['owners']) or sourceIsAdmin or (source.lower() in self.config['chans'][target]['admins']):
+			if command_list[0] in ['!youtube', '!spam', '!event']:
+				try:
+					command = command_list[0].replace('!','')
+					subCommand = command_list[1].lower()
+					if subCommand == 'timer':
+						self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'timer', [int(command_list[2])], target,))
+					elif subCommand == 'start':
+						self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'active', [True], target,))
+					elif subCommand == 'stop':
+						self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'active', [False], target,))
+					else:
+						self.msg(source, "Commande "+command_list[1]+" inconnue pour "+command_list[0]+".")
+				except:
+					self.msg(source, "Pas assez d'arguments.")
+			elif command_list[0] == '!admin':
+				if len(command_list) == 1:
+					self.msg(source, "Administrateurs pour #"+target+": "+", ".join(self.config['chans'][target]['admins']))
+				else:
 					try:
-						command = command_list[0].replace('!','')
+						command = 'admin'
 						subCommand = command_list[1].lower()
-						if subCommand == 'timer':
-							self.startProcess(target=self.sendConfig, args=(source, command, 'timer', [int(command_list[2])], target,))
-						elif subCommand == 'start':
-							self.startProcess(target=self.sendConfig, args=(source, command, 'active', [True], target,))
-						elif subCommand == 'stop':
-							self.startProcess(target=self.sendConfig, args=(source, command, 'active', [False], target,))
+						if subCommand in ['add', 'remove']:
+							self.startProcess(target=self.sendConfig, args=(e.type, source, command, subCommand, command_list[2:], target,))
 						else:
-							self.msg(source, "Commande "+command_list[1]+" inconnue pour "+command_list[0]+".")
+							self.msg(source, "Commande "+subCommand+" inconnue pour "+command_list[0]+".")
 					except:
 						self.msg(source, "Pas assez d'arguments.")
-				elif command_list[0] == '!admin':
-					if len(command_list) == 1:
-						self.msg(source, "Administrateurs pour #"+target+": "+", ".join(self.config['chans'][target]['admins']))
-					else:
-						try:
-							command = 'admin'
-							subCommand = command_list[1].lower()
-							if subCommand in ['add', 'remove']:
-								self.startProcess(target=self.sendConfig, args=(source, command, subCommand, command_list[2:], target,))
-							else:
-								self.msg(source, "Commande "+subCommand+" inconnue pour "+command_list[0]+".")
-						except:
-							self.msg(source, "Pas assez d'arguments.")
-				elif command_list[0] == "!aide":
-					if len(command_list) == 1:
-						message = "Commandes admin: "+", ".join(self.commandDictAdmin.keys())
-					else:
-						command = command_list[1].lower()
-						if command in self.commandDictAdmin.keys():
-							message = "!"+command+": "+self.commandDictAdmin[command]
-					try:
-						if e.type == "privmsg":
-							self.msg(source, message)
-						elif e.type == "pubmsg":
-							self.notice(source, message)
-						del message
-					except:
-						pass
+			elif command_list[0] == "!aide":
+				if len(command_list) == 1:
+					message = "Commandes admin: "+", ".join(self.commandDictAdmin.keys())
+				else:
+					command = command_list[1].lower()
+					if command in self.commandDictAdmin.keys():
+						message = "!"+command+": "+self.commandDictAdmin[command]
+				try:
+					if e.type == "privmsg":
+						self.msg(source, message)
+					elif e.type == "pubmsg":
+						self.notice(source, message)
+					del message
+				except:
+					pass
 
-		except:
-			pass
+
 		"""
 		Owner commands
 		"""
@@ -381,7 +372,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 						command = 'owner'
 						subCommand = command_list[1].lower()
 						if subCommand in ['add', 'remove']:
-							self.startProcess(target=self.sendConfig, args=(source, command, subCommand, command_list[2:],))
+							self.startProcess(target=self.sendConfig, args=(e.type, source, command, subCommand, command_list[2:],))
 						else:
 							self.msg(source, "Commande "+subCommand+" inconnue pour "+command_list[0]+".")
 					except:
@@ -432,10 +423,11 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		message += result['message']
 		self.msg(source, message)
 
-	def sendConfig(self, source, command, subCommand, dataSet, target = 'global'):
+	def sendConfig(self,eventType, source, command, subCommand, dataSet, target = 'global'):
 		source = source.lower()
 		command = command.lower()
 		subCommand = subCommand.lower()
+		self.print('sendConfig(self, "'+eventType+'", "'+source+'", "'+command+'", "'+subCommand+'", '+str(dataSet)+', "'+target+'")')
 		for data in dataSet:
 			request = requests.post(self.baseAddress + 'bot/config', data={
 				'command': command,
@@ -447,12 +439,19 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			response = request.json()
 			try:
 				for error in response['errors']:
-					self.msg(source, bold('Erreur: ')+error)
+					message = bold('Erreur: ')+error
 			except:
 				if response['error']:
-					self.msg(source, bold('Erreur: ')+response['message'])
+					message = bold('Erreur: ')+response['message']
 				else:
-					self.msg(source, response['message'])
+					message = response['message']
+			try:
+				if eventType == "pubmsg":
+					self.notice(source, message)
+				else:
+					self.msg(source, message)
+			except:
+				pass
 
 	def fetchYoutube(self, target, source, yid):
 		request = requests.post(self.baseAddress + 'bot/ytfetch/' + target, data={'yid':yid,'name':source})
