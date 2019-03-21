@@ -288,6 +288,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 					self.msg(source, message)
 				elif e.type == "pubmsg":
 					self.notice(source, message)
+				del message
 			except:
 				pass
 		"""
@@ -351,6 +352,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 							self.msg(source, message)
 						elif e.type == "pubmsg":
 							self.notice(source, message)
+						del message
 					except:
 						pass
 
@@ -385,6 +387,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 							self.msg(source, message)
 						elif e.type == "pubmsg":
 							self.notice(source, message)
+						del message
 					except:
 						pass
 
