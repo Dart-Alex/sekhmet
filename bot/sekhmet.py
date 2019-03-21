@@ -14,7 +14,7 @@ import os
 import time
 import traceback
 from multiprocessing import Process
-from threading import Thread, RLock, Timer
+from threading import Thread, RLock, Timer, Event
 import requests
 from bs4 import BeautifulSoup
 import datetime
@@ -35,7 +35,69 @@ def underline(string):
 def itallic(string):
 	return '\x1D'+string+'\x1D'
 
+class StoppableThread(Thread):
+	def __init__(self):
+		super(StoppableThread, self).__init__()
+		self._stop_event = Event()
 
+	def stop(self):
+		self._stop_event.set()
+
+	def stopped(self):
+		return self._stop_event.is_set()
+
+class CheckConfig(StoppableThread):
+	def __init__(self):
+		super(CheckConfig, self).__init__()
+
+	def run(self):
+		bot.print('CheckConfig(self).start()')
+		while not self.stopped():
+			time.sleep(10)
+			request = requests.get(bot.baseAddress + 'bot/config/check')
+			result = request.json()
+			bot.print('Checking config')
+			if((not result['error']) and (result['lastUpdate'] != bot.config['lastUpdate'])):
+				bot.print('Getting new config')
+				request = requests.get(bot.baseAddress + 'bot/config')
+				result = request.json()
+				with bot.updateLock:
+					if(bot.config['myname'] != result['myname']):
+						bot.connection.nick(result['myname'])
+
+					for key in bot.spamYtProcess.keys():
+						try:
+							bot.spamYtProcess[key].terminate()
+							bot.spamYtProcess[key].join()
+						except:
+							pass
+
+					for key in bot.spamProcess.keys():
+						try:
+							bot.spamProcess[key].terminate()
+							bot.spamProcess[key].join()
+						except:
+							pass
+
+					for key in bot.spamEventProcess.keys():
+						try:
+							bot.spamEventProcess[key].terminate()
+							bot.spamEventProcess[key].join()
+						except:
+							pass
+
+					for chan in result['chans'].keys():
+						if chan not in bot.config['chans'].keys():
+							bot.lastMsg[chan] = []
+							bot.print('Joining #'+chan)
+							bot.connection.join('#'+chan)
+
+					for chan in bot.config['chans'].keys():
+						if chan not in result['chans'].keys():
+							del bot.lastMsg[chan]
+							bot.print('Leaving #'+chan)
+							bot.connection.part('#'+chan, 'Leaving')
+					bot.config = result
 
 class ModIRC(irc.bot.SingleServerIRCBot):
 
@@ -55,6 +117,20 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		"owner": "Affiche ou modifie la liste des owners du bot. Syntaxe : !owner (add/remove) <pseudo1> (<pseudo2> ...)"
 	}
 
+	baseAddress = ""
+	config = {}
+	sendLock = RLock()
+	updateLock = RLock()
+	printLock = RLock()
+	lastMsg = {}
+	spamYtProcess = {}
+	spamProcess = {}
+	spamEventProcess = {}
+	checkConfigThread = CheckConfig()
+
+
+
+
 	def __init__(self, args):
 		"""
 		Args will be sys.argv (command prompt arguments)
@@ -72,16 +148,6 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			print(request.text)
 			print('No config returned')
 			sys.exit(1)
-		self.sendLock = RLock()
-		self.updateLock = RLock()
-		self.printLock = RLock()
-		self.lastMsg = {}
-		self.whois = {}
-		self.bans = {}
-		self.lastWhois = {}
-		self.spamYtProcess = {}
-		self.spamProcess = {}
-		self.spamEventProcess = {}
 		for chan in self.config["chans"].keys():
 			self.lastMsg[chan] = []
 
@@ -115,7 +181,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		for i in self.config["chans"].keys():
 			self.print('Joining #'+i)
 			c.join('#'+i)
-		self.checkConfigProcess = self.startProcess(target=self.checkConfig, args=(c,))
+		if not self.checkConfigThread.isAlive(): self.checkConfigThread.start()
 
 	def on_nicknameinuse(self, c, e):
 		with self.updateLock:
@@ -530,58 +596,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			time.sleep(self.config['chans'][target]['youtube']['timer'])
 			self.randomYoutube(target, True)
 
-	def checkConfig(self, c):
-		self.print('checkConfig(self, c)')
-		while True:
-			time.sleep(60)
-			request = requests.get(self.baseAddress + 'bot/config/check')
-			result = request.json()
-			self.print('Checking config')
-			if((not result['error']) and (result['lastUpdate'] != self.config['lastUpdate'])):
-				self.print('Getting new config')
-				request = requests.get(self.baseAddress + 'bot/config')
-				result = request.json()
-				with self.updateLock:
 
-					if(self.config['myname'] != result['myname']):
-						c.nick(result['myname'])
-
-					for key in self.spamYtProcess.keys():
-						try:
-							self.spamYtProcess[key].terminate()
-							self.spamYtProcess[key].join()
-							del self.spamYtProcess[key]
-						except:
-							pass
-
-					for key in self.spamProcess.keys():
-						try:
-							self.spamProcess[key].terminate()
-							self.spamProcess[key].join()
-							del self.spamProcess[key]
-						except:
-							pass
-
-					for key in self.spamEventProcess.keys():
-						try:
-							self.spamEventProcess[key].terminate()
-							self.spamEventProcess[key].join()
-							del self.spamEventProcess[key]
-						except:
-							pass
-
-					for chan in result['chans'].keys():
-						if chan not in self.config['chans'].keys():
-							self.lastMsg[chan] = []
-							self.print('Joining #'+chan)
-							c.join('#'+chan)
-
-					for chan in self.config['chans'].keys():
-						if chan not in result['chans'].keys():
-							del self.lastMsg[chan]
-							self.print('Leaving #'+chan)
-							c.part('#'+chan, 'Leaving')
-					self.config = result
 
 
 
