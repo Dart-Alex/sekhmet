@@ -399,6 +399,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 	def errCommand(self, target, body, lastMsgs):
 		try:
+			self.print('errCommand(self, target="'+target+'", body="'+body+'", lastMsgs='+str(lastMsgs)+')')
 			toReplace = body.replace('!err ','').split('/')[0]
 			replaced = body.replace('!err','').split('/')[1]
 			found = False
@@ -417,6 +418,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			pass
 
 	def confirmNick(self, source, token):
+		self.print('confirmNick(self, source="'+source+'", token="'+token+'")')
 		request = requests.get(self.baseAddress + 'bot/confirm/'+source+'/'+token)
 		result = request.json()
 		message = ""
@@ -429,7 +431,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		source = source.lower()
 		command = command.lower()
 		subCommand = subCommand.lower()
-		self.print('sendConfig(self, "'+eventType+'", "'+source+'", "'+command+'", "'+subCommand+'", '+str(dataSet)+', "'+target+'")')
+		self.print('sendConfig(self, eventType="'+eventType+'", source="'+source+'", command="'+command+'", subCommand="'+subCommand+'", dataSet='+str(dataSet)+', target="'+target+'")')
 		for data in dataSet:
 			request = requests.post(self.baseAddress + 'bot/config', data={
 				'command': command,
@@ -456,6 +458,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				pass
 
 	def fetchYoutube(self, target, source, yid):
+		self.print('fetchYoutube(self, target="'+target+'", source="'+source+'", yid="'+yid+'")')
 		request = requests.post(self.baseAddress + 'bot/ytfetch/' + target, data={'yid':yid,'name':source})
 		video = request.json()
 		if video['error']:
@@ -469,6 +472,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		self.msg('#' + target, message)
 
 	def searchYoutube(self, target, source, search):
+		self.print('searchYoutube(self, target="'+target+'", source="'+source+'", search="'+search+'")')
 		request = requests.post(self.baseAddress + 'bot/ytsearch/' + target, data={'search_query':search, 'name':source})
 		result = request.json()
 		if result['error']:
@@ -483,6 +487,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		self.msg('#' + target, message)
 
 	def randomYoutube(self, target, auto=False):
+		self.print('randomYoutube(self, target="'+target+'", auto='+str(auto)+')')
 		request = requests.get(self.baseAddress + 'bot/yt/' + target)
 		result = request.json()
 		if auto:
@@ -497,6 +502,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		self.msg('#' + target, message)
 
 	def countYoutubeVideos(self, target):
+		self.print('countYoutubeVideos(self, target="'+target+'")')
 		request = requests.get(self.baseAddress + 'bot/ytcount/' + target)
 		result = request.json()
 		if result['error']:
@@ -506,6 +512,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		self.msg('#' + target, message)
 
 	def countYoutubeVideosByName(self, target, name):
+		self.print('countYoutubeVideosByName(self, target="'+target+'", name="'+name+'")')
 		request = requests.get(self.baseAddress + 'bot/ytcount/' + target + '/' + name)
 		result = request.json()
 		if result['error']:
@@ -515,11 +522,13 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		self.msg('#' + target, message)
 
 	def spamYoutube(self, target):
+		self.print('spamYoutube(self, target="'+target+'")')
 		while True:
 			time.sleep(self.config['chans'][target]['youtube']['timer'])
 			self.randomYoutube(target, True)
 
 	def checkConfig(self, c):
+		self.print('checkConfig(self, c)')
 		while True:
 			time.sleep(60)
 			request = requests.get(self.baseAddress + 'bot/config/check')
