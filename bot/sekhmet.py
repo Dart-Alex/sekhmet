@@ -259,23 +259,10 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		User commands
 		"""
 		if command_list[0] == "!ping":
-			self.msg('#'+target, 'pong !')
-		elif command_list[0] == "!ytcount":
-			if self.config['chans'][target]['youtube']['active']:
-				if len(command_list) == 1:
-					self.startProcess(target=self.countYoutubeVideos, args=(target,))
-					pass
-				else:
-					for nick in command_list[1:]:
-						self.startProcess(target=self.countYoutubeVideosByName, args=(target, nick,))
-		elif command_list[0] == "!yt":
-			if self.config['chans'][target]['youtube']['active']:
-				if len(command_list) == 1:
-					self.startProcess(target=self.randomYoutube, args=(target,))
-				else:
-					self.startProcess(target=self.searchYoutube, args=(target, source, ' '.join(command_list[1:]),))
-		elif command_list[0] == "!err":
-			self.startProcess(target=self.errCommand, args=(target, body, self.lastMsg[target]))
+			if e.type == "pubmsg":
+				self.msg('#'+target, 'pong !')
+			else:
+				self.msg(source, "pong !")
 		elif command_list[0] == "!aide":
 			if len(command_list) == 1:
 				message = "Commandes utilisateur: "+", ".join(self.commandDictUser.keys())
@@ -289,6 +276,29 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				elif e.type == "pubmsg":
 					self.notice(source, message)
 				del message
+			except:
+				pass
+		"""
+		pubmsg user commands
+		"""
+		if e.type == "pubmsg":
+			try:
+				if command_list[0] == "!ytcount":
+					if self.config['chans'][target]['youtube']['active']:
+						if len(command_list) == 1:
+							self.startProcess(target=self.countYoutubeVideos, args=(target,))
+							pass
+						else:
+							for nick in command_list[1:]:
+								self.startProcess(target=self.countYoutubeVideosByName, args=(target, nick,))
+				elif command_list[0] == "!yt":
+					if self.config['chans'][target]['youtube']['active']:
+						if len(command_list) == 1:
+							self.startProcess(target=self.randomYoutube, args=(target,))
+						else:
+							self.startProcess(target=self.searchYoutube, args=(target, source, ' '.join(command_list[1:]),))
+				elif command_list[0] == "!err":
+					self.startProcess(target=self.errCommand, args=(target, body, self.lastMsg[target]))
 			except:
 				pass
 		"""
