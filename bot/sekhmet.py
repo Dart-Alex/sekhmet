@@ -317,11 +317,12 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				if command_list[0] in ['!youtube', '!spam', '!event']:
 					try:
 						command = command_list[0].replace('!','')
-						if command_list[1].lower() == 'timer':
+						subCommand = command_list[1].lower()
+						if subCommand == 'timer':
 							self.startProcess(target=self.sendConfig, args=(source, command, 'timer', [int(command_list[2])], target,))
-						elif command_list[1].lower() == 'start':
+						elif subCommand == 'start':
 							self.startProcess(target=self.sendConfig, args=(source, command, 'active', [True], target,))
-						elif command_list[1].lower() == 'stop':
+						elif subCommand == 'stop':
 							self.startProcess(target=self.sendConfig, args=(source, command, 'active', [False], target,))
 						else:
 							self.msg(source, "Commande "+command_list[1]+" inconnue pour "+command_list[0]+".")
@@ -509,7 +510,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 	def checkConfig(self, c):
 		while True:
-			time.sleep(10)
+			time.sleep(60)
 			request = requests.get(self.baseAddress + 'bot/config/check')
 			result = request.json()
 			self.print('Checking config')
