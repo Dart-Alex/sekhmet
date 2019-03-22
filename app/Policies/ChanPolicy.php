@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\User;
 use App\Chan;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use App\ChanUser;
 
 class ChanPolicy
 {
@@ -21,7 +22,7 @@ class ChanPolicy
     {
 		if(!$chan->hidden) return true;
 		if(auth()->guest()) return false;
-		return ($user->isAdmin() || $chan->isAdmin($user));
+		return ($user->isAdmin() || $chan->isAdmin($user) || $chan->hasUser($user));
     }
 
     /**
@@ -69,6 +70,16 @@ class ChanPolicy
 	public function join(User $user, Chan $chan) {
 		if(!$chan->hidden) return true;
 		return $user->isAdmin();
+	}
 
+	/**
+	 * Determine wether the user can leave the chan.
+	 *
+	 * @param \App\User $user
+	 * @param \App\Chan $chan
+	 * @return mixed
+	 */
+	public function part(User $user, Chan $chan) {
+		return $chan->hasUser($user);
 	}
 }
