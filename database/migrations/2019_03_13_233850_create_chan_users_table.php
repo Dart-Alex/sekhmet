@@ -14,6 +14,7 @@ class CreateChanUsersTable extends Migration
     public function up()
     {
         Schema::create('chan_users', function (Blueprint $table) {
+			$table->bigIncrements('id');
 			$table->unsignedBigInteger('chan_id');
 			$table->unsignedBigInteger('user_id');
 			$table->boolean('admin')->default(false);
