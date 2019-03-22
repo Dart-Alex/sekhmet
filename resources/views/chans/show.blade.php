@@ -12,7 +12,19 @@
 	<div class='field is-grouped'>
 		@can('join', $chan)
 		<div class="control">
-			<a href="#" class="button is-primary">Rejoindre le chan</a>
+			<form action='{{route('chanUsers.store', ['chan' => $chan->name])}}' method='POST'>
+				@csrf
+				<input type='submit' class='button is-primary' value='Rejoindre le chan'/>
+			</form>
+		</div>
+		@endcan
+		@can('part', $chan)
+		<div class='control'>
+			<form action="{{route('chanUsers.destroy', ['chan' => $chan->name, 'chanUser' => $chan->chanUser(auth()->user())])}}" method="post">
+				@csrf
+				@method('DELETE')
+				<input type='submit' class='button is-danger' value='Partir du chan'/>
+			</form>
 		</div>
 		@endcan
 		@can('update', $chan)
@@ -30,5 +42,32 @@
 		</form>
 		@endcan
 	</div>
+	<h2>Utilisateurs</h2>
+	<ul>
+		@foreach($chan->chanUsers->sortByDesc('admin') as $chanUser)
+		<li>
+			{{$chanUser->admin?'@':''}}
+			{{$chanUser->user->name}}
+			({{join(', ', $chanUser->user->ircNames->pluck('name')->toArray())}})
+			<span style='display:inline-flex;'>
+				@can('update', [$chanUser, $chan])
+				<a title="{{($chanUser->admin?'Rendre utilisateur':'Rendre admin')}}" class="fas fa-chevron-{{($chanUser->admin?'down':'up')}}" href="{{route('chanUsers.update', ['chan' => $chan->name, 'chanUser' => $chanUser->id])}}" onclick="event.preventDefault();document.getElementById('update-form-{{$chanUser->id}}').submit();"></a>
+				<form id='update-form-{{$chanUser->id}}' action="{{route('chanUsers.update', ['chan' => $chan->name, 'chanUser' => $chanUser->id])}}" method="post">
+					@csrf
+					@method('PATCH')
+					<input type='hidden' name='admin' value='{{$chanUser->admin?'true':'false'}}'/>
+				</form>
+				@endcan
+				@can('delete', [$chanUser, $chan])
+				<a title="Supprimer du chan" class="fas fa-trash" href="{{route('chanUsers.destroy', ['chan' => $chan->name, 'chanUser' => $chanUser->id])}}" onclick="event.preventDefault();document.getElementById('delete-form-{{$chanUser->id}}').submit();"></a>
+				<form id='delete-form-{{$chanUser->id}}' action="{{route('chanUsers.destroy', ['chan' => $chan->name, 'chanUser' => $chanUser->id])}}" method="post">
+					@csrf
+					@method('DELETE')
+				</form>
+				@endcan
+			</span>
+		</li>
+		@endforeach
+	</ul>
 </div>
 @endsection
