@@ -107,7 +107,7 @@ export default {
 		canModify() {
 			if(this.user.guest) return false;
 			if(this.user.admin) return true;
-			if(this.user.chanAdmin) return true;
+			if(this.user.chan_admin) return true;
 			if(this.comment.user_id == this.user.id) return true;
 			return false;
 		},
