@@ -67,3 +67,14 @@ Route::delete('/users/{user}', 'UserController@destroy')->name('users.destroy');
  */
 Route::post('/ircNames', 'IrcNameController@store')->name('ircNames.store');
 Route::delete('/ircNames/{ircName}', 'IrcNameController@destroy')->name('ircNames.destroy');
+
+
+/**
+ * ChanUsers
+ * POST		/chanUsers					(store)		chanUsers.store
+ * PATCH	/chanUsers/{chanUser}		(update)	chanUsers.update
+ * DELETE	/ChanUsers/{chanUser}		(destroy)	chanUsers.destroy
+ */
+Route::post('/chanUsers/{chan}', 'ChanUserController@store')->name('chanUsers.store');
+Route::post('/chanUsers/{chan}/{chanUser}', 'ChanUserController@update')->name('chanUsers.update');
+Route::delete('chanUsers/{chan}/{chanUser}', 'ChanUserController@destroy')->name('chanUsers.destroy');
