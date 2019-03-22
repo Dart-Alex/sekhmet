@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\ChanUser;
 use Illuminate\Http\Request;
 use App\Chan;
+use App\User;
 
 class ChanUserController extends Controller
 {
@@ -47,10 +48,7 @@ class ChanUserController extends Controller
     public function update(Request $request, Chan $chan, ChanUser $chanUser)
     {
 		$this->authorize('update', [$chanUser, $chan]);
-		$admin = $this->validate($request, [
-			'admin' => 'required|boolean'
-		])['admin'];
-		$chanUser->admin = $admin;
+		$chanUser->admin = !$chanUser->admin;
 		$chanUser->save();
 		$name = $chanUser->user->name;
 		$message = ($chanUser->admin?'est maintenant':"n'est plus");
