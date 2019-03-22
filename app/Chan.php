@@ -86,6 +86,9 @@ class Chan extends Model
 	{
 		return $this->hasMany(Post::class, 'id', 'chan_id');
 	}
+	public function chanUser(User $user) {
+		return ChanUser::where('chan_id', $this->id)->where('user_id', $user->id)->first();
+	}
 	public function hasUser(User $user) {
 		return ChanUser::where('chan_id', $this->id)->where('user_id', $user->id)->exists();
 	}
