@@ -68,8 +68,8 @@ class ChanPolicy
 	 * @return mixed
 	 */
 	public function join(User $user, Chan $chan) {
-		if(!$chan->hidden) return true;
-		return $user->isAdmin();
+		if(!$chan->hidden) return !$chan->hasUser($user);
+		return $user->isAdmin() && !$chan->hasUser($user);
 	}
 
 	/**
