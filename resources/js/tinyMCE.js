@@ -1,0 +1,41 @@
+window.onload = () => {
+	let defaultToolbar = 'fullscreen preview | undo redo | styleselect | bold italic underline | alignleft aligncenter alignright alignjustify | indent outdent | ';
+	tinymce.init({
+		selector: 'textarea',
+		plugins: [
+			'a11ychecker',
+			'autolink',
+			'autoresize',
+			'autosave',
+			'charmap',
+			'fullscreen',
+			'link',
+			'image',
+			'lists',
+			'advlist',
+			'media',
+			'code',
+			'pageembed',
+			'paste',
+			'permanentpen',
+			'powerpaste',
+			'preview',
+			'print',
+			'quickbars',
+			'searchreplace',
+			'tinymcespellchecker',
+			'table',
+			'toc',
+			'visualblocks',
+			'wordcount'
+		],
+		toolbar: defaultToolbar + 'bullist numlist | code visualblocks | forecolor backcolor | image link media | permanentpen | searchreplace',
+		min_height: 500,
+		max_height: 700,
+		image_caption: true,
+		media_live_embeds: true,
+		paste_data_images: false,
+		quickbars_insert_toolbar: "image link media | quicktable",
+		spellchecker_language: 'fr',
+});
+}
