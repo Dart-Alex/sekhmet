@@ -8,7 +8,7 @@
 			</span>
 			<p>Par {{comment.name}}</p>
 			<p>{{createdAt}}</p>
-			<p>{{comment.content}}</p>
+			<nl2br tag="p" :text='comment.content'></nl2br>
 			<p v-if="comment.created_at != comment.updated_at">{{updatedAt}}</p>
 		</div>
 		<message v-if="editForm.message.any()" :type="editForm.message.type" :content="editForm.message.content"></message>
@@ -72,9 +72,13 @@
 <script>
 import Form from "../classes/Form.js";
 import dateFormat from "../functions/dateFormat.js";
+import Nl2br from 'vue-nl2br';
 export default {
 	name: "comment",
 	props: ['id'],
+	components: {
+		"nl2br":Nl2br
+	},
 	data() {
 		return {
 			user: this.$parent.user,
