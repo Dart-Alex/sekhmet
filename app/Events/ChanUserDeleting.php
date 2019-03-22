@@ -9,6 +9,7 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use App\ChanUser;
 
 class ChanUserDeleting
 {
@@ -21,7 +22,7 @@ class ChanUserDeleting
      */
     public function __construct(ChanUser $chanUser)
     {
-        $this->$chanUser = $chanUser;
+		$this->chanUser = $chanUser;
     }
 
     /**

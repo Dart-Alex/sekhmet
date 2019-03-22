@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 use App\ChanUser;
+use App\Events\ChanUserDeleting;
 
 class BotConfigModified
 {

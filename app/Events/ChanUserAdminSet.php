@@ -21,7 +21,7 @@ class ChanUserAdminSet
      */
     public function __construct()
     {
-        //
+        app('log')->info('ChanUserAdminSet');
     }
 
     /**
