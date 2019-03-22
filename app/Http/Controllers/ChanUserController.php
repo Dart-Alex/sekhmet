@@ -4,60 +4,37 @@ namespace App\Http\Controllers;
 
 use App\ChanUser;
 use Illuminate\Http\Request;
+use App\Chan;
 
 class ChanUserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Chan $chan)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\ChanUser  $chanUser
-     * @return \Illuminate\Http\Response
-     */
-    public function show(ChanUser $chanUser)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\ChanUser  $chanUser
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(ChanUser $chanUser)
-    {
-        //
+		$this->authorize('create', [ChanUser::class, $chan]);
+		$user = auth()->user();
+		if(($user->isAdmin() || $chan->isAdmin($user)) && $request->has('user_id')) {
+			$user_id = (int) $this->validate($request, [
+				'user_id' => 'required|numeric|exists:users,id'
+			])['user_id'];
+			$addedUser = User::find($user_id);
+		}
+		else {
+			$addedUser = $user;
+		}
+		if($chan->hasUser($addedUser)) {
+			danger("$addedUser->name a déjà rejoint ".$chan->displayName().".");
+		}
+		else {
+			ChanUser::create(['user_id' => $addedUser->id, 'chan_id' => $chan->id]);
+			success("$addedUser->name a rejoint ".$chan->displayName().".");
+		}
+		return redirect()->back();
     }
 
     /**
@@ -67,9 +44,18 @@ class ChanUserController extends Controller
      * @param  \App\ChanUser  $chanUser
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, ChanUser $chanUser)
+    public function update(Request $request, Chan $chan, ChanUser $chanUser)
     {
-        //
+		$this->authorize('update', [$chanUser, $chan]);
+		$admin = $this->validate($request, [
+			'admin' => 'required|boolean'
+		])['admin'];
+		$chanUser->admin = $admin;
+		$chanUser->save();
+		$name = $chanUser->user->name;
+		$message = ($chanUser->admin?'est maintenant':"n'est plus");
+		success("$name $message administrateur sur ".$chan->displayName());
+		return redirect()->back();
     }
 
     /**
@@ -78,8 +64,12 @@ class ChanUserController extends Controller
      * @param  \App\ChanUser  $chanUser
      * @return \Illuminate\Http\Response
      */
-    public function destroy(ChanUser $chanUser)
+    public function destroy(Chan $chan, ChanUser $chanUser)
     {
-        //
+		$this->authorize('delete', [$chanUser, $chan]);
+		$name = $chanUser->user->name;
+		$chanUser->delete();
+		success("$name est parti de ".$chan->displayName().'.');
+		return redirect()->back();
     }
 }
