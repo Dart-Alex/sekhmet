@@ -86,6 +86,9 @@ class Chan extends Model
 	{
 		return $this->hasMany(Post::class, 'id', 'chan_id');
 	}
+	public function hasUser(User $user) {
+		return ChanUser::where('chan_id', $this->id)->where('user_id', $user->id)->exists();
+	}
 	public function isAdmin(User $user) {
 		$admins = ChanUser::where('admin', true)
 			->where('chan_id', $this->id)
