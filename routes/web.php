@@ -76,5 +76,5 @@ Route::delete('/ircNames/{ircName}', 'IrcNameController@destroy')->name('ircName
  * DELETE	/ChanUsers/{chanUser}		(destroy)	chanUsers.destroy
  */
 Route::post('/chanUsers/{chan}', 'ChanUserController@store')->name('chanUsers.store');
-Route::post('/chanUsers/{chan}/{chanUser}', 'ChanUserController@update')->name('chanUsers.update');
-Route::delete('chanUsers/{chan}/{chanUser}', 'ChanUserController@destroy')->name('chanUsers.destroy');
+Route::patch('/chanUsers/{chan}/{chanUser}', 'ChanUserController@update')->name('chanUsers.update');
+Route::delete('/chanUsers/{chan}/{chanUser}', 'ChanUserController@destroy')->name('chanUsers.destroy');
