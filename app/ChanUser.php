@@ -8,30 +8,28 @@ use App\Events\ChanUserDeleting;
 
 class ChanUser extends Model
 {
-    /**
+	/**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'user_id', 'admin', 'chan_id'
-    ];
+	protected $fillable = [
+		'user_id', 'admin', 'chan_id'
+	];
 
-    /**
+	/**
      * The attributes that should be hidden for arrays.
      *
      * @var array
      */
-    protected $hidden = [
+	protected $hidden = [];
 
-    ];
-
-    /**
+	/**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = [
+	protected $casts = [
 		'created_at' => 'datetime',
 		'updated_at' => 'datetime',
 		'admin' => 'boolean'
@@ -42,20 +40,23 @@ class ChanUser extends Model
      *
      * @var array
      */
-    protected $dispatchesEvents = [
+	protected $dispatchesEvents = [
 		'deleting' => ChanUserDeleting::class,
-    ];
+	];
 
-	public function user() {
+	public function user()
+	{
 		return $this->belongsTo(User::class);
 	}
 
-	public function chan() {
+	public function chan()
+	{
 		return $this->belongsTo(Chan::class, 'chan_id', 'id');
 	}
 
-	public function setAdminAttribute($value) {
-		if($value != $this->admin) event(new ChanUserAdminSet());
+	public function setAdminAttribute($value)
+	{
+		if ($value != $this->admin) event(new ChanUserAdminSet());
 		$this->attributes['admin'] = $value;
 	}
 }

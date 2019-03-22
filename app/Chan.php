@@ -61,11 +61,11 @@ class Chan extends Model
      *
      * @var array
      */
-    protected $dispatchesEvents = [
-        'saved' => ChanAdded::class,
+	protected $dispatchesEvents = [
+		'saved' => ChanAdded::class,
 		'updated' => ChanUpdated::class,
 		'deleting' => ChanDeleted::class,
-    ];
+	];
 
 	public function getRouteKeyName()
 	{
@@ -86,29 +86,33 @@ class Chan extends Model
 	{
 		return $this->hasMany(Post::class, 'id', 'chan_id');
 	}
-	public function chanUser(User $user) {
+	public function chanUser(User $user)
+	{
 		return ChanUser::where('chan_id', $this->id)->where('user_id', $user->id)->first();
 	}
-	public function hasUser(User $user) {
+	public function hasUser(User $user)
+	{
 		return ChanUser::where('chan_id', $this->id)->where('user_id', $user->id)->exists();
 	}
-	public function isAdmin(User $user) {
-		$admins = ChanUser::where('admin', true)
+	public function isAdmin(User $user)
+	{
+		return ChanUser::where('admin', true)
 			->where('chan_id', $this->id)
-			->get()
-			->pluck('user_id')
-			->toArray();
-		return in_array($user->id, $admins);
+			->where('user_id', $user->id)
+			->where('admin', true)
+			->exists();
 	}
-	public function displayName() {
-		return '#'.ucfirst($this->name).(($this->hidden)?' (caché)':'');
+	public function displayName()
+	{
+		return '#' . ucfirst($this->name) . (($this->hidden) ? ' (caché)' : '');
 	}
 
-	public function getConfig() {
+	public function getConfig()
+	{
 		$adminUsers = ChanUser::where('chan_id', $this->id)->where('admin', true)->get();
 		$admins = [];
-		foreach($adminUsers as $adminUser) {
-			foreach($adminUser->user->ircNames as $ircName) {
+		foreach ($adminUsers as $adminUser) {
+			foreach ($adminUser->user->ircNames as $ircName) {
 				$admins[] = strtolower($ircName->name);
 			}
 		}
