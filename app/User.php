@@ -6,6 +6,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Events\UserAdminSet;
+use App\Events\UserDeleting;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -40,6 +41,15 @@ class User extends Authenticatable implements MustVerifyEmail
 		'updated_at' => 'datetime',
 		'admin' => 'boolean'
 	];
+
+	/**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+		'deleting' => UserDeleting::class,
+    ];
 
 	public function isAdmin() {
 		return $this->admin;

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Events\ChanUserAdminSet;
+use App\Events\ChanUserDeleting;
 
 class ChanUser extends Model
 {
@@ -35,6 +36,15 @@ class ChanUser extends Model
 		'updated_at' => 'datetime',
 		'admin' => 'boolean'
 	];
+
+	/**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+		'deleting' => ChanUserDeleting::class,
+    ];
 
 	public function user() {
 		return $this->belongsTo(User::class);
