@@ -23,7 +23,7 @@ class ChanUserController extends Controller
 			$user_id = (int) $this->validate($request, [
 				'user_id' => 'required|numeric|exists:users,id'
 			])['user_id'];
-			$addedUser = User::find($user_id);
+			$addedUser = User::where('id', $user_id)->first();
 		}
 		else {
 			$addedUser = $user;

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Chan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use App\User;
 
 class ChanController extends Controller
 {
@@ -64,7 +66,10 @@ class ChanController extends Controller
 	public function show(Chan $chan)
 	{
 		$this->authorize('view', $chan);
-		return view('chans.show', compact('chan'));
+		$users = null;
+		if(Gate::allows('update', $chan)) $users = User::all();
+
+		return view('chans.show', compact('chan', 'users'));
 	}
 
 	/**

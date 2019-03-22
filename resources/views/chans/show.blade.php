@@ -55,7 +55,6 @@
 				<form id='update-form-{{$chanUser->id}}' action="{{route('chanUsers.update', ['chan' => $chan->name, 'chanUser' => $chanUser->id])}}" method="post">
 					@csrf
 					@method('PATCH')
-					<input type='hidden' name='admin' value='{{$chanUser->admin?'true':'false'}}'/>
 				</form>
 				@endcan
 				@can('delete', [$chanUser, $chan])
@@ -68,6 +67,29 @@
 			</span>
 		</li>
 		@endforeach
+		@can('update', $chan)
+		<li>
+			<form action='{{route('chanUsers.store', ['chan' => $chan->name])}}' method='post'>
+				@csrf
+				<div class="field is-grouped">
+					<div class="control">
+						<div class="select">
+							<select name="user_id" required>
+								@foreach($users->sortBy('name') as $user)
+								@if(!$user->hasChan($chan))
+								<option value={{$user->id}}>{{$user->name}} </option>
+								@endif
+								@endforeach
+							</select>
+						</div>
+					</div>
+					<div class="control">
+						<input type="submit" class="button is-primary" value="Ajouter">
+					</div>
+				</div>
+			</form>
+		</li>
+		@endcan
 	</ul>
 </div>
 @endsection
