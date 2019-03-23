@@ -43,6 +43,13 @@ Route::get('/chans/{chan}/events/{post}/edit', "PostController@edit")->name('pos
 Route::patch('/chans/{chan}/events/{post}', "PostController@update")->name('posts.update');
 Route::delete('/chans/{chan}/events/{post}', "PostController@destroy")->name('posts.destroy');
 
+/**
+ * Event subscribers
+ * POST		/chans/{chan}/events/{post}/subscribers						(store)		postSubscribers.store
+ * DELETE	/chans/{chan}/events/{post}/subscribers/{postSubscriber}	(destroy)	postSubscribers.destroy
+ */
+Route::post('/chans/{chan}/events/{post}/subscribers', 'PostSubscriberController@store')->name('postSubscribers.store');
+Route::delete('/chans/{chan}/events/{post}/subscribers/{postSubscriber}', 'PostSubscriberController@destroy')->name('postSubscribers.destroy');
 
 /**
  * Users
