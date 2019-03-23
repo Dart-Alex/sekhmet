@@ -28,6 +28,7 @@ class EventServiceProvider extends ServiceProvider
     protected $subscribe = [
 		'App\Listeners\CommentsModified',
 		'App\Listeners\BotConfigModified',
+		'App\Listeners\PostSubscribersCheck',
     ];
 
     /**

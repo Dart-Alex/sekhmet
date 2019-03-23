@@ -50,7 +50,7 @@ class Post extends Model
 
 	public function postSubscribers()
 	{
-		return $this->hasMany(PostSubscriber::class, 'id', 'post_id');
+		return $this->hasMany(PostSubscriber::class);
 	}
 
 	public function setContentAttribute($value)

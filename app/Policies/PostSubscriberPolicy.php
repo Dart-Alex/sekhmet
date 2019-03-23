@@ -19,7 +19,7 @@ class PostSubscriberPolicy
      */
     public function create(?User $user, Post $post)
     {
-		return $user->can('view', $post) && (auth()->guest() || !PostSubscriber::where('user_id', $user->id)->where('post_id', $post->id)->exists());
+		return (auth()->guest() || !PostSubscriber::where('user_id', $user->id)->where('post_id', $post->id)->exists());
     }
 
     /**

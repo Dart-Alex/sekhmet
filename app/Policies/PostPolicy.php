@@ -14,7 +14,7 @@ class PostPolicy
 	public function index(?User $user, Chan $chan)
 	{
 		if(!$chan->hidden) return true;
-		return !auth()->guest() && ($user->isAdmin() || $chan->isAdmin($user));
+		return ($user->isAdmin() || $chan->isAdmin($user));
 	}
     /**
      * Determine whether the user can view the post.
@@ -26,7 +26,7 @@ class PostPolicy
     public function view(?User $user, Post $post)
     {
 		if(!$post->chan->hidden) return true;
-		return !auth()->guest() && ($user->isAdmin() || $post->chan->isAdmin($user));
+		return ($user->isAdmin() || $post->chan->isAdmin($user));
     }
 
     /**

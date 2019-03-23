@@ -17,8 +17,53 @@
 			</form>
 		</div>
 	</div>
-
 	@endcan
+	<h2>Inscrits</h2>
+	<ul>
+		@foreach($post->postSubscribers as $subscriber)
+		<li>
+			{{$subscriber->name}}
+			@can('delete', $subscriber)
+			<a title="Supprimer" class="fas fa-times has-text-danger" href="{{route('postSubscribers.destroy', ['chan' => $chan->name, 'post' => $post->id, 'postSubscriber' => $subscriber->id])}}" onclick="event.preventDefault();document.getElementById('delete-form-subscriber-{{$subscriber->id}}').submit();">
+				</a>
+				<form id="delete-form-subscriber-{{$subscriber->id}}" action="{{route('postSubscribers.destroy', ['chan' => $chan->name, 'post' => $post->id, 'postSubscriber' => $subscriber->id])}}" method="POST">
+					@csrf
+					@method('DELETE')
+				</form>
+			@endcan
+		</li>
+		@endforeach
+		@can('create', ['App\PostSubscriber', $post])
+		<li>
+			<form action="{{route('postSubscribers.store', ['chan' => $chan->name, 'post' => $post->id])}}" method="post">
+				@csrf
+		@auth
+			<input type="hidden" name='name' value='{{auth()->user()->name}}'/>
+			<div class="field">
+				<div class="control">
+					<input type="submit" class='button is-primary' value="S'inscrire"/>
+				</div>
+			</div>
+		@endauth
+		@guest
+			<div class="field is-grouped">
+				<div class='control'>
+					<input class='input' type='text' name='name' id='name' placeholder='Votre pseudo' value='{{old('name')}}' required/>
+				</div>
+				<div class="control">
+					<input type="submit" class='button is-primary' value="S'inscrire"/>
+				</div>
+				@if ($errors->has('name'))
+				<p class='help is-danger'>
+					{{ $errors->first('name') }}
+				</p>
+				@endif
+			</div>
+		@endguest
+			</form>
+		</li>
+		@endcan
+	</ul>
 	@if($post->comments_allowed)
 	<comments id="{{$post->id}}"></comments>
 	@endif
