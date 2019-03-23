@@ -118,6 +118,6 @@ Breadcrumbs::for('posts.show', function($trail, Chan $chan, Post $post) {
 
 // Home > chans.index > {chan} > posts.index > {post} > posts.edit
 Breadcrumbs::for('posts.edit', function($trail, Chan $chan, Post $post) {
-	$trail->parent('post.show', $chan, $post);
+	$trail->parent('posts.show', $chan, $post);
 	$trail->push("Éditer", route('posts.edit', ["chan" => $chan->name, "post" => $post->id]));
 });
