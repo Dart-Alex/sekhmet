@@ -66,6 +66,11 @@ class User extends Authenticatable implements MustVerifyEmail
 		return $this->hasMany(ChanUser::class);
 	}
 
+	public function postSubscribers()
+	{
+		return $this->hasMany(PostSubscriber::class, 'id', 'user_id');
+	}
+
 	public function hasChan(Chan $chan)
 	{
 		return ChanUser::where('chan_id', $chan->id)->where('user_id', $this->id)->exists();

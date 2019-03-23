@@ -48,6 +48,11 @@ class Post extends Model
 		return $this->hasMany(Comment::class);
 	}
 
+	public function postSubscribers()
+	{
+		return $this->hasMany(PostSubscriber::class, 'id', 'post_id');
+	}
+
 	public function setContentAttribute($value)
 	{
 		$this->attributes['content'] = clean($value);
