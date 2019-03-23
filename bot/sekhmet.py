@@ -65,39 +65,96 @@ class CheckConfig(StoppableThread):
 					if(bot.config['myname'] != result['myname']):
 						bot.connection.nick(result['myname'])
 
-					for key in bot.spamYtProcess.keys():
-						try:
-							bot.spamYtProcess[key].terminate()
-							bot.spamYtProcess[key].join()
-						except:
-							pass
-
-					for key in bot.spamProcess.keys():
-						try:
-							bot.spamProcess[key].terminate()
-							bot.spamProcess[key].join()
-						except:
-							pass
-
-					for key in bot.spamEventProcess.keys():
-						try:
-							bot.spamEventProcess[key].terminate()
-							bot.spamEventProcess[key].join()
-						except:
-							pass
-
 					for chan in result['chans'].keys():
 						if chan not in bot.config['chans'].keys():
 							bot.lastMsg[chan] = []
 							bot.print('Joining #'+chan)
 							bot.connection.join('#'+chan)
+						else:
+							if bot.config['chans'][chan]['youtube'] != result['chans'][chan]['youtube']:
+								try:
+									bot.print('Terminating spamYtProcess['+chan+']')
+									bot.spamYtProcess[chan].terminate()
+									bot.spamYtProcess[chan].join()
+									bot.print('spamYtProcess['+chan+'] terminated')
+									del bot.spamYtProcess[chan]
+								except:
+									bot.print('Couldnt terminate spamYtProcess['+chan+']')
+									pass
+							if bot.config['chans'][chan]['spam'] != result['chans'][chan]['spam']:
+								try:
+									bot.print('Terminating spamProcess['+chan+']')
+									bot.spamProcess[chan].terminate()
+									bot.spamProcess[chan].join()
+									bot.print('spamProcess['+chan+'] terminated')
+									del bot.spamProcess[chan]
+								except:
+									bot.print('Couldnt terminate spamProcess['+chan+']')
+									pass
+							if bot.config['chans'][chan]['event'] != result['chans'][chan]['event']:
+								try:
+									bot.print('Terminating spamEventProcess['+chan+']')
+									bot.spamEventProcess[chan].terminate()
+									bot.spamEventProcess[chan].join()
+									bot.print('spamEventProcess['+chan+'] terminated')
+									del bot.spamEventProcess[chan]
+								except:
+									bot.print('Couldnt terminate spamEventProcess['+chan+']')
+									pass
 
 					for chan in bot.config['chans'].keys():
 						if chan not in result['chans'].keys():
 							del bot.lastMsg[chan]
+							try:
+								bot.print('Terminating spamYtProcess['+chan+']')
+								bot.spamYtProcess[chan].terminate()
+								bot.spamYtProcess[chan].join()
+								bot.print('spamYtProcess['+chan+'] terminated')
+								del bot.spamYtProcess[chan]
+							except:
+								bot.print('Couldnt terminate spamYtProcess['+chan+']')
+								pass
+							try:
+								bot.print('Terminating spamProcess['+chan+']')
+								bot.spamProcess[chan].terminate()
+								bot.spamProcess[chan].join()
+								bot.print('spamProcess['+chan+'] terminated')
+								del bot.spamProcess[chan]
+							except:
+								bot.print('Couldnt terminate spamProcess['+chan+']')
+								pass
+							try:
+								bot.print('Terminating spamEventProcess['+chan+']')
+								bot.spamEventProcess[chan].terminate()
+								bot.spamEventProcess[chan].join()
+								bot.print('spamEventProcess['+chan+'] terminated')
+								del bot.spamEventProcess[chan]
+							except:
+								bot.print('Couldnt terminate spamEventProcess['+chan+']')
+								pass
 							bot.print('Leaving #'+chan)
 							bot.connection.part('#'+chan, 'Leaving')
 					bot.config = result
+					for chan in bot.config['chans'].keys():
+						if bot.config['chans'][chan]['youtube']['active'] and bot.config['chans'][chan]['youtube']['timer'] > 0:
+							alive = False
+							try:
+								alive = bot.spamYtProcess[chan].is_alive()
+							except:
+								pass
+							if not alive:
+								bot.print('Starting youtube spam for #'+chan)
+								bot.spamYtProcess[chan] = bot.startProcess(target=bot.spamYoutube, args=(chan,))
+						if bot.config['chans'][chan]['event']['active'] and bot.config['chans'][chan]['event']['timer'] > 0:
+							alive = False
+							try:
+								alive = bot.spamEventProcess[chan].is_alive()
+							except:
+								pass
+							if not alive:
+								bot.print('Starting event spam for #'+chan)
+								bot.spamEventProcess[chan] = bot.startProcess(target=bot.spamEvent, args=(chan,))
+
 
 class ModIRC(irc.bot.SingleServerIRCBot):
 
@@ -105,13 +162,14 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 	commandDictUser = {
 		"yt": "Affiche une vidéo youtube (aléatoire si aucun argument). Syntaxe : !yt (pseudo/numéro de vidéo/recherche)",
 		"ytcount": "Affiche le nombre de vidéos partagées sur le canal, ou par un utilisateur. Syntaxe : !ytcount (<pseudo> (<pseudo2> <pseudo3> ...))",
-		"err": "Corrige ce qu'un utilisateur a dit. Syntaxe : !err <texte à remplacer>/<texte de remplacement>"
+		"err": "Corrige ce qu'un utilisateur a dit. Syntaxe : !err <texte à remplacer>/<texte de remplacement>",
+		"event": "Affiche le prochain event du canal, liste les inscrits, ou permet de s'inscrire ou se désinscrire. Syntaxe : !event (#chan si en privé)/!event (#chan si en privé) list/!event (#chan si en privé) <join/part>"
 	}
 	commandDictAdmin = {
 		"admin": "Affiche ou modifie la liste des admins du bot sur le salon. Syntaxe : !admin (#channel si en privé) (add/remove) <pseudo1> (<pseudo2> ...)",
 		"youtube": "Change les paramètres du module Youtube. Syntaxe : !youtube (#channel si en privé) start/stop / !youtube (#channel si en privé) timer <timer en secondes>",
 		"spam": "Change les paramètres du module Spam. Syntaxe : !spam (#channel si en privé) start/stop / !spam (#channel si en privé) timer <timer en secondes>",
-		"event": "Change les paramètres du module Event. Syntaxe : !event (#channel si en privé) start/stop / !event (#channel si en privé) timer <timer en secondes>"
+		"event": "Change les paramètres du module Event. Syntaxe : !event (#channel si en privé) start/stop / !event (#channel si en privé) timer <timer en secondes> / !event (join/part) <user1> <user2>..."
 	}
 	commandDictOwner = {
 		"owner": "Affiche ou modifie la liste des owners du bot. Syntaxe : !owner (add/remove) <pseudo1> (<pseudo2> ...)"
@@ -170,6 +228,12 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		c = self.connection
 		with self.sendLock:
 			c.notice(target, message)
+
+	def privmsg(self, eventType, target, message):
+		if eventType == "privmsg":
+			self.msg(target, message)
+		else:
+			self.notice(target, message)
 
 	def print(self, message):
 		if(self.config['debug']):
@@ -265,7 +329,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 					return
 			# Ignore self.
 			if source == self.config["myname"]: return
-			self.print('('+e.type+')'+'['+e.target+']<'+source+'> <= '+body)
+			#self.print('('+e.type+')'+'['+e.target+']<'+source+'> <= '+body)
 			if e.type == "privmsg" and body.split(' ')[0] == 'confirm':
 				self.startProcess(target=self.confirmNick, args=(source.lower(), body.split(' ')[1]))
 				return
@@ -273,6 +337,16 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				if self.irc_commands(body, source, target, c, e) == 1: pass
 			if e.type == "pubmsg":
 				if target in self.config['chans'].keys():
+					if self.config['chans'][target]['event']['active']:
+						if self.config['chans'][target]['event']['timer'] > 0:
+							spamActive = False
+							try:
+								spamActive = self.spamEventProcess[target].is_alive()
+							except:
+								pass
+							if not spamActive:
+								self.print('Event spam not active, starting it')
+								self.spamEventProcess[target] = self.startProcess(target=self.spamEvent, args=(target,))
 					if self.config['chans'][target]['youtube']['active']:
 						if self.config['chans'][target]['youtube']['timer'] > 0:
 							try:
@@ -322,11 +396,32 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		command_list = body.split()
 		command_list[0] = command_list[0].lower()
 		sourceIsAdmin = False
+
+		"""
+		privmsg commands
+		"""
+		if e.type == "privmsg":
+			if command_list[0] in ['!youtube', '!spam', '!event', '!badwords', '!admin']:
+				try:
+					target = command_list[1].replace('#', '').lower()
+					if target not in self.config['chans'].keys():
+						self.privmsg(e.type, source, 'Je ne connais pas le canal '+command_list[1])
+						return 1
+					command_list.pop(1)
+					self.print("Substituted command : "+" ".join(command_list)+" target="+target)
+				except:
+					self.privmsg(e.type, source, "Pas assez d'arguments.")
+
+			elif command_list[0] == "!aide":
+				for chan in self.config['chans'].keys():
+					if source.lower() in self.config['chans'][chan]['admins']:
+						sourceIsAdmin = True
 		"""
 		User commands
 		"""
 		if command_list[0] == "!ping":
 			self.msg('#'+target, 'pong !')
+
 		elif command_list[0] == "!ytcount":
 			if self.config['chans'][target]['youtube']['active']:
 				if len(command_list) == 1:
@@ -335,14 +430,30 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				else:
 					for nick in command_list[1:]:
 						self.startProcess(target=self.countYoutubeVideosByName, args=(target, nick,))
+
 		elif command_list[0] == "!yt":
 			if self.config['chans'][target]['youtube']['active']:
 				if len(command_list) == 1:
 					self.startProcess(target=self.randomYoutube, args=(target,))
 				else:
 					self.startProcess(target=self.searchYoutube, args=(target, source, ' '.join(command_list[1:]),))
+
 		elif command_list[0] == "!err":
 			self.startProcess(target=self.errCommand, args=(target, body, self.lastMsg[target]))
+
+		elif command_list[0] == "!event":
+			if len(command_list) == 1:
+				self.startProcess(target=self.fetchEvent, args=(target, source, e.type, False,))
+			elif len(command_list) == 2:
+				command = command_list[1].lower()
+				if command == "list":
+					self.startProcess(target=self.fetchEventList, args=(target, source, e.type,))
+				elif command == "join":
+					self.startProcess(target=self.registerEvent, args=(target, source, [source], e.type,))
+				elif command == "part":
+					self.startProcess(target=self.removeEvent, args=(target, source, [source], e.type,))
+
+
 		elif command_list[0] == "!aide":
 			if len(command_list) == 1:
 				message = "Commandes utilisateur: "+", ".join(self.commandDictUser.keys())
@@ -351,32 +462,11 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				if command in self.commandDictUser.keys():
 					message = "!"+command+": "+self.commandDictUser[command]
 			try:
-				if e.type == "privmsg":
-					self.msg(source, message)
-				elif e.type == "pubmsg":
-					self.notice(source, message)
+				self.privmsg(e.type, source, message)
 				del message
 			except:
 				pass
-		"""
-		privmsg admin commands
-		"""
-		if e.type == "privmsg":
-			if command_list[0] in ['!youtube', '!spam', '!event', '!badwords', '!admin']:
-				try:
-					target = command_list[1].replace('#', '').lower()
-					if target not in self.config['chans'].keys():
-						self.msg(source, 'Je ne connais pas le canal '+command_list[1])
-						return 1
-					command_list.pop(1)
-					self.print("Substituted command : "+" ".join(command_list)+" target="+target)
-				except:
-					self.msg(source, "Pas assez d'arguments.")
-			elif command_list[0] == "!aide":
 
-				for chan in self.config['chans'].keys():
-					if source.lower() in self.config['chans'][chan]['admins']:
-						sourceIsAdmin = True
 		"""
 		Admin commands
 		"""
@@ -385,7 +475,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				if command_list[0] in ['!youtube', '!spam', '!event']:
 					command = command_list[0].replace('!','')
 					if len(command_list) == 1:
-						self.msg(source, "#"+target+" "+command+": "+str(self.config['chans'][target][command]))
+						self.privmsg(e.type, source, "#"+target+" "+command+": "+("actif" if self.config['chans'][target][command]['active'] else "inactif") + " timer:"+str(self.config['chans'][target][command]['timer'])+" secondes.")
 					else:
 						try:
 							subCommand = command_list[1].lower()
@@ -395,13 +485,17 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 								self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'active', [True], target,))
 							elif subCommand == 'stop':
 								self.startProcess(target=self.sendConfig, args=(e.type, source, command, 'active', [False], target,))
-							else:
-								self.msg(source, "Commande "+command_list[1]+" inconnue pour "+command_list[0]+".")
+							elif len(command_list) > 2 and command == 'event':
+								if subCommand == 'join':
+									self.startProcess(target=self.registerEvent, args=(target, source, command_list[2:], e.type,))
+								if subCommand == 'part':
+									self.startProcess(target=self.removeEvent, args=(target, source, command_list[2:], e.type,))
+
 						except:
-							self.msg(source, "Pas assez d'arguments.")
+							self.privmsg(e.type, source, "Pas assez d'arguments.")
 				elif command_list[0] == '!admin':
 					if len(command_list) == 1:
-						self.msg(source, "Administrateurs pour #"+target+": "+", ".join(self.config['chans'][target]['admins']))
+						self.privmsg(e.type, source, "Administrateurs pour #"+target+": "+", ".join(self.config['chans'][target]['admins']))
 					else:
 						try:
 							command = 'admin'
@@ -409,9 +503,9 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 							if subCommand in ['add', 'remove']:
 								self.startProcess(target=self.sendConfig, args=(e.type, source, command, subCommand, command_list[2:], target,))
 							else:
-								self.msg(source, "Commande "+subCommand+" inconnue pour "+command_list[0]+".")
+								self.privmsg(e.type, source, "Commande "+subCommand+" inconnue pour "+command_list[0]+".")
 						except:
-							self.msg(source, "Pas assez d'arguments.")
+							self.privmsg(e.type, source, "Pas assez d'arguments.")
 				elif command_list[0] == "!aide":
 					if len(command_list) == 1:
 						message = "Commandes admin: "+", ".join(self.commandDictAdmin.keys())
@@ -420,10 +514,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 						if command in self.commandDictAdmin.keys():
 							message = "!"+command+": "+self.commandDictAdmin[command]
 					try:
-						if e.type == "privmsg":
-							self.msg(source, message)
-						elif e.type == "pubmsg":
-							self.notice(source, message)
+						self.privmsg(e.type, source, message)
 						del message
 					except:
 						pass
@@ -437,7 +528,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		if source.lower() in self.config['owners']:
 			if command_list[0] == '!owner':
 				if len(command_list) == 1:
-					self.msg(source, "Owners: "+", ".join(self.config['owners']))
+					self.privmsg(e.type, source, "Owners: "+", ".join(self.config['owners']))
 				else:
 					try:
 						command = 'owner'
@@ -447,7 +538,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 						else:
 							self.msg(source, "Commande "+subCommand+" inconnue pour "+command_list[0]+".")
 					except:
-						self.msg(source, "Pas assez d'arguments.")
+						self.privmsg(e.type, source, "Pas assez d'arguments.")
 			elif command_list[0] == "!aide":
 					if len(command_list) == 1:
 						message = "Commandes owner: "+", ".join(self.commandDictOwner.keys())
@@ -456,10 +547,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 						if command in self.commandDictOwner.keys():
 							message = "!"+command+": "+self.commandDictOwner[command]
 					try:
-						if e.type == "privmsg":
-							self.msg(source, message)
-						elif e.type == "pubmsg":
-							self.notice(source, message)
+						self.privmsg(e.type, source, message)
 						del message
 					except:
 						pass
@@ -519,10 +607,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 				else:
 					message = response['message']
 			try:
-				if eventType == "pubmsg":
-					self.notice(source, message)
-				else:
-					self.msg(source, message)
+				self.privmsg(eventType, source, message)
 			except:
 				pass
 
@@ -590,11 +675,62 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			message = bold('[ytCount] ') + bold(str(result['count'])) + ' vidéos ont été partagées par '+ itallic(noHL(name)) + ' sur '+bold('#'+target)+' depuis le '+underline(result['oldest'])
 		self.msg('#' + target, message)
 
+	def fetchEvent(self, target, source='none', eventType='pubmsg', auto=False):
+		self.print('fetchEvent(self, target="'+target+'", source="'+source+'", eventType="'+eventType+'", auto='+str(auto)+')')
+		request = requests.get(self.baseAddress + 'bot/events/'+ target.lower())
+		result = request.json()
+		if result['error']:
+			if not auto:
+				self.privmsg(eventType, source, bold('[Event]')+" Pas d'event prévu sur "+bold('#'+target))
+		else:
+			message = bold('[Event]') + result['name'] + ' ' + itallic(result['date']) + ' (' + result['subscribed'] + ' inscrits, ' + result['comments'] + ' commentaires) ' + underline(result['url'])
+			if auto:
+				self.msg('#'+target, message)
+			else:
+				self.privmsg(eventType, source, message+ " " + bold('(#'+target+")"))
+
+	def fetchEventList(self, target, source, eventType):
+		self.print('fetchEventList(self, target="'+target+'", source="'+source+'", eventType="'+eventType+'")')
+		request = requests.get(self.baseAddress + 'bot/events/'+ target.lower() + '/list')
+		result = request.json()
+		if result['error']:
+			self.privmsg(eventType, source, bold('[Event]')+" Pas d'event prévu sur "+bold('#'+target))
+		else:
+			if len(result['subscribed']) == 0:
+				self.privmsg(eventType, source, bold('[Event] Inscrits:') + " Personne ne s'est inscrit."+ " " + bold('(#'+target+")"))
+			else:
+				self.privmsg(eventType, source, bold('[Event] Inscrits:') + ", ".join(result['subscribed'])+ " " + bold('(#'+target+")"))
+
+	def registerEvent(self, target, source, data, eventType):
+		self.print('registerEvent(self, target="'+target+'", source="'+source+'", data='+str(data)+', eventType="'+eventType+'")')
+		request = requests.post(self.baseAddress + 'bot/events/' + target.lower() + '/register', data={data:data, source:source.lower()})
+		result = request.json()
+		if result['error']:
+			self.privmsg(eventType, source, bold('[Event]')+" Pas d'event prévu sur "+bold('#'+target))
+		else:
+			for message in result['messages']:
+				self.privmsg(eventType, source, bold('[Event]') + " " + message + " " + bold('(#'+target+")"))
+
+	def removeEvent(self, target, source, data, eventType):
+		self.print('removeEvent(self, target="'+target+'", source="'+source+'", data='+str(data)+', eventType="'+eventType+'")')
+		request = requests.post(self.baseAddress + 'bot/events/' + target.lower() + '/remove', data={data:data, source:source.lower()})
+		result = request.json()
+		if result['error']:
+			self.privmsg(eventType, source, bold('[Event]')+" Pas d'event prévu sur "+bold('#'+target))
+		else:
+			for message in result['messages']:
+				self.privmsg(eventType, source, bold('[Event]') + " " + message + " " + bold('(#'+target+")"))
+
 	def spamYoutube(self, target):
 		self.print('spamYoutube(self, target="'+target+'")')
 		while True:
 			time.sleep(self.config['chans'][target]['youtube']['timer'])
 			self.randomYoutube(target, True)
+	def spamEvent(self, target):
+		self.print('spamEvent(self, target="'+target+'")')
+		while True:
+			time.sleep(self.config['chans'][target]['event']['timer'])
+			self.fetchEvent(target=target, auto=True)
 
 
 

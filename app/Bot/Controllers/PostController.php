@@ -5,84 +5,114 @@ namespace App\Bot\Controllers;
 use App\Post;
 use Illuminate\Http\Request;
 use App\Chan;
+use App\PostSubscriber;
+use App\IrcName;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(Chan $chan)
+
+    public function show(Chan $chan)
     {
-		$posts = Post::where('chan_id', $chan->id)->whereDate('date', '>=', now()->toDateTimeString())->orderBy('date', 'ASC')->get();
-		$oldPosts = Post::where('chan_id', $chan->id)->whereDate('date', '<', now()->toDateTimeString())->orderBy('date', 'ASC')->get();
-		return view('posts.index', compact('chan', 'posts', 'oldPosts'));
+		if(!$post = Post::where('chan_id', $chan->id)->whereDate('date', '>=', now()->toDateTimeString())->orderBy('date', 'ASC')->first()) {
+			return ['error' => true];
+		}
+        return [
+			"error" => false,
+			"name" => $post->name,
+			"date" => $post->date->diffForHumans().' ('.$post->date->isoFormat('LLLL').')',
+			"url" => route('posts.show', ['chan' => $chan->name, 'post' => $post->id]),
+			"subscribed" => $post->postSubcribers->count(),
+			"comments" => $post->comments->count()
+		];
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Chan $chan)
+    public function list(Chan $chan)
     {
-        //
+        if(!$post = Post::where('chan_id', $chan->id)->whereDate('date', '>=', now()->toDateTimeString())->orderBy('date', 'ASC')->first()) {
+			return ['error' => true];
+		}
+		return [
+			"error" => false,
+			"subscribed" => $post->postSubscribers->pluck('name')->toArray()
+		];
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request, Chan $chan)
+    public function register(Request $request, Chan $chan)
     {
-        //
+        if(!$post = Post::where('chan_id', $chan->id)->whereDate('date', '>=', now()->toDateTimeString())->orderBy('date', 'ASC')->first()) {
+			return ['error' => true];
+		}
+		$messages = [];
+		$data = $request->data;
+		foreach($data as $name)
+		{
+			$name = strtolower($name);
+			if($ircName = IrcName::where('name', $name)->first()) {
+				if(PostSubscriber::where('user_id', $ircName->user_id)->where('post_id', $post->id)->exists()) {
+					$messages[] = $ircName->user->name.' est déjà inscrit.';
+				}
+				else {
+					PostSubscriber::create([
+						'user_id' => $ircName->user_id,
+						'post_id' => $post->id,
+						'name' => $name
+					]);
+					$messages[] = $ircName->user->name.' inscrit.';
+				}
+			}
+			else {
+				if(PostSubscriber::where('post_id', $post->id)->where('name', $name)->exists()) {
+					$messages[] = "$name est déjà inscrit.";
+				}
+				else {
+					PostSubscriber::create([
+						'user_id' => null,
+						'post_id' => $post->id,
+						'name' => $name
+					]);
+					$messages[] = $name.' inscrit.';
+				}
+			}
+		}
+		return [
+			'error' => false,
+			'messages' => $messages
+		];
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Chan $chan, Post $post)
+    public function remove(Request $request, Chan $chan)
     {
-        return view('posts.show', compact('chan', 'post'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Chan $chan, Post $post)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Chan $chan, Post $post)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Post $post)
-    {
-        //
+        if(!$post = Post::where('chan_id', $chan->id)->whereDate('date', '>=', now()->toDateTimeString())->orderBy('date', 'ASC')->first()) {
+			return ['error' => true];
+		}
+		$messages = [];
+		$data = $request->data;
+		foreach($data as $name)
+		{
+			$name = strtolower($name);
+			if($ircName = IrcName::where('name', $name)->first()) {
+				if($postSubscriber = PostSubscriber::where('user_id', $ircName->user_id)->where('post_id', $post->id)->first()) {
+					$postSubscriber->delete();
+					$messages[] = $ircName->user->name." n'est plus inscrit.";
+				}
+				else {
+					$messages[] = $ircName->user->name." n'était pas inscrit.";
+				}
+			}
+			else {
+				if($postSubscriber = PostSubscriber::where('name', $name)->where('post_id', $post->id)->first())
+				{
+					$postSubscriber->delete();
+					$messages[] = $name." n'est plus inscrit.";
+				}
+				else {
+					$messages[] = $name." n'était pas inscrit.";
+				}
+			}
+		}
+		return [
+			'error' => false,
+			'messages' => $messages
+		];
     }
 }

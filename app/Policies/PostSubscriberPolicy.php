@@ -19,7 +19,7 @@ class PostSubscriberPolicy
      */
     public function create(?User $user, Post $post)
     {
-		return (auth()->guest() || !PostSubscriber::where('user_id', $user->id)->where('post_id', $post->id)->exists());
+		return $post->date >= now() && (auth()->guest() || !PostSubscriber::where('user_id', $user->id)->where('post_id', $post->id)->exists());
     }
 
     /**
@@ -31,7 +31,7 @@ class PostSubscriberPolicy
      */
     public function delete(User $user, PostSubscriber $postSubscriber)
     {
-        return $user->can('update', $postSubscriber->post) || $postSubscriber->user_id == $user->id;
+        return $postSubscriber->post->date >= now() && ($user->can('update', $postSubscriber->post) || $postSubscriber->user_id == $user->id);
     }
 
 }

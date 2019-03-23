@@ -30,3 +30,15 @@ Route::post('/bot/ytfetch/{chan}', 'YoutubeVideoController@fetch')->name('bot.yt
  * GET	/bot/confirm/{name}/{token}	(confirm)	bot.confirm
  */
 Route::get('/bot/confirm/{name}/{token}', 'IrcNameController@confirm')->name('bot.confirm');
+
+/**
+ * Events routes
+ * GET 	/bot/events/{chan}			(show)		bot.events.show
+ * GET 	/bot/events/{chan}/list		(list)		bot.events.list
+ * POST	/bot/events/{chan}/register	(register)	bot.events.register
+ * POST	/bot/events/{chan}/remove	(remove)	bot.events.remove
+ */
+Route::get('/bot/events/{chan}', 'PostController@show')->name('bot.events.show');
+Route::get('/bot/events/{chan}/list', 'PostController@list')->name('bot.events.list');
+Route::post('/bot/events/{chan}/register', 'PostController@register')->name('bot.events.register');
+Route::post('/bot/events/{chan}/remove', 'PostController@remove')->name('bot.events.remove');
