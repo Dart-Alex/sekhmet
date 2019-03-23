@@ -2,7 +2,7 @@
 	<div class="box">
 		<message v-if="form.message.any()" :type="form.message.type" :content="form.message.content"></message>
 		<h2>Commentaires</h2>
-		<comment v-for="(comment, index) in rootComments" :key="index" :id="index"></comment>
+		<comment v-for="(comment, index) in comments.get()" v-if='comment.reply_to == null' :key="index" :id="index"></comment>
 		<div class="box">
 			<form :method="form.method" :action="form.action" @submit.prevent="onSubmit" @keydown="form.errors.clear($event.target.name)">
 				<div class='field'>
@@ -53,15 +53,6 @@ export default {
 	computed: {
 		channel() {
 			return window.Echo.channel('comments-'+this.id);
-		},
-		rootComments() {
-			let rootComments = {};
-			for(let index in this.comments.get()) {
-				if(this.comments.get(index).reply_to === null) {
-					window.Vue.set(rootComments, index, this.comments.get(index));
-				}
-			}
-			return rootComments;
 		}
 	},
 	methods: {
