@@ -16,7 +16,7 @@ window.onload = () => {
 			'media',
 			'code',
 			'pageembed',
-			'paste',
+			//'paste',
 			'permanentpen',
 			'powerpaste',
 			'preview',
