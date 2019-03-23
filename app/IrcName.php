@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Events\IrcNameDeleting;
+use App\Events\IrcNameCreated;
 
 class IrcName extends Model
 {
@@ -32,6 +34,11 @@ class IrcName extends Model
     protected $casts = [
 		'created_at' => 'datetime',
 		'updated_at' => 'datetime'
+	];
+
+	protected $dispatchesEvents = [
+		'deleting' => IrcNameDeleting::class,
+		'created' => IrcNameCreated::class,
 	];
 
 	public function user() {
