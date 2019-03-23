@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Events\PostDeleting;
 
 class Post extends Model
 {
@@ -31,6 +32,10 @@ class Post extends Model
 		'date' => 'datetime',
 		'created_at' => 'datetime',
 		'updated_at' => 'datetime'
+	];
+
+	protected $dispatchesEvents = [
+		'deleting' => PostDeleting::class,
 	];
 
 	public function chan()

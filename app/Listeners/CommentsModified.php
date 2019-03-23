@@ -29,10 +29,18 @@ class CommentsModified
 		return true;
 	}
 
+	public function postDeleting($event)
+	{
+		$post = $event->post;
+		Cache::forget('comments-'.$post->id);
+		return true;
+	}
+
 	public function subscribe($events)
 	{
 		$events->listen('App\Events\CommentAdded', 'App\Listeners\CommentsModified');
 		$events->listen('App\Events\CommentDeleted', 'App\Listeners\CommentsModified');
 		$events->listen('App\Events\CommentUpdated', 'App\Listeners\CommentsModified');
+		$events->listen('App\Events\PostDeleting', 'App\Listeners\CommentsModified@postDeleting');
 	}
 }
