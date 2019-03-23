@@ -5,11 +5,17 @@ namespace App\Policies;
 use App\User;
 use App\Post;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use App\Chan;
 
 class PostPolicy
 {
     use HandlesAuthorization;
 
+	public function index(?User $user, Chan $chan)
+	{
+		if(!$chan->hidden) return true;
+		return !auth()->guest() && ($user->isAdmin() || $chan->isAdmin($user));
+	}
     /**
      * Determine whether the user can view the post.
      *
@@ -17,9 +23,10 @@ class PostPolicy
      * @param  \App\Post  $post
      * @return mixed
      */
-    public function view(User $user, Post $post)
+    public function view(?User $user, Post $post)
     {
-        return true;
+		if(!$post->chan->hidden) return true;
+		return !auth()->guest() && ($user->isAdmin() || $post->chan->isAdmin($user));
     }
 
     /**
@@ -28,9 +35,9 @@ class PostPolicy
      * @param  \App\User  $user
      * @return mixed
      */
-    public function create(User $user)
+    public function create(User $user, Chan $chan)
     {
-        return true;
+        return $user->isAdmin() || $chan->isAdmin($user);
     }
 
     /**
@@ -42,7 +49,7 @@ class PostPolicy
      */
     public function update(User $user, Post $post)
     {
-        return true;
+        return $user->isAdmin() || $post->chan->isAdmin($user);
     }
 
     /**
@@ -54,6 +61,6 @@ class PostPolicy
      */
     public function delete(User $user, Post $post)
     {
-        return true;
+        return $user->isAdmin() || $post->chan->isAdmin($user);
     }
 }
