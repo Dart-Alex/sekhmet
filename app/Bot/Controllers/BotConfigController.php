@@ -204,7 +204,9 @@ class BotConfigController extends Controller
 						}
 						else
 						{
-							array_push($chan->config_badwords, $data);
+							$badwords = $chan->config_badwords;
+							array_push($badwords, $data);
+							$chan->config_badwords = $badwords;
 							$chan->save();
 							return [
 								'error' => false,
@@ -221,7 +223,9 @@ class BotConfigController extends Controller
 							];
 						}
 						else {
-							array_pull($chan->config_badwords, $data);
+							$badwords = $chan->config_badwords;
+							array_pull($badwords, $data);
+							$chan->config_badwords = $badwords;
 							$chan->save();
 							return [
 								'error' => false,
