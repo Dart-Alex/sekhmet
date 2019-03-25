@@ -155,7 +155,7 @@ class BotConfigController extends Controller
 			{
 				$data = strtolower($this->validate($request, [
 					'data' => 'required|string'
-				]));
+				])['data']);
 			}
 			switch($command) {
 				case "owner":
