@@ -48,7 +48,7 @@ class Kernel extends HttpKernel
 			\App\Http\Middleware\EnforceJson::class,
 		],
 		'bot' => [
-			// \App\Bot\Middleware\Localhost::class,
+			\App\Bot\Middleware\Localhost::class,
 			\App\Bot\Middleware\BotAlive::class,
 			\Illuminate\Routing\Middleware\SubstituteBindings::class,
 			\App\Http\Middleware\EnforceJson::class,
