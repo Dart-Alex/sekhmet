@@ -196,7 +196,7 @@ class BotConfigController extends Controller
 					break;
 				case "badwords":
 					if($subCommand == 'add') {
-						if(in_array($data, $chan->badwords)) {
+						if(in_array($data, $chan->config_badwords)) {
 							return [
 								'error' => true,
 								'message' => "$data déjà badword sur #$chan->name."
@@ -214,7 +214,7 @@ class BotConfigController extends Controller
 					}
 					else
 					{
-						if(!in_array($data, $chan->badwords)) {
+						if(!in_array($data, $chan->config_badwords)) {
 							return [
 								'error' => true,
 								'message' => "$data n'est pas dans les badwords de #$chan->name."
