@@ -514,7 +514,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 							command = 'badwords'
 							subCommand = command_list[1].lower()
 							if subCommand in ['add', 'remove']:
-								self.startProcess(target=self.sendConfig, args=(e.type, source, command, subcommand, command_list[2:], target,))
+								self.startProcess(target=self.sendConfig, args=(e.type, source, command, subCommand, command_list[2:], target,))
 						except:
 							self.privmsg(e.type, source, "Pas assez d'arguments.")
 				elif command_list[0] == "!aide":
