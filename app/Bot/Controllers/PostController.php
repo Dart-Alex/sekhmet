@@ -21,8 +21,8 @@ class PostController extends Controller
 			"name" => $post->name,
 			"date" => $post->date->diffForHumans().' ('.$post->date->isoFormat('LLLL').')',
 			"url" => route('posts.show', ['chan' => $chan->name, 'post' => $post->id]),
-			"subscribed" => ($post->postSubcribers?$post->postSubscribers->count():0),
-			"comments" => ($post->comments?$post->comments->count():0)
+			"subscribed" => $post->postSubscribers->count(),
+			"comments" => $post->comments->count()
 		];
     }
 
