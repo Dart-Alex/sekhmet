@@ -53,7 +53,7 @@ class CheckConfig(StoppableThread):
 	def run(self):
 		bot.print('CheckConfig(self).start()')
 		while not self.stopped():
-			time.sleep(10)
+			time.sleep(60)
 			request = requests.get(bot.baseAddress + 'bot/config/check')
 			result = request.json()
 			bot.print('Checking config')
@@ -169,7 +169,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		"admin": "Affiche ou modifie la liste des admins du bot sur le salon. Syntaxe : !admin (#channel si en privé) (add/remove) <pseudo1> (<pseudo2> ...)",
 		"youtube": "Change les paramètres du module Youtube. Syntaxe : !youtube (#channel si en privé) start/stop / !youtube (#channel si en privé) timer <timer en secondes>",
 		"spam": "Change les paramètres du module Spam. Syntaxe : !spam (#channel si en privé) start/stop / !spam (#channel si en privé) timer <timer en secondes>",
-		"event": "Change les paramètres du module Event. Syntaxe : !event (#channel si en privé) start/stop / !event (#channel si en privé) timer <timer en secondes> / !event (join/part) <user1> <user2>..."
+		"event": "Change les paramètres du module Event. Syntaxe : !event (#channel si en privé) start/stop / !event (#channel si en privé) timer <timer en secondes> / !event (join/part) <user1> <user2>...",
+		"badwords": "Change la liste des badwords ou l'affiche. Syntaxe : !badwords (#channel si en privé) (add/remove) (badwords)"
 	}
 	commandDictOwner = {
 		"owner": "Affiche ou modifie la liste des owners du bot. Syntaxe : !owner (add/remove) <pseudo1> (<pseudo2> ...)"
