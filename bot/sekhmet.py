@@ -590,7 +590,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		subCommand = subCommand.lower()
 		self.print('sendConfig(self, eventType="'+eventType+'", source="'+source+'", command="'+command+'", subCommand="'+subCommand+'", dataSet='+str(dataSet)+', target="'+target+'")')
 		for data in dataSet:
-			request = requests.post(self.baseAddress + 'bot/config', data={
+			request = requests.post(self.baseAddress + 'bot/config', json={
 				'command': command,
 				'target': target,
 				'subCommand': subCommand,
@@ -613,7 +613,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 	def fetchYoutube(self, target, source, yid):
 		self.print('fetchYoutube(self, target="'+target+'", source="'+source+'", yid="'+yid+'")')
-		request = requests.post(self.baseAddress + 'bot/ytfetch/' + target, data={'yid':yid,'name':source})
+		request = requests.post(self.baseAddress + 'bot/ytfetch/' + target, json={'yid':yid,'name':source})
 		video = request.json()
 		if video['error']:
 			message = bold('[yt] ') + video['message']
@@ -627,7 +627,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 	def searchYoutube(self, target, source, search):
 		self.print('searchYoutube(self, target="'+target+'", source="'+source+'", search="'+search+'")')
-		request = requests.post(self.baseAddress + 'bot/ytsearch/' + target, data={'search_query':search, 'name':source})
+		request = requests.post(self.baseAddress + 'bot/ytsearch/' + target, json={'search_query':search, 'name':source})
 		result = request.json()
 		if result['error']:
 			message = bold('[ytSearch] ') + result['message']
@@ -703,7 +703,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 	def registerEvent(self, target, source, data, eventType):
 		self.print('registerEvent(self, target="'+target+'", source="'+source+'", data='+str(data)+', eventType="'+eventType+'")')
-		request = requests.post(self.baseAddress + 'bot/events/' + target.lower() + '/register', data={'data':data[:], 'source':source.lower()})
+		request = requests.post(self.baseAddress + 'bot/events/' + target.lower() + '/register', json={'data':data, 'source':source.lower()})
 		result = request.json()
 		if result['error']:
 			self.privmsg(eventType, source, bold('[Event]')+" Pas d'event prévu sur "+bold('#'+target))
@@ -713,7 +713,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 	def removeEvent(self, target, source, data, eventType):
 		self.print('removeEvent(self, target="'+target+'", source="'+source+'", data='+str(data)+', eventType="'+eventType+'")')
-		request = requests.post(self.baseAddress + 'bot/events/' + target.lower() + '/remove', data={'data':data[:], 'source':source.lower()})
+		request = requests.post(self.baseAddress + 'bot/events/' + target.lower() + '/remove', json={'data':data, 'source':source.lower()})
 		result = request.json()
 		if result['error']:
 			self.privmsg(eventType, source, bold('[Event]')+" Pas d'event prévu sur "+bold('#'+target))
