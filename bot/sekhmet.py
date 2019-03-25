@@ -703,7 +703,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 	def registerEvent(self, target, source, data, eventType):
 		self.print('registerEvent(self, target="'+target+'", source="'+source+'", data='+str(data)+', eventType="'+eventType+'")')
-		request = requests.post(self.baseAddress + 'bot/events/' + target.lower() + '/register', data={'data':data, 'source':source.lower()})
+		request = requests.post(self.baseAddress + 'bot/events/' + target.lower() + '/register', data={'data':data[:], 'source':source.lower()})
 		result = request.json()
 		if result['error']:
 			self.privmsg(eventType, source, bold('[Event]')+" Pas d'event prévu sur "+bold('#'+target))
@@ -713,7 +713,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 	def removeEvent(self, target, source, data, eventType):
 		self.print('removeEvent(self, target="'+target+'", source="'+source+'", data='+str(data)+', eventType="'+eventType+'")')
-		request = requests.post(self.baseAddress + 'bot/events/' + target.lower() + '/remove', data={'data':data, 'source':source.lower()})
+		request = requests.post(self.baseAddress + 'bot/events/' + target.lower() + '/remove', data={'data':data[:], 'source':source.lower()})
 		result = request.json()
 		if result['error']:
 			self.privmsg(eventType, source, bold('[Event]')+" Pas d'event prévu sur "+bold('#'+target))
