@@ -16,6 +16,8 @@
 		<ul>
 			<li>Liste des vidéos youtube par chan et par utilisateur</li>
 			<li>Formulaire de contact administration du site/d'un canal</li>
+			<li>Recherche google via le bot</li>
+			<li>Affichage du titre d'une page lors de l'envoi d'un url sur irc</li>
 			<li>Design</li>
 		</ul>
     </div>
