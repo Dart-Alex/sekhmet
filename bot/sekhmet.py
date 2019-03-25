@@ -683,7 +683,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			if not auto:
 				self.privmsg(eventType, source, bold('[Event]')+" Pas d'event prévu sur "+bold('#'+target))
 		else:
-			message = bold('[Event]') + result['name'] + ' ' + itallic(result['date']) + ' (' + result['subscribed'] + ' inscrits, ' + result['comments'] + ' commentaires) ' + underline(result['url'])
+			message = bold('[Event]') + result['name'] + ' ' + itallic(result['date']) + ' (' + str(result['subscribed']) + ' inscrits, ' + str(result['comments']) + ' commentaires) ' + underline(result['url'])
 			if auto:
 				self.msg('#'+target, message)
 			else:
