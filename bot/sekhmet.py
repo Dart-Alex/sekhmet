@@ -506,6 +506,17 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 								self.privmsg(e.type, source, "Commande "+subCommand+" inconnue pour "+command_list[0]+".")
 						except:
 							self.privmsg(e.type, source, "Pas assez d'arguments.")
+				elif command_list[0] == '!badwords':
+					if len(command_list) == 1:
+						self.privmsg(e.type, source, "Badwords pour #"+target+": "+", ".join(self.config['chans'][target]['badwords']))
+					else:
+						try:
+							command = 'badwords'
+							subCommand = command_list[1].lower()
+							if subCommand in ['add', 'remove']:
+								self.startProcess(target=self.sendConfig, args=(e.type, source, command, subcommand, command_list[2:], target,))
+						except:
+							self.privmsg(e.type, source, "Pas assez d'arguments.")
 				elif command_list[0] == "!aide":
 					if len(command_list) == 1:
 						message = "Commandes admin: "+", ".join(self.commandDictAdmin.keys())
