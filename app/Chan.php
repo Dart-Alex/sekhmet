@@ -104,7 +104,7 @@ class Chan extends Model
 	}
 	public function displayName()
 	{
-		return '#' . ucfirst($this->name) . (($this->hidden == true) ? ' (caché)' : '');
+		return '#' . ucfirst($this->name) . (($this->attributes['hidden'] == true)? ' (caché)' : '');
 	}
 
 	public function getConfig()
