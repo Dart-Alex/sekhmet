@@ -56,6 +56,19 @@ Artisan::command('importYoutube', function () {
 	$this->info('Les entrées ont été importées');
 })->describe('Imports youtube json to database');
 
+Artisan::commant('cacheYoutube', function() {
+	$youtubeVideos = YoutubeVideo::all();
+	$bar = $this->output->createProgressBar($youtubeVideos->count());
+	$bar->start();
+	foreach($youtubeVideos as $youtubeVideo) {
+		$youtubeVideo->getInfo();
+		$youtubeVideo->getIndex();
+		$bar->advance();
+	}
+	$bar->finish();
+	$this->info('Cache set');
+});
+
 Artisan::command('bot:start', function () {
 	if(!Cache::has('bot-process-pgid')) {
 		$pid = exec('python3 '.base_path('bot/sekhmet.py').' '.env('BOT_URL').' > '.base_path('storage/logs/bot.log').' 2>&1 & echo $!; ');
