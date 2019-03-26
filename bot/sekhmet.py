@@ -376,7 +376,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 							if isVideo:
 								self.print('')
 								self.startProcess(target=self.fetchYoutube, args=(target, source, yid,))
-						elif body.lower().find('http://') != -1 or body.lower().find('https://'):
+						elif body.lower().find('http://') != -1 or body.lower().find('https://') != -1:
 							url = body[body.find('http'):].split(' ')[0]
 							self.startProcess(target=self.urlDisplay, args=(url, target,))
 					if body[0] != "!":
@@ -753,7 +753,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		soup = BeautifulSoup(request.text)
 		title = str(soup.title.string).replace('\n','').replace('  ','')
 		if title != '':
-			self.msg(target, bold('[url] ') + title)
+			self.msg('#'+target, bold('[urlTitle] ') + title)
 
 
 
