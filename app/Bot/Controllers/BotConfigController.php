@@ -68,7 +68,7 @@ class BotConfigController extends Controller
 				'address' => env('BOT_ADDRESS')
 			],
 			'chans' => $chans,
-			'debug' => true
+			'debug' => env('DEBUG', true)
 		];
 	}
 
