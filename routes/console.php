@@ -68,10 +68,16 @@ Artisan::command('importYoutube', function () {
 
 Artisan::command('cacheYoutube', function() {
 	$youtubeVideos = YoutubeVideo::all();
-	$bar = $this->output->createProgressBar($youtubeVideos->count());
+	$bar = $this->output->createProgressBar($youtubeVideos->count()*2);
 	$bar->start();
 	foreach($youtubeVideos as $youtubeVideo) {
-		$youtubeVideo->getInfo();
+		if(!$youtubeVideo->getInfo()) {
+			$youtubeVideo->delete();
+		}
+		$bar->advance();
+	}
+	$youtubeVideos = YoutubeVideo::all();
+	foreach($youtubeVideos as $youtubeVideo) {
 		$youtubeVideo->getIndex();
 		$bar->advance();
 	}
