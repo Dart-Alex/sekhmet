@@ -376,7 +376,9 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 							if isVideo:
 								self.print('')
 								self.startProcess(target=self.fetchYoutube, args=(target, source, yid,))
-
+						elif body.lower().find('http://') != -1 or body.lower().find('https://'):
+							url = body[body.find('http'):].split(' ')[0]
+							self.startProcess(target=self.urlDisplay, args=(url, target,))
 					if body[0] != "!":
 						self.lastMsg[target] = [source + " " + body] + self.lastMsg[target][0:9]
 
@@ -738,12 +740,20 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		while True:
 			time.sleep(self.config['chans'][target]['youtube']['timer'])
 			self.randomYoutube(target, True)
+
 	def spamEvent(self, target):
 		self.print('spamEvent(self, target="'+target+'")')
 		while True:
 			time.sleep(self.config['chans'][target]['event']['timer'])
 			self.fetchEvent(target=target, auto=True)
 
+	def urlDisplay(self, url, target):
+		self.print('urlDisplay(self, url="'+url+'", target="'+target+'")')
+		request = requests.get(url)
+		soup = BeautifulSoup(request.text)
+		title = str(soup.title.string).replace('\n','').replace('  ','')
+		if title != '':
+			self.msg(target, bold('[url] ') + title)
 
 
 
