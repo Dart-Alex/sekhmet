@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Carbon\CarbonInterval;
 
 class YoutubeVideo extends Model
 {
@@ -56,6 +57,10 @@ class YoutubeVideo extends Model
 			Cache::put("yt-video-yidByIndex-$this->chan_name-$index", $this->yid, now()->addDay());
 		}
 		return $index;
+	}
+
+	public function getDuration() {
+		return CarbonInterval::create($this->getInfo()->contentDetails->duration)->forHumans();
 	}
 
 	static function getYidByIndex(int $index, Chan $chan) {

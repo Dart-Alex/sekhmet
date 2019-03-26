@@ -23,7 +23,11 @@
 						<img src="{{$info->snippet->thumbnails->default->url}}" height="{{$info->snippet->thumbnails->default->height}}" width="{{$info->snippet->thumbnails->default->width}}"/>
 					</a>
 				</td>
-				<td>{{$info->snippet->title}}</td>
+				<td>
+					<a href="https://youtu.be/{{$youtubeVideo->yid}}" target="__blank">
+						{{$info->snippet->title}} [{{$youtubeVideo->getDuration()}}]
+					</a>
+				</td>
 				<td><a href={{route('youtubeVideos.indexName', ['chan' => $chan, 'name' => $youtubeVideo->name])}}>{{$youtubeVideo->name}}</a></td>
 				<td>{{$youtubeVideo->created_at->isoFormat('LLLL')}}</td>
 			</tr>
