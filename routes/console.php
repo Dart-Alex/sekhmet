@@ -56,7 +56,7 @@ Artisan::command('importYoutube', function () {
 	$this->info('Les entrées ont été importées');
 })->describe('Imports youtube json to database');
 
-Artisan::commant('cacheYoutube', function() {
+Artisan::command('cacheYoutube', function() {
 	$youtubeVideos = YoutubeVideo::all();
 	$bar = $this->output->createProgressBar($youtubeVideos->count());
 	$bar->start();
