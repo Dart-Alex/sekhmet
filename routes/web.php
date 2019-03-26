@@ -85,3 +85,9 @@ Route::delete('/ircNames/{ircName}', 'IrcNameController@destroy')->name('ircName
 Route::post('/chanUsers/{chan}', 'ChanUserController@store')->name('chanUsers.store');
 Route::patch('/chanUsers/{chan}/{chanUser}', 'ChanUserController@update')->name('chanUsers.update');
 Route::delete('/chanUsers/{chan}/{chanUser}', 'ChanUserController@destroy')->name('chanUsers.destroy');
+
+/**
+ * Youtube videos
+ * GET /chans/{chan}/youtube		(index)		youtubeVideos.index
+ */
+Route::get('/chans/{chan}/youtube', 'YoutubeVideoController@index')->name('youtubeVideos.index');

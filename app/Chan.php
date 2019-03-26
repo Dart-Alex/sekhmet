@@ -86,6 +86,11 @@ class Chan extends Model
 	{
 		return $this->hasMany(Post::class, 'id', 'chan_id');
 	}
+
+	public function youtubeVideos()
+	{
+		return $this->hasMany(YoutubeVideo::class, 'name', 'chan_name');
+	}
 	public function chanUser(User $user)
 	{
 		return ChanUser::where('chan_id', $this->id)->where('user_id', $user->id)->first();

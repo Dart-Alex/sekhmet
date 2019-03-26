@@ -39,12 +39,14 @@ Artisan::command('importYoutube', function () {
 			if(!in_array($yid, $yids[$chanName])) {
 				$yids[$chanName][] = $yid;
 				$date = Carbon::createFromTimestamp($video['timestamp']);
-				YoutubeVideo::create([
-					'chan_name' => $chanName,
-					'name' => $video['nick'],
-					'created_at' => $date,
-					'yid' => $yid
-				]);
+				if(YoutubeVideo::fetchInfo($yid)) {
+					YoutubeVideo::create([
+						'chan_name' => $chanName,
+						'name' => $video['nick'],
+						'created_at' => $date,
+						'yid' => $yid
+					]);
+				}
 			}
 			$bar->advance();
 

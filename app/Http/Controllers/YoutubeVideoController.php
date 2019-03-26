@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\YoutubeVideo;
 use Illuminate\Http\Request;
+use App\Chan;
 
 class YoutubeVideoController extends Controller
 {
@@ -12,9 +13,10 @@ class YoutubeVideoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Chan $chan)
     {
-        //
+		$youtubeVideos = YoutubeVideo::where('chan_name', $chan->name)->orderBy('created_at', 'DESC')->paginate(20);
+		return view('youtubeVideos.index', compact('chan', 'youtubeVideos'));
     }
 
     /**
