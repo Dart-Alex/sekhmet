@@ -750,7 +750,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 	def urlDisplay(self, url, target):
 		self.print('urlDisplay(self, url="'+url+'", target="'+target+'")')
 		request = requests.get(url)
-		soup = BeautifulSoup(request.text)
+		soup = BeautifulSoup(request.text, features="lxml")
 		title = str(soup.title.string).replace('\n','').replace('  ','')
 		if title != '':
 			self.msg('#'+target, bold('[urlTitle] ') + title)
