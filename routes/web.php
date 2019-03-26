@@ -89,5 +89,7 @@ Route::delete('/chanUsers/{chan}/{chanUser}', 'ChanUserController@destroy')->nam
 /**
  * Youtube videos
  * GET /chans/{chan}/youtube		(index)		youtubeVideos.index
+ * GET /chans/{chan}/youtube/{name}	(indexName)	youtoubeVideos.indexName
  */
 Route::get('/chans/{chan}/youtube', 'YoutubeVideoController@index')->name('youtubeVideos.index');
+Route::get('/chans/{chan}/youtube/{name}', 'YoutubeVideoController@indexName')->name('youtubeVideos.indexName');

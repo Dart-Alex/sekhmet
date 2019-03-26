@@ -24,7 +24,7 @@
 					</a>
 				</td>
 				<td>{{$info->snippet->title}}</td>
-				<td>{{$youtubeVideo->name}}</td>
+				<td><a href={{route('youtubeVideos.indexName', ['chan' => $chan, 'name' => $youtubeVideo->name])}}>{{$youtubeVideo->name}}</a></td>
 				<td>{{$youtubeVideo->created_at->isoFormat('LLLL')}}</td>
 			</tr>
 			@endif

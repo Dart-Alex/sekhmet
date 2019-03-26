@@ -8,6 +8,7 @@ use App\Chan;
 
 class YoutubeVideoController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +18,13 @@ class YoutubeVideoController extends Controller
     {
 		$youtubeVideos = YoutubeVideo::where('chan_name', $chan->name)->orderBy('id', 'DESC')->paginate(20);
 		return view('youtubeVideos.index', compact('chan', 'youtubeVideos'));
-    }
+	}
+
+	public function indexName(Chan $chan, $name)
+	{
+		$youtubeVideos = YoutubeVideo::where('chan_name', $chan->name)->where('name', $name)->orderBy('id', 'DESC')->paginate(20);
+		return view('youtubeVideos.index', compact('chan', 'youtubeVideos', 'name'));
+	}
 
     /**
      * Show the form for creating a new resource.

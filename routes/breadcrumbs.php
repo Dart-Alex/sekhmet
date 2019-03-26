@@ -128,3 +128,9 @@ Breadcrumbs::for('youtubeVideos.index', function($trail, Chan $chan) {
 	$trail->parent('chans.show', $chan);
 	$trail->push('Youtube', route('youtubeVideos.index', ['chan' => $chan->name]));
 });
+
+// Home > chans.index > {chan} > youtubeVideos.index > {name}
+Breadcrumbs::for('youtubeVideos.indexName', function($trail, Chan $chan, $name) {
+	$trail->parent('youtubeVideos.index', $chan);
+	$trail->push($name, route('youtubeVideos.indexName', ['chan' => $chan->name, 'name' => $name]));
+});
