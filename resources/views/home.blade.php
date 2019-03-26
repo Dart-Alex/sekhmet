@@ -11,13 +11,13 @@
 			<li>Bot et son api</li>
 			<li>Liste des commandes irc via !aide</li>
 			<li>Events pleinement fonctionnels (ajout/modification/spam du bot configurable/inscription/commentaires)</li>
+			<li>Affichage du titre d'une page lors de l'envoi d'un url sur irc</li>
 		</ul>
 		<h4>A venir</h4>
 		<ul>
 			<li>Liste des vidéos youtube par chan et par utilisateur</li>
 			<li>Formulaire de contact administration du site/d'un canal</li>
 			<li>Recherche google via le bot</li>
-			<li>Affichage du titre d'une page lors de l'envoi d'un url sur irc</li>
 			<li>Design</li>
 		</ul>
     </div>
