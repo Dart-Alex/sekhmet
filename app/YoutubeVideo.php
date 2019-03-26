@@ -50,10 +50,10 @@ class YoutubeVideo extends Model
 	public function getIndex() {
 		if(!$index = Cache::get('yt-video-index-'.$this->id)) {
 			$index = static::where('chan_name', $this->chan_name)->where('id', '<=', $this->id)->orderBy('id', 'ASC')->count();
-			Cache::put('yt-video-index-'.$this->id, $index, now()->addMonth());
+			Cache::put('yt-video-index-'.$this->id, $index, now()->addDay());
 		}
 		if(!Cache::has("yt-video-yidByIndex-$this->chan_name-$index")) {
-			Cache::put("yt-video-yidByIndex-$this->chan_name-$index", $this->yid, now()->addMonth());
+			Cache::put("yt-video-yidByIndex-$this->chan_name-$index", $this->yid, now()->addDay());
 		}
 		return $index;
 	}
