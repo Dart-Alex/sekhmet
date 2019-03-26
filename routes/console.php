@@ -31,26 +31,36 @@ Artisan::command('importYoutube', function () {
 		$yids[$chanName] = [];
 		$count += count($videos);
 	}
-	$bar = $this->output->createProgressBar($count);
+	$bar = $this->output->createProgressBar($count*2);
 	$bar->start();
+	$videoCollection = collect([]);
 	foreach($content as $chan => $videos) {
 		$chanName = strtolower(str_replace('#', '', $chan));
 		foreach($videos as $yid => $video) {
 			if(!in_array($yid, $yids[$chanName])) {
 				$yids[$chanName][] = $yid;
 				$date = Carbon::createFromTimestamp($video['timestamp']);
-				if(YoutubeVideo::fetchInfo($yid)) {
-					YoutubeVideo::create([
+				// YoutubeVideo::create([
+				// 	'chan_name' => $chanName,
+				// 	'name' => $video['nick'],
+				// 	'created_at' => $date,
+				// 	'yid' => $yid
+				// ]);
+				$videoCollection->push([
 						'chan_name' => $chanName,
 						'name' => $video['nick'],
 						'created_at' => $date,
 						'yid' => $yid
 					]);
-				}
 			}
 			$bar->advance();
 
 		}
+	}
+
+	foreach($videoCollection->sortBy('created_at') as $video) {
+		YoutubeVideo::create($video);
+		$bar->advance();
 	}
 	$bar->finish();
 	$this->info('Les entrées ont été importées');

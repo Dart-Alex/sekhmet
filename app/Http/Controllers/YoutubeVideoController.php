@@ -15,7 +15,7 @@ class YoutubeVideoController extends Controller
      */
     public function index(Chan $chan)
     {
-		$youtubeVideos = YoutubeVideo::where('chan_name', $chan->name)->orderBy('created_at', 'DESC')->paginate(20);
+		$youtubeVideos = YoutubeVideo::where('chan_name', $chan->name)->orderBy('id', 'DESC')->paginate(20);
 		return view('youtubeVideos.index', compact('chan', 'youtubeVideos'));
     }
 
