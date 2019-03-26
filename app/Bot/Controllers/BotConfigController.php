@@ -67,7 +67,8 @@ class BotConfigController extends Controller
 				'port' => env('BOT_PORT'),
 				'address' => env('BOT_ADDRESS')
 			],
-			'chans' => $chans
+			'chans' => $chans,
+			'debug' => true
 		];
 	}
 
