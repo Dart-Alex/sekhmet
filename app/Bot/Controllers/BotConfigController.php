@@ -68,7 +68,11 @@ class BotConfigController extends Controller
 				'address' => env('BOT_ADDRESS')
 			],
 			'chans' => $chans,
-			'debug' => env('DEBUG', true)
+			'debug' => env('DEBUG', true),
+			'google' => [
+				'key' => env('GOOGLE_API_KEY', 'XXX'),
+				'engine' => env('GOOGLE_SEARCH_ENGINE', 'XXX')
+			]
 		];
 	}
 

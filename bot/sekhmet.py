@@ -163,7 +163,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		"yt": "Affiche une vidéo youtube (aléatoire si aucun argument). Syntaxe : !yt (pseudo/numéro de vidéo/recherche)",
 		"ytcount": "Affiche le nombre de vidéos partagées sur le canal, ou par un utilisateur. Syntaxe : !ytcount (<pseudo> (<pseudo2> <pseudo3> ...))",
 		"err": "Corrige ce qu'un utilisateur a dit. Syntaxe : !err <texte à remplacer>/<texte de remplacement>",
-		"event": "Affiche le prochain event du canal, liste les inscrits, ou permet de s'inscrire ou se désinscrire. Syntaxe : !event (#chan si en privé)/!event (#chan si en privé) list/!event (#chan si en privé) <join/part>"
+		"event": "Affiche le prochain event du canal, liste les inscrits, ou permet de s'inscrire ou se désinscrire. Syntaxe : !event (#chan si en privé)/!event (#chan si en privé) list/!event (#chan si en privé) <join/part>",
+		"google": "Effectue une recherche google. Syntaxe : !google <recherche>"
 	}
 	commandDictAdmin = {
 		"admin": "Affiche ou modifie la liste des admins du bot sur le salon. Syntaxe : !admin (#channel si en privé) (add/remove) <pseudo1> (<pseudo2> ...)",
@@ -470,6 +471,12 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			except:
 				pass
 
+		elif command_list[0] == "!google":
+			try:
+				self.startProcess(target=self.searchGoogle, args=(target, ' '.join(command_list[1:]),))
+			except:
+				self.privmsg(e.type, source, bold('[Google] ')+"Pas assez d'arguments.")
+
 		"""
 		Admin commands
 		"""
@@ -754,6 +761,22 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 		title = str(soup.title.string).replace('\n','').replace('  ','')
 		if title != '':
 			self.msg('#'+target, bold('[urlTitle] ') + title)
+
+	def searchGoogle(self, target, query):
+		self.print('searchGoogle(self, target="'+target+'", query="'+query+'")')
+		payload = {
+			'key' : self.config['google']['key'],
+			'cx' : self.config['google']['engine'],
+			'num' : 1,
+			'field' : 'items(link,snippet)',
+			'q' : query
+		}
+		request = requests.get('https://www.googleapis.com/customsearch/v1', params=payload)
+		result = request.json()
+		try:
+			self.msg('#'+target, bold('[Google] ')+undeline(result['items'][0]['link'])+' : '+itallic(result['items'][0]['snippet']))
+		except:
+			self.msg('#'+target, bold('[Google] ')+'Aucun résultat.')
 
 
 
