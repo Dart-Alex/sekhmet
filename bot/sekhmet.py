@@ -768,13 +768,13 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 			'key' : self.config['google']['key'],
 			'cx' : self.config['google']['engine'],
 			'num' : 1,
-			'field' : 'items(link,snippet)',
+			'fields' : 'items(link,snippet)',
 			'q' : query
 		}
 		request = requests.get('https://www.googleapis.com/customsearch/v1', params=payload)
 		result = request.json()
 		try:
-			self.msg('#'+target, bold('[Google] ')+undeline(result['items'][0]['link'])+' : '+itallic(result['items'][0]['snippet']))
+			self.msg('#'+target, bold('[Google] ')+underline(result['items'][0]['link'])+' : '+itallic(result['items'][0]['snippet'].replace('\n', ' ')))
 		except:
 			self.msg('#'+target, bold('[Google] ')+'Aucun résultat.')
 
