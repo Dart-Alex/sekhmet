@@ -44,6 +44,13 @@ class YoutubeVideo extends Model
 		return $this->belongsTo(IrcName::class, 'name', 'name');
 	}
 
+	public function displayName() {
+		if($ircName = $this->ircName) {
+			return $ircName->user->name;
+		}
+		return $this->attributes['name'];
+	}
+
 	public function getInfo() {
 		return static::fetchInfo($this->yid);
 	}

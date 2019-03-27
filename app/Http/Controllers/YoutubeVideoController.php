@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\YoutubeVideo;
 use Illuminate\Http\Request;
 use App\Chan;
+use App\User;
 
 class YoutubeVideoController extends Controller
 {
@@ -16,79 +17,34 @@ class YoutubeVideoController extends Controller
      */
     public function index(Chan $chan)
     {
-		$youtubeVideos = YoutubeVideo::where('chan_name', $chan->name)->orderBy('id', 'DESC')->paginate(20);
+		$youtubeVideos = YoutubeVideo::where('chan_name', $chan->name)->orderBy('id', 'DESC')->with('ircName.user')->paginate(20);
+
 		return view('youtubeVideos.index', compact('chan', 'youtubeVideos'));
 	}
 
 	public function indexName(Chan $chan, $name)
 	{
-		$youtubeVideos = YoutubeVideo::where('chan_name', $chan->name)->where('name', $name)->orderBy('id', 'DESC')->paginate(20);
+		$names = [$name];
+		if($user = User::where('name', $name)->with('ircNames')->first()) {
+			$names = array_merge($names, $user->ircNames->pluck('name')->toArray());
+		}
+		$youtubeVideos = YoutubeVideo::where('chan_name', $chan->name)->whereIn('name', $names)->orderBy('id', 'DESC')->with('ircName.user')->paginate(20);
+
 		return view('youtubeVideos.index', compact('chan', 'youtubeVideos', 'name'));
 	}
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\YoutubeVideos  $youtubeVideos
-     * @return \Illuminate\Http\Response
-     */
-    public function show(YoutubeVideo $youtubeVideo)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\YoutubeVideos  $youtubeVideos
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(YoutubeVideo $youtubeVideo)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\YoutubeVideos  $youtubeVideos
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, YoutubeVideo $youtubeVideo)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\YoutubeVideos  $youtubeVideos
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(YoutubeVideo $youtubeVideo)
-    {
-        //
-    }
+	public function search(Request $request, Chan $chan) {
+		$name = $this->validate($request, [
+			'name' => 'required'
+		])['name'];
+		$names = [$name];
+		if($user = User::where('name', $name)->with('ircNames')->first()) {
+			$names = array_merge($names, $user->ircNames->pluck('name')->toArray());
+		}
+		if(YoutubeVideo::where('chan_name', $chan->name)->whereIn('name', $names)->exists()) {
+			return redirect()->route('youtubeVideos.indexName', ['chan' => $chan->name, 'name' => $name]);
+		}
+		warning("Aucune vidéo trouvée pour $name.");
+		return redirect()->back();
+	}
 }

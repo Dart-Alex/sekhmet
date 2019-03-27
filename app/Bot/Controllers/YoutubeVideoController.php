@@ -6,6 +6,7 @@ use App\YoutubeVideo;
 use Illuminate\Http\Request;
 use App\Chan;
 use Carbon\CarbonInterval;
+use App\User;
 
 
 class YoutubeVideoController extends Controller
@@ -20,7 +21,7 @@ class YoutubeVideoController extends Controller
 		];
 		if(!$new) {
 			$return["date"] = $video->created_at->format('d/m/Y');
-			$return['name'] = $video->name;
+			$return['name'] = $video->displayName();
 			$return['index'] = $video->getIndex();
 		}
 		return $return;
@@ -28,7 +29,7 @@ class YoutubeVideoController extends Controller
 
 	protected function returnByYid(Chan $chan, $name, $yid) {
 		$new = true;
-		if($video = YoutubeVideo::where('chan_name', $chan->name)->where('yid', $yid)->first()) {
+		if($video = YoutubeVideo::where('chan_name', $chan->name)->where('yid', $yid)->with('ircName.user')->first()) {
 			$new = false;
 		}
 		else {
@@ -51,7 +52,7 @@ class YoutubeVideoController extends Controller
     public function getRandom(Chan $chan) {
 		$videoInfo = false;
 		while(!$videoInfo) {
-			if($video = YoutubeVideo::where('chan_name', $chan->name)->inRandomOrder()->first()) {
+			if($video = YoutubeVideo::where('chan_name', $chan->name)->inRandomOrder()->with('ircName.user')->first()) {
 				$videoInfo = $video->getInfo();
 				if(!$videoInfo) $video->delete();
 			}
@@ -65,16 +66,16 @@ class YoutubeVideoController extends Controller
 		return $this->returnVideo($video, $videoInfo);
 	}
 
-	public function getRandomByUser(Chan $chan, $name) {
+	public function getRandomByUser(Chan $chan, $names) {
 		$videoInfo = false;
 		while(!$videoInfo) {
-			if($video = YoutubeVideo::where('chan_name', $chan->name)->where('name', $name)->inRandomOrder()->first()) {
+			if($video = YoutubeVideo::where('chan_name', $chan->name)->whereIn('name', $names)->with('ircName.user')->inRandomOrder()->first()) {
 				$videoInfo = $video->getInfo();
 				if(!$videoInfo) $video->delete();
 			}
 			else {
 				return [
-					"message" => "Aucune vidéo pour ".$name." sur ".$chan->displayName().".",
+					"message" => "Aucune vidéo pour ".$names[0]." sur ".$chan->displayName().".",
 					"error" => true,
 				];
 			}
@@ -104,7 +105,11 @@ class YoutubeVideoController extends Controller
 	}
 
 	public function countByUser(Chan $chan, $name) {
-		$count = YoutubeVideo::where('chan_name', $chan->name)->where('name', $name)->count();
+		$names = [$name];
+		if($user = User::where('name', $name)->wuth('ircNames')->first()) {
+			$names = array_merge($names, $user->ircNames->pluck('name')->toArray());
+		}
+		$count = YoutubeVideo::where('chan_name', $chan->name)->whereIn('name', $names)->count();
 		if($count == 0) {
 			return [
 				'error' => true,
@@ -115,7 +120,7 @@ class YoutubeVideoController extends Controller
 			"error" => false,
 			"count" => $count
 		];
-		$return['oldest'] = YoutubeVideo::where('chan_name', $chan->name)->where('name', $name)
+		$return['oldest'] = YoutubeVideo::where('chan_name', $chan->name)->whereIn('name', $names)
 			->orderBy('created_at', 'ASC')
 			->first()
 			->created_at
@@ -126,8 +131,12 @@ class YoutubeVideoController extends Controller
 	public function search(Request $request, Chan $chan) {
 		$query = $request->search_query;
 		$name = $request->name;
-		if(YoutubeVideo::where('chan_name', $chan->name)->where('name', $query)->exists()) {
-			return $this->getRandomByUser($chan, $query);
+		$names = [$query];
+		if($user = User::where('name', $query)->with('ircNames')->first()) {
+			$names = array_merge($names, $user->ircNames->pluck('name')->toArray());
+		}
+		if(YoutubeVideo::where('chan_name', $chan->name)->whereIn('name', $names)->exists()) {
+			return $this->getRandomByUser($chan, $names);
 		}
 		else if (preg_match('/^\d+$/', $query)) {
 			$yid = YoutubeVideo::getYidByIndex((int) $query, $chan);
