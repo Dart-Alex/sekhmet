@@ -67,7 +67,7 @@ class ChanController extends Controller
 	{
 		$this->authorize('view', $chan);
 		$users = null;
-		if(Gate::allows('update', $chan)) $users = User::all();
+		if(Gate::allows('update', $chan)) $users = User::orderBy('name', 'ASC')->get();
 
 		return view('chans.show', compact('chan', 'users'));
 	}

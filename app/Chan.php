@@ -79,7 +79,7 @@ class Chan extends Model
 
 	public function chanUsers()
 	{
-		return $this->hasMany(ChanUser::class);
+		return $this->hasMany(ChanUser::class)->with('user');
 	}
 
 	public function posts()

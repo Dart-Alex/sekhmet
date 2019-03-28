@@ -76,7 +76,7 @@
 						<div class="select">
 							<select name="user_id" required>
 								@foreach($users->sortBy('name') as $user)
-								@if(!$user->hasChan($chan))
+								@if(!$chan->chanUsers->contains('user_id', $user->id))
 								<option value={{$user->id}}>{{$user->name}} </option>
 								@endif
 								@endforeach
