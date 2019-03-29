@@ -28,7 +28,7 @@ class BotConfigController extends Controller
 			}
 		}
 		$chans = [];
-		foreach (Chan::all() as $chan) {
+		foreach (Chan::with(['chanUsers', 'chanUsers.user', 'chanUsers.user.ircNames'])->get() as $chan) {
 			$chans[$chan->name] = $chan->getConfig();
 		}
 		// $realname = Cache::get('botconfig-realname', function () {
