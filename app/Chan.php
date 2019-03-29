@@ -114,7 +114,7 @@ class Chan extends Model
 
 	public function getConfig()
 	{
-		$adminUsers = ChanUser::where('chan_id', $this->id)->where('admin', true)->get();
+		$adminUsers = ChanUser::where('chan_id', $this->id)->where('admin', true)->with(['user', 'user.ircNames'])->get();
 		$admins = [];
 		foreach ($adminUsers as $adminUser) {
 			foreach ($adminUser->user->ircNames as $ircName) {
