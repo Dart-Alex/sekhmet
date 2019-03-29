@@ -112,6 +112,7 @@ Artisan::command('bot:restart', function() {
 Artisan::command('bot:check', function() {
 	while(true) {
 		if(!(Cache::has('bot-alive') && Cache::get('bot-alive') <= now()->addSeconds(120))) {
+			$this->info('Bot dead, restarting it '.now()->isoFormat('LLLL'));
 			Artisan::call('bot:restart');
 		}
 		sleep(120);
