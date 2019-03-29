@@ -1,5 +1,5 @@
 @component('mail::message')
-Email envoyé par <a href="mailto:{{$from}}">{{$fromName}}&lt;{{$from}}&gt;</a>.
+Email envoyé par <a href="mailto:{{$from}}">{{$fromName}}&lt;{{$from}}&gt;</a> {{$to}}
 
 @component('mail::panel')
 {!!nl2br(e($body))!!}
