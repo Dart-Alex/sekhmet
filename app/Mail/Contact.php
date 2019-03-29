@@ -30,7 +30,7 @@ class Contact extends Mailable implements ShouldQueue
     public function build()
     {
 		if(isset($this->args['chan_id'])) {
-			$to = 'au canal '.Chan::where('chan_id', $this->args['chan_id'])->first()->displayName().'.';
+			$to = 'au canal '.Chan::where('id', $this->args['chan_id'])->first()->displayName().'.';
 		}
 		else {
 			$to = 'aux administrateurs.';
