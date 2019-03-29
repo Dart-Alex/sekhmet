@@ -14,10 +14,10 @@
 			<li>Affichage du titre d'une page lors de l'envoi d'un url sur irc</li>
 			<li>Recherche google via le bot</li>
 			<li>Liste des vidéos youtube par chan et par utilisateur</li>
+			<li>Formulaire de contact administration du site/d'un canal</li>
 		</ul>
 		<h4>A venir</h4>
 		<ul>
-			<li>Formulaire de contact administration du site/d'un canal</li>
 			<li>Design</li>
 		</ul>
     </div>
