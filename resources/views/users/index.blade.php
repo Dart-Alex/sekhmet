@@ -38,6 +38,8 @@
 		</div>
 		@endforeach
 
+		{{$users->links()}}
+
 
 </div>
 @endsection

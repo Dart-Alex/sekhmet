@@ -108,3 +108,12 @@ Artisan::command('bot:restart', function() {
 		$this->info('Bot restarted (PGID:'.Cache::get('bot-process-pgid').')');
 	} else $this->info('Bot not started');
 });
+
+Artisan::command('bot:check', function() {
+	while(true) {
+		if(!(Cache::has('bot-alive') && Cache::get('bot-alive') <= now()->addSeconds(120))) {
+			Artisan::call('bot:restart');
+		}
+		sleep(120);
+	}
+});

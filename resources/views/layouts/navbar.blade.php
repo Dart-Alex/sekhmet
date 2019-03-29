@@ -24,8 +24,13 @@
 							@endforeach
 						</div>
 					</div>
+					<a href="{{ route('contact') }}" class="navbar-item">Contact</a>
+					@can('index', 'App\User')
+					<a href="{{ route('users.index') }}" class="navbar-item">Utilisateurs</a>
+					@endcan
 				</div>
 				<div class="navbar-end">
+
 					<!-- Authentication Links -->
 					@guest
 					<a class="navbar-item" href="{{ route('login') }}">{{ __('Login') }}</a>

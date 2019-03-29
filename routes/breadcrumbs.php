@@ -9,6 +9,12 @@ Breadcrumbs::for('home', function ($trail) {
 	$trail->push('Accueil', route('home'));
 });
 
+// Home > contact
+Breadcrumbs::for('contact', function ($trail) {
+	$trail->parent('home');
+	$trail->push('Formulaire de contact', route('contact'));
+});
+
 // Home > verification.resend
 Breadcrumbs::for('verification.resend', function ($trail) {
 	$trail->parent('home');

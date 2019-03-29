@@ -7,7 +7,7 @@
 	<ul>
 		<li><a href="{{route('posts.index', ['chan' => $chan->name])}}">Evenements</a></li>
 		<li><a href="{{route('youtubeVideos.index', ['chan' => $chan->name])}}">Youtube</a></li>
-		<li><a href="">Contacter les administrateurs</a></li>
+		<li><a href="{{route('contact')}}?chan={{$chan->name}}">Contacter les administrateurs</a></li>
 	</ul>
 	<div class='field is-grouped'>
 		@can('join', $chan)

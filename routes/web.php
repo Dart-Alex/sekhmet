@@ -96,3 +96,11 @@ Route::get('/chans/{chan}/youtube', 'YoutubeVideoController@index')->name('youtu
 Route::get('/chans/{chan}/youtube/{name}', 'YoutubeVideoController@indexName')->name('youtubeVideos.indexName');
 Route::post('/chans/{chan}/youtube/search', 'YoutubeVideoController@search')->name('youtubeVideos.search');
 
+/**
+ * Contact form
+ * GET	/contact	(show)	contact
+ * POST	/contact	(store)	contact.send
+ */
+Route::get('/contact', 'ContactController@show')->name('contact');
+Route::post('/contact', 'ContactController@store')->name('contact.send');
+
