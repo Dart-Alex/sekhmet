@@ -55,6 +55,12 @@
 			@endif
 		</div>
 		<div class="field">
+			<label class="checkbox">
+				<input type="checkbox" required/>
+				J'accepte la <a href="{{route('polconf')}}">politique de confidentialité</a>
+			</label>
+		</div>
+		<div class="field">
 			<div class="control">
 				<input type="submit" class="button is-primary" value="Envoyer"/>
 			</div>

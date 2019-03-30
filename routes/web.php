@@ -13,6 +13,10 @@
 Auth::routes(['verify' => true]);
 
 Route::get('/', 'HomeController@index')->name('home');
+
+Route::get('/polconf', function() {
+	return view('polconf');
+})->name('polconf');
 /**
  * Chans
  * GET		/chans				(index)		chans.index

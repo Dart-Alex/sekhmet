@@ -15,6 +15,12 @@ Breadcrumbs::for('contact', function ($trail) {
 	$trail->push('Formulaire de contact', route('contact'));
 });
 
+// Home > polconf
+Breadcrumbs::for('polconf', function ($trail) {
+	$trail->parent('home');
+	$trail->push('Politique de confidentialité', route('polconf'));
+});
+
 // Home > verification.resend
 Breadcrumbs::for('verification.resend', function ($trail) {
 	$trail->parent('home');
