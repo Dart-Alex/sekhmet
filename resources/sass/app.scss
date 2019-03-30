@@ -1,7 +1,7 @@
 
 // Fonts
 @import url(https://fonts.googleapis.com/css?family=Raleway:300,400,600);
-
+$footer-size: 168px;
 #main-navbar {
     border-bottom: 1px solid #ddd;
 }
@@ -12,4 +12,33 @@ ul.pagination-list li {
 
 nav.breadcrumb {
 	padding:20px;
+}
+
+main {
+	margin-bottom:50px !important;
+}
+
+body {
+    min-height: 100vh;
+    position:relative;
+}
+body::after {
+    content: '';
+    display: block;
+    height: $footer-size;
+}
+.footer {
+    margin-top:auto;
+    background-color: #f2f2f2;
+    border-top: 1px solid #999;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: $footer-size;
+
+}
+
+.page-current {
+	background-color:lightgrey;
+	cursor: default;
 }
