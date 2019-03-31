@@ -35,7 +35,7 @@
 				<tr>
 					<td>{{$youtubeVideo->getIndex()}}</td>
 					<td>
-						<a href="https://youtu.be/{{$youtubeVideo->yid}}" target="__blank">
+						<a class="no-modify" href="https://youtu.be/{{$youtubeVideo->yid}}" target="__blank">
 							<img src="{{$info->snippet->thumbnails->default->url}}" height="{{$info->snippet->thumbnails->default->height}}" width="{{$info->snippet->thumbnails->default->width}}"/>
 						</a>
 					</td>
