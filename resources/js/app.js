@@ -108,6 +108,24 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 		});
 	}
+	let host = window.location.hostname.toLowerCase();
+	for (let i=0, links = document.querySelectorAll('a'), n = links.length; i < n; i++)
+	{
+		let link = links[i];
+		let url = link.getAttribute('href');
+		if(url !== null) {
+			let regex = new RegExp('^(?:(?:f|ht)tp(?:s)?\:)?//(?:[^\@]+\@)?([^:/]+)', 'im');
+			let match = url.match(regex);
+			let domain = ((match ? match[1].toString() : ((url.indexOf(':') < 0) ? host:''))).toLowerCase();
+
+			if (domain != host && link.className != "no-modify") {
+				let content = link.innerHTML;
+				link.setAttribute('target', '_blank');
+				link.innerHTML = `<span>${content} </span><span class='icon is-small'><i class='fas fa-external-link-alt'></i></span>`;
+			}
+		}
+
+	}
 
 });
 
