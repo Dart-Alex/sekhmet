@@ -2,7 +2,8 @@
 		<div class="container">
 			<div class="navbar-brand">
 				<a class="navbar-item" href="{{ url('/') }}">
-						{{ config('app.name', 'Laravel') }}
+					<span class="icon"><i class="fas fa-home"></i></span>
+					<span>{{ config('app.name', 'Laravel') }}</span>
 				</a>
 				<a role="button" aria-label="menu" aria-expanded="false" data-target="navbarMenu" class="navbar-burger burger">
 					<span aria-hidden="true"></span>
@@ -13,7 +14,10 @@
 			<div class="navbar-menu" id="navbarMenu">
 				<div class="navbar-start">
 					<div class="navbar-item has-dropdown" data-target="chanMenu">
-						<a href="#" class="navbar-link" id="chanDropdown">Chans</a>
+						<a href="#" class="navbar-link" id="chanDropdown">
+							<span class="icon"><i class="fas fa-hashtag"></i></span>
+							<span>Chans</span>
+						</a>
 						<div class="navbar-dropdown is-boxed" id="chanMenu">
 							<?php
 								if(!auth()->guest() && auth()->user()->isAdmin()) $chansMenu = \App\Chan::orderBy('name', 'ASC')->get();
@@ -24,22 +28,37 @@
 							@endforeach
 						</div>
 					</div>
-					<a href="{{ route('contact') }}" class="navbar-item">Contact</a>
+					<a href="{{ route('contact') }}" class="navbar-item">
+						<span class="icon"><i class="fas fa-envelope"></i></span>
+						<span>Contact</span>
+					</a>
 					@can('index', 'App\User')
-					<a href="{{ route('users.index') }}" class="navbar-item">Utilisateurs</a>
+					<a href="{{ route('users.index') }}" class="navbar-item">
+						<span class="icon"><i class="fas fa-users"></i></span>
+						<span>Utilisateurs</span>
+					</a>
 					@endcan
 				</div>
 				<div class="navbar-end">
 
 					<!-- Authentication Links -->
 					@guest
-					<a class="navbar-item" href="{{ route('login') }}">{{ __('Login') }}</a>
+					<a class="navbar-item" href="{{ route('login') }}">
+						<span class="icon"><i class="fas fa-sign-in-alt"></i></span>
+						<span>{{ __('Login') }}</span>
+					</a>
 
 					@if (Route::has('register'))
-					<a class="navbar-item" href="{{ route('register') }}">{{ __('Register') }}</a>
+					<a class="navbar-item" href="{{ route('register') }}">
+						<span class="icon"><i class="fas fa-plus"></i></span>
+						<span>{{ __('Register') }}</span>
+					</a>
 					@endif @else
 					<div class="navbar-item has-dropdown" data-target="userMenu">
-						<a id="userDropdown" href="#" class="navbar-link">{{ Auth::user()->name }} <span class="caret"></span></a>
+						<a id="userDropdown" href="#" class="navbar-link">
+							<span class="icon"><i class="fas fa-user"></i></span>
+							<span>{{ Auth::user()->name }}</span>
+						</a>
 						<div class="navbar-dropdown is-boxed is-right" id="userMenu">
 							<a href="{{ route('logout') }}" class="navbar-item" onclick="event.preventDefault();document.getElementById('logout-form').submit();">
 								{{ __('Logout') }}
