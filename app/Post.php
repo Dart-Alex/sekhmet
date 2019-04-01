@@ -57,4 +57,19 @@ class Post extends Model
 	{
 		$this->attributes['content'] = clean($value);
 	}
+
+	public function hasImage() {
+		return $this->getImage() != 'nothing';
+	}
+
+	public function getImage() {
+        if($start = strpos($this->content, '<img')) {
+            $end = strpos($this->content, '>', $start);
+            $img = substr($this->content, $start, $end-$start+1);
+            return preg_replace('/^.*src=.([^ \'"]*). .*$/', '$1', $img);
+        }
+        else {
+            return 'nothing';
+        }
+    }
 }
