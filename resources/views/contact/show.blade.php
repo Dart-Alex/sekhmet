@@ -13,8 +13,9 @@
 		</div>
 		<div class='field'>
 			<label for='fromName' class='label'>Votre nom</label>
-			<div class='control'>
+			<div class='control has-icons-left'>
 				<input class='input' type='text' name='fromName' id='fromName' placeholder='Votre nom' value='{{old('fromName', (auth()->guest()?'':auth()->user()->name))}}' required/>
+				<span class="icon is-small is-left"><i class="fas fa-user"></i></span>
 			</div>
 			@if ($errors->has('fromName'))
 			<p class='help is-danger'>
@@ -25,16 +26,18 @@
 		<div class='field'>
 			<label for='from' class='label'>Votre email</label>
 			<div class="field is-grouped">
-				<div class='control is-expanded'>
+				<div class='control is-expanded has-icons-left'>
 					<input class='input' type='email' name='from' id='from' placeholder='Votre email' value='{{old('from', (auth()->guest()?'':auth()->user()->email))}}' required/>
+					<span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
 				</div>
 				@if ($errors->has('from'))
 				<p class='help is-danger'>
 					{{ $errors->first('from') }}
 				</p>
 				@endif
-				<div class='control is-expanded'>
+				<div class='control is-expanded has-icons-left'>
 					<input class='input' type='email' name='from_confirmation' id='from_confirmation' placeholder='Confirmation' value='{{old('from_confirmation', (auth()->guest()?'':auth()->user()->email))}}' required/>
+					<span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
 				</div>
 				@if ($errors->has('from_confirmation'))
 				<p class='help is-danger'>

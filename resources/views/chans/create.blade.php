@@ -6,8 +6,9 @@
 		<h3>Configuration</h3>
 		<div class='field'>
 			<label for='name' class='label'>Nom du chan (sans #)</label>
-			<div class='control'>
+			<div class='control has-icons-left'>
 				<input class='input' type='text' name='name' id='name' value='{{old('name')}}' required/>
+				<span class="icon is-small is-left"><i class="fas fa-hashtag"></i></span>
 			</div>
 			@if ($errors->has('name'))
 			<p class='help is-danger'>

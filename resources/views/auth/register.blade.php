@@ -28,8 +28,9 @@
 						</div>
 						<div class='field-body'>
 							<div class='field'>
-								<div class='control'>
+								<div class='control has-icons-left'>
 									<input class='input' type='text' name='name' id='name' placeholder='Nom' value='{{old(' name ')}}' required/>
+									<span class="icon is-small is-left"><i class="fas fa-user"></i></span>
 								</div>
 								@if($errors->has('name'))
 								<p class='help is-danger'>
@@ -46,8 +47,9 @@
 						</div>
 						<div class='field-body'>
 							<div class='field'>
-								<div class='control is-expanded'>
+								<div class='control is-expanded has-icons-left'>
 									<input class='input' type='email' name='email' id='email' placeholder='Email' value='{{old(' email ')}}' required/>
+									<span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
 								</div>
 								@if($errors->has('email'))
 								<p class='help is-danger'>
@@ -56,9 +58,10 @@
 								@endif
 							</div>
 							<div class='field'>
-								<div class='control is-expanded'>
+								<div class='control is-expanded has-icons-left'>
 									<input class='input' type='email' name='email_confirmation' id='email_confirmation' placeholder='Confirmation' value='{{old('
 									 email_confirmation ')}}' required/>
+									 <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
 								</div>
 								@if($errors->has('email_confirmation'))
 								<p class='help is-danger'>
@@ -75,9 +78,10 @@
 						</div>
 						<div class='field-body'>
 							<div class='field'>
-								<div class='control is-expanded'>
+								<div class='control is-expanded has-icons-left'>
 									<input class='input' type='password' name='password' id='password' placeholder='Mot de passe' value='{{old(' password
 									 ')}}' required/>
+									 <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
 								</div>
 								@if($errors->has('password'))
 								<p class='help is-danger'>
@@ -86,9 +90,10 @@
 								@endif
 							</div>
 							<div class='field'>
-								<div class='control is-expanded'>
+								<div class='control is-expanded has-icons-left'>
 									<input class='input' type='password' name='password_confirmation' id='password_confirmation' placeholder='Confirmation' value='{{old('
 									 password_confirmation ')}}' required/>
+									 <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
 								</div>
 								@if($errors->has('password_confirmation'))
 								<p class='help is-danger'>

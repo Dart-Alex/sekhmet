@@ -30,9 +30,10 @@
 
                             <div class="field-body">
                                 <div class="field">
-                                    <p class="control">
-                                        <input class="input" id="email" type="email" name="email"
-                                               value="{{ old('email') }}" required autofocus>
+                                    <p class="control has-icons-left">
+                                        <input class="input" id="email" type="email" name="email" placeholder="Email"
+											   value="{{ old('email') }}" required autofocus/>
+										<span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
                                     </p>
 
                                     @if ($errors->has('email'))
@@ -51,8 +52,9 @@
 
                             <div class="field-body">
                                 <div class="field">
-                                    <p class="control">
-                                        <input class="input" id="password" type="password" name="password" required>
+                                    <p class="control has-icons-left">
+										<input class="input" id="password" type="password" name="password" placeholder="Mot de passe" required/>
+										<span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
                                     </p>
 
                                     @if ($errors->has('password'))

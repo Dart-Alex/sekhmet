@@ -1,12 +1,13 @@
 @extends('layouts.app')
 @section('content')
-<div class="container">
+<div>
 	<div class="content">
 		<form action="{{route('youtubeVideos.search', ['chan' => $chan->name])}}" method="post">
 			@csrf
 		<div class='field is-grouped'>
-			<div class='control'>
-				<input class='input' type='text' name='name' id='name' placeholder='Recherche' value='{{old('name')}}' required/>
+			<div class='control has-icons-left'>
+				<input class='input' type='text' name='name' id='name' placeholder='Pseudo' value='{{old('name')}}' required/>
+				<span class="icon is-small is-left"><i class="fas fa-user"></i></span>
 			</div>
 			<div class="control">
 				<input type="submit" class="button is-primary" value="Rechercher"/>
@@ -18,7 +19,7 @@
 			@endif
 		</div>
 		</form>
-		<table class='table-responsive'>
+		<table class='table is-striped is-hoverable is-fullwidth'>
 			<thead>
 				<tr>
 					<th>Index</th>

@@ -18,37 +18,40 @@
 		</div>
 	</div>
 	@endcan
-	<h2>Inscrits</h2>
-	<ul>
+	<div class="panel">
+		<div class="panel-heading">
+			Inscrits
+		</div>
+
 		@foreach($post->postSubscribers as $subscriber)
-		<li>
+		<div class="panel-block">
 			{{$subscriber->name}}
 			@can('delete', $subscriber)
-			<a title="Supprimer" class="fas fa-times has-text-danger" href="{{route('postSubscribers.destroy', ['chan' => $chan->name, 'post' => $post->id, 'postSubscriber' => $subscriber->id])}}" onclick="event.preventDefault();document.getElementById('delete-form-subscriber-{{$subscriber->id}}').submit();">
-				</a>
+			<a title="Supprimer" class="has-text-danger" href="{{route('postSubscribers.destroy', ['chan' => $chan->name, 'post' => $post->id, 'postSubscriber' => $subscriber->id])}}" onclick="event.preventDefault();document.getElementById('delete-form-subscriber-{{$subscriber->id}}').submit();">
+				<span class="icon"><i class="fas fa-times"></i></span>
+			</a>
 				<form id="delete-form-subscriber-{{$subscriber->id}}" action="{{route('postSubscribers.destroy', ['chan' => $chan->name, 'post' => $post->id, 'postSubscriber' => $subscriber->id])}}" method="POST">
 					@csrf
 					@method('DELETE')
 				</form>
 			@endcan
-		</li>
+			</div>
 		@endforeach
 		@can('create', ['App\PostSubscriber', $post])
-		<li>
+		<div class="panel-block">
 			<form action="{{route('postSubscribers.store', ['chan' => $chan->name, 'post' => $post->id])}}" method="post">
 				@csrf
 		@auth
 			<input type="hidden" name='name' value='{{auth()->user()->name}}'/>
-			<div class="field">
 				<div class="control">
 					<input type="submit" class='button is-primary' value="S'inscrire"/>
 				</div>
-			</div>
 		@endauth
 		@guest
 			<div class="field is-grouped">
-				<div class='control'>
+				<div class='control has-icons-left'>
 					<input class='input' type='text' name='name' id='name' placeholder='Votre pseudo' value='{{old('name')}}' required/>
+					<span class="icon is-small is-left"><i class="fas fa-user"></i></span>
 				</div>
 				<div class="control">
 					<input type="submit" class='button is-primary' value="S'inscrire"/>
@@ -61,9 +64,10 @@
 			</div>
 		@endguest
 			</form>
-		</li>
+		</div>
 		@endcan
-	</ul>
+	</div>
+
 	@if($post->comments_allowed)
 	<comments id="{{$post->id}}"></comments>
 	@endif

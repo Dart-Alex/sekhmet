@@ -4,7 +4,7 @@
 	@can('create', App\Chan::class)
 	<a href="{{route('chans.create')}}" class="button is-primary">Créer un nouveau chan</a>
 	@endcan
-	<ul>
+	<ul class="no-bullet">
 		@foreach($chans as $chan)
 		@can('view', $chan)
 		<li>
