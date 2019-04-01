@@ -1,3 +1,19 @@
+@charset "utf-8";
+/*! bulma.io v0.7.1 | MIT License | github.com/jgthms/bulma */
+
+@import "initial-variables.sass";
+
+
+/* modified path import of other modules */
+@import "node_modules/bulma/sass/utilities/_all";
+@import "node_modules/bulma/sass/base/_all";
+@import "node_modules/bulma/sass/elements/_all";
+@import "node_modules/bulma/sass/components/_all";
+@import "node_modules/bulma/sass/grid/_all";
+@import "node_modules/bulma/sass/layout/_all";
+
+/* import bulma extensions. https://wikiki.github.io/ */
+@import "bulma-extensions";
 
 // Fonts
 @import url(https://fonts.googleapis.com/css?family=Raleway:300,400,600);
@@ -10,12 +26,17 @@ ul.pagination-list li {
 	list-style-type:none;
 }
 
-nav.breadcrumb {
-	padding:20px;
+ul.no-bullet li {
+	list-style-type:none;
 }
 
 main {
+	margin-top: 50px !important;
 	margin-bottom:50px !important;
+}
+
+table {
+	margin-top: 50px;
 }
 
 body {
@@ -41,4 +62,104 @@ body::after {
 .page-current {
 	background-color:lightgrey;
 	cursor: default;
+}
+
+.post-bloc {
+    @extend .box;
+    padding: 0;
+    text-align: left;
+    flex: auto;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-bottom: 2rem !important;
+    float:left;
+}
+
+.post-cover {
+    height: 250px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    position: relative;
+    display:flex;
+    flex-direction: column;
+    background-color: #ddd;
+}
+
+.post-cover a {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: block;
+}
+
+.post-extract {
+    padding: 1rem 1.5rem;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    height: calc(100% - 250px);
+    display: flex;
+    flex-direction: column;
+}
+
+.post-extract p:not(:last-child) {
+    margin-bottom: 1rem;
+}
+
+.post-extract .extract {
+    flex-grow: 1;
+    text-align:justify;
+}
+
+.post-extract .bottom {
+    display: flex;
+}
+
+.post-extract .bottom .left {
+    color: #ccc;
+    align-self: flex-start;
+    margin-bottom: 0;
+}
+
+.post-extract .bottom .right {
+    flex-grow: 1;
+    align-self: flex-end;
+    margin-bottom: 0;
+    text-align: right;
+}
+input[readonly] {
+	background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+input[readonly]:hover {
+	border-color: transparent;
+}
+
+@media all and (max-width: 1024px) {
+	.container {
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+	table, tr, td, tbody {
+		width:100% !important;
+		display: block;
+		border: none;
+		text-align:center !important;
+	}
+	thead {
+		display:none;
+	}
+	table {
+		border: solid black 1px;
+	}
+	tr {
+		border-bottom: solid black 1px;
+	}
 }
