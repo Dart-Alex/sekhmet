@@ -106,7 +106,7 @@ class YoutubeVideoController extends Controller
 
 	public function countByUser(Chan $chan, $name) {
 		$names = [$name];
-		if($user = User::where('name', $name)->wuth('ircNames')->first()) {
+		if($user = User::where('name', $name)->with('ircNames')->first()) {
 			$names = array_merge($names, $user->ircNames->pluck('name')->toArray());
 		}
 		$count = YoutubeVideo::where('chan_name', $chan->name)->whereIn('name', $names)->count();
