@@ -17,8 +17,8 @@ class PostController extends Controller
 	public function index(Chan $chan)
 	{
 		$this->authorize('index', [Post::class, $chan]);
-		$posts = Post::where('chan_id', $chan->id)->whereDate('date', '>=', now()->toDateTimeString())->orderBy('date', 'ASC')->get();
-		$oldPosts = Post::where('chan_id', $chan->id)->whereDate('date', '<', now()->toDateTimeString())->orderBy('date', 'ASC')->get();
+		$posts = Post::where('chan_id', $chan->id)->whereDate('date', '>=', now()->toDateTimeString())->orderBy('date', 'ASC')->with(['comments', 'postSubscribers'])->get();
+		$oldPosts = Post::where('chan_id', $chan->id)->whereDate('date', '<', now()->toDateTimeString())->orderBy('date', 'ASC')->with(['comments', 'postSubscribers'])->get();
 		return view('posts.index', compact('chan', 'posts', 'oldPosts'));
 	}
 
@@ -89,11 +89,20 @@ class PostController extends Controller
 	public function update(Request $request, Chan $chan, Post $post)
 	{
 		$this->authorize('update', $post);
-		$validated = $this->validate($request, [
-			'date' => 'required|date:Y-m-d\TH:i|after:now',
-			'content' => 'required|string',
-			'name' => 'required|string'
-		]);
+		if(!auth()->user()->isAdmin()) {
+			$validated = $this->validate($request, [
+				'date' => 'required|date:Y-m-d\TH:i|after:now',
+				'content' => 'required|string',
+				'name' => 'required|string'
+			]);
+		}
+		else {
+			$validated = $this->validate($request, [
+				'date' => 'required|date:Y-m-d\TH:i',
+				'content' => 'required|string',
+				'name' => 'required|string'
+			]);
+		}
 		$validated['comments_allowed'] = $request->has('comments_allowed');
 		$validated['date'] = Carbon::createFromFormat('Y-m-d\TH:i', $validated['date']);
 		$post->fill($validated);
