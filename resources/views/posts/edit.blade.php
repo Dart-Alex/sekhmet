@@ -18,7 +18,7 @@
 				<div class='field'>
 					<label for='date' class='label'>Date</label>
 					<div class='control'>
-						<input class='input' type='datetime-local' name='date' id='date' value='{{old('date', $post->date->format('Y-m-d\TH:i'))}}' required/>
+						<input class='input' type='datetime-local' name='date' id='date' value='{{old('date', $post->date->format('Y-m-d\TH:i'))}}' required {{($post->date <= now() && !(auth()->user()->isAdmin()))?'readonly':''}}/>
 					</div>
 					@if ($errors->has('date'))
 					<p class='help is-danger'>
