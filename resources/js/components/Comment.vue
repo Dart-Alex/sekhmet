@@ -56,7 +56,7 @@
 					</div>
 					<span class='help is-danger' v-if="replyForm.errors.has('content')" v-text="replyForm.errors.get('content')"></span>
 				</div>
-				<div class='field is-grouped'>
+				<div class='field is-grouped is-grouped-centered'>
 					<div class='control'>
 						<input type='submit' class='button is-primary' value='Répondre' :disabled='replyForm.errors.any()'/>
 					</div>
