@@ -1,5 +1,5 @@
 <template>
-	<div class="box">
+	<div class="comment">
 		<message v-if="deleteForm.message.any()" :type="deleteForm.message.type" :content="deleteForm.message.content"></message>
 		<div style="margin-bottom:24px;" v-if="!editing">
 			<span class="comment-buttons">
@@ -39,7 +39,7 @@
 
 		<comment v-for="index in comment.replies" :key="index" :id="index"></comment>
 		<a v-if="!replying" class="button is-primary" @click="toggleReply">Répondre</a>
-		<div v-if="replying" class="box">
+		<div v-if="replying" class="comment">
 			<message v-if="replyForm.message.any()" :type="replyForm.message.type" :content="replyForm.message.content"></message>
 			<form :method='replyForm.method' :action='replyForm.action' @submit.prevent='onReply' @keydown='replyForm.errors.clear($event.target.name)'>
 				<div class='field'>

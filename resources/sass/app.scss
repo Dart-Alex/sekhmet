@@ -133,6 +133,11 @@ body::after {
     text-align: right;
 }
 
+.comments, .comment {
+	@extend .box;
+}
+
+
 input[readonly] {
 	background-color: transparent;
     border-color: transparent;
@@ -173,5 +178,14 @@ input[readonly]:hover {
 	}
 	tr {
 		border-bottom: solid black 1px;
+	}
+	.comment {
+		padding: 0.5rem;
+	}
+	.comments {
+		background-color:transparent;
+		border:none;
+		box-shadow:none;
+		padding:0;
 	}
 }

@@ -1,9 +1,9 @@
 <template>
-	<div class="box">
+	<div class="comments">
 		<message v-if="form.message.any()" :type="form.message.type" :content="form.message.content"></message>
 		<h2>Commentaires</h2>
 		<comment v-for="(comment, index) in comments.get()" v-if='comment.reply_to == null' :key="index" :id="index"></comment>
-		<div class="box">
+		<div class="comment">
 			<form :method="form.method" :action="form.action" @submit.prevent="onSubmit" @keydown="form.errors.clear($event.target.name)">
 				<div class='field'>
 					<label for='name' class='label'>Auteur</label>
@@ -19,7 +19,7 @@
 					</div>
 					<span class='help is-danger' v-if="form.errors.has('content')" v-text="form.errors.get('content')"></span>
 				</div>
-				<div class='field is-grouped'>
+				<div class='field is-grouped is-grouped-centered'>
 					<div class="control">
 						<input type="submit" class="button is-primary" value="Envoyer" :disabled="form.errors.any()"/>
 					</div>
