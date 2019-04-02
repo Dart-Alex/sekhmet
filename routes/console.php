@@ -71,9 +71,12 @@ Artisan::command('cacheYoutube', function() {
 	$bar = $this->output->createProgressBar($youtubeVideos->count()*2);
 	$bar->start();
 	foreach($youtubeVideos as $youtubeVideo) {
-		$youtubeVideo->getInfo();
+		if(!$videoInfo = $youtubeVideo->getInfo()) {
+			$youtubeVideo->delete();
+		}
 		$bar->advance();
 	}
+	Cache::tags(['yt-video-index'])->flush();
 	foreach($youtubeVideos as $youtubeVideo) {
 		$youtubeVideo->getIndex();
 		$bar->advance();
