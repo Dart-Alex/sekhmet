@@ -1,16 +1,21 @@
 @extends('layouts.app')
 @section('content')
 <div class="box content">
+	<h2 class="has-text-centered">Formulaire de contact</h2>
 	<form action="{{route('contact.send')}}" method="post">
 		@csrf
-		<div class="select">
-			<select name="chan_id" id="chan_id" required>
-				<option {{($chan?'':'selected')}} value="0">Administrateurs du site</option>
-				@foreach ($chans as $chanSelect)
-				<option {{ (($chan && $chan->id == $chanSelect->id)?'selected':'') }} value="{{$chanSelect->id}}">{{$chanSelect->displayName()}}</option>
-				@endforeach
-			</select>
+		<div class="field">
+			<label class="label" for="chan_id">Destinataires</label>
+			<div class="select">
+				<select name="chan_id" id="chan_id" required>
+					<option {{($chan?'':'selected')}} value="0">Administrateurs du site</option>
+					@foreach ($chans as $chanSelect)
+					<option {{ (($chan && $chan->id == $chanSelect->id)?'selected':'') }} value="{{$chanSelect->id}}">{{$chanSelect->displayName()}}</option>
+					@endforeach
+				</select>
+			</div>
 		</div>
+
 		<div class='field'>
 			<label for='fromName' class='label'>Votre nom</label>
 			<div class='control has-icons-left'>

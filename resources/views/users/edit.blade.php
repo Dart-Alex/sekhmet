@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <div class="box content">
-	<h3>Profil</h3>
+	<h3 class="has-text-centered">Profil</h3>
 	<form action="{{route('users.update',['user' => $user->id])}}" method="POST">
 		@csrf
 		@method('PATCH')
@@ -106,19 +106,34 @@
 			</div>
 
 	</form>
-	<h3>Pseudos irc</h3>
-	<ul>
-		@foreach($user->ircNames as $ircName)
-		<li>
-			{{$ircName->name}}
+</div>
+@if(Cache::has('ircName-validation-user-'.$user->id))
+<?php $validated = Cache::get('ircName-validation-user-'.$user->id); ?>
+<div class="notification is-warning">
+	<p>
+		Vous avez une validation en attente pour le pseudo {{$validated['name']}}. Envoyez le message suivant au bot pour le confirmer.
+	</p>
+	<p>
+		/msg {{env('BOT_NAME', config('app.name', 'Sekhmet'))}} confirm {{$validated['token']}}
+	</p>
+</div>
+@endif
+<div class="panel">
+	<div class="panel-heading">
+		Pseudos irc
+	</div>
+	@foreach($user->ircNames as $ircName)
+	<div class="panel-block" style="justify-content:space-between;">
+		<span>{{$ircName->name}}</span>
+		<form id="delete-form-{{$ircName->id}}" action="{{route('ircNames.destroy', ['ircName' => $ircName->id])}}" method="POST">
+			@csrf
+			@method('DELETE')
 			<a title="Supprimer" class="fas fa-trash" href="{{route('ircNames.destroy', ['ircName' => $ircName->id])}}" onclick="event.preventDefault();document.getElementById('delete-form-{{$ircName->id}}').submit();">
 			</a>
-			<form id="delete-form-{{$ircName->id}}" action="{{route('ircNames.destroy', ['ircName' => $ircName->id])}}" method="POST">
-				@csrf
-				@method('DELETE')
-			</form>
-		</li>
-		@endforeach
+		</form>
+	</div>
+	@endforeach
+	<div class="panel-block">
 		<form action="{{route('ircNames.store')}}" method="POST">
 			@csrf
 			<input type='hidden' name='user_id' value='{{$user->id}}'/>
@@ -127,7 +142,7 @@
 					<input class='input' type='text' name='name' id='name' placeholder='Nouveau pseudo' value='{{old('name')}}' required/>
 				</div>
 				<div class="control">
-					<input type='submit' value='Ajouter' class='button is-primary'/>
+					<input type='submit' value='+' class='button is-primary'/>
 				</div>
 				@if ($errors->has('name'))
 				<p class='help is-danger'>
@@ -136,15 +151,7 @@
 				@endif
 			</div>
 		</form>
-		@if(Cache::has('ircName-validation-user-'.$user->id))
-		<?php $validated = Cache::get('ircName-validation-user-'.$user->id); ?>
-		<p>
-			Vous avez une validation en attente pour le pseudo {{$validated['name']}}. Envoyez le message suivant au bot pour le confirmer.
-		</p>
-		<p>
-			/msg {{env('BOT_NAME', config('app.name', 'Sekhmet'))}} confirm {{$validated['token']}}
-		</p>
-		@endif
-	</ul>
+	</div>
 </div>
+
 @endsection
