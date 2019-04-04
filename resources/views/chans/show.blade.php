@@ -26,7 +26,7 @@
 			@endcan
 		</header>
 		<div class="card-content">
-			{{ $chan->description }}
+			{!! nl2br(e($chan->description)) !!}
 		</div>
 		<footer class="card-footer">
 			<a title="Événements" class="card-footer-item" href="{{route('posts.index', ['chan' => $chan->name])}}">
