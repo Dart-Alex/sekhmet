@@ -38,7 +38,7 @@
 		</form>
 
 		<comment v-for="index in comment.replies" :key="index" :id="index"></comment>
-		<a v-if="!replying" class="button is-primary" @click="toggleReply">Répondre</a>
+		<a v-if="!replying && depth <= 4" class="button is-primary" @click="toggleReply">Répondre</a>
 		<div v-if="replying" class="comment">
 			<message v-if="replyForm.message.any()" :type="replyForm.message.type" :content="replyForm.message.content"></message>
 			<form :method='replyForm.method' :action='replyForm.action' @submit.prevent='onReply' @keydown='replyForm.errors.clear($event.target.name)'>
@@ -83,6 +83,7 @@ export default {
 		return {
 			user: this.$parent.user,
 			comments: this.$parent.comments,
+			depth: this.$parent.depth + 1,
 			editing: false,
 			replying: false,
 			editForm: new Form({

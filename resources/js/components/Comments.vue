@@ -39,6 +39,7 @@ import Comments from "../classes/Comments.js";
 export default {
 	data() {
 		return {
+			depth: 0,
 			comments: new Comments(),
 			user: this.$parent.user,
 			form: new Form({
