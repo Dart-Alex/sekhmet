@@ -84,12 +84,19 @@ class Chan extends Model
 
 	public function posts()
 	{
-		return $this->hasMany(Post::class, 'id', 'chan_id');
+		return $this->hasMany(Post::class, 'chan_id', 'id');
+	}
+
+	public function countNewPosts() {
+		return Post::where('chan_id', $this->id)->where('date', '>', now())->count();
 	}
 
 	public function youtubeVideos()
 	{
-		return $this->hasMany(YoutubeVideo::class, 'name', 'chan_name');
+		return $this->hasMany(YoutubeVideo::class, 'chan_name', 'name');
+	}
+	public function countYoutubeVideos() {
+		return YoutubeVideo::where('chan_name', $this->name)->count();
 	}
 	public function chanUser(User $user)
 	{
