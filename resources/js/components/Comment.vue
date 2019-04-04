@@ -29,7 +29,7 @@
 			</div>
 			<div class='field is-grouped is-fullwidth'>
 				<div class='control is-expanded'>
-					<input type='submit' class='button is-primary is-outlined is-fullwidth' value='Modifier' :disabled='editForm.errors.any()'/>
+					<input type='submit' class='button is-warning is-outlined is-fullwidth' value='Modifier' :disabled='editForm.errors.any()'/>
 				</div>
 				<div class='control is-expanded'>
 					<input type='reset' class='button is-fullwidth' value='Annuler' @click.prevent='toggleEdit'/>
@@ -38,7 +38,7 @@
 		</form>
 
 		<comment v-for="index in comment.replies" :key="index" :id="index"></comment>
-		<a v-if="!replying && depth <= 4" class="button is-primary is-outlined is-fullwidth" @click="toggleReply">Répondre</a>
+		<a v-if="!replying && depth <= 4 && !editing" class="button is-primary is-outlined is-fullwidth" @click="toggleReply">Répondre</a>
 		<div v-if="replying" class="comment">
 			<message v-if="replyForm.message.any()" :type="replyForm.message.type" :content="replyForm.message.content"></message>
 			<form :method='replyForm.method' :action='replyForm.action' @submit.prevent='onReply' @keydown='replyForm.errors.clear($event.target.name)'>
