@@ -24,8 +24,8 @@ return [
     'settings'      => [
         'default' => [
 			'HTML.Doctype'             => 'HTML 4.01 Transitional',
-            'HTML.Allowed'             => 'div,b,font[face|size|color|style],strong,i[style|class],em,u,hr[class|width|size|noshade],a[href|target|title],ul,ol,li,p[style],br,span[class|style],img[class|src|border|alt|title|hspace|vspace|width|height|align|name],table[style],thead,tbody,th,tr,td,h1,h2,h3,h4,h5,h6',
-            'CSS.AllowedProperties'    => 'font,font-size,font-weight,font-style,font-family,text-decoration,padding-left,color,background-color,text-align,borders',
+            'HTML.Allowed'             => 'div,b,font[face|size|color|style],strong,i[style|class],em,u,hr[class|width|size|noshade],a[href|target|title],ul,ol,li,p[style],br,span[class|style],img[class|src|border|alt|title|hspace|vspace|width|height|align|name|style],table[style],thead,tbody,th,tr,td,h1,h2,h3,h4,h5,h6',
+            'CSS.AllowedProperties'    => 'font,font-size,font-weight,font-style,font-family,text-decoration,padding,padding-left,padding-right,padding-top,padding-bottom,color,background-color,text-align,margin,margin-left,margin-right,margin-top,margin-bottom',
             'AutoFormat.AutoParagraph' => true,
 			'AutoFormat.RemoveEmpty'   => true,
 			"HTML.SafeIframe"      => 'true',
