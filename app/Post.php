@@ -40,7 +40,7 @@ class Post extends Model
 
 	public function chan()
 	{
-		return $this->belongsTo(Chan::class, 'chan_id', 'id');
+		return $this->belongsTo(Chan::class);
 	}
 
 	public function comments()
