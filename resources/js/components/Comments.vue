@@ -19,12 +19,12 @@
 					</div>
 					<span class='help is-danger' v-if="form.errors.has('content')" v-text="form.errors.get('content')"></span>
 				</div>
-				<div class='field is-grouped is-grouped-centered'>
-					<div class="control">
-						<input type="submit" class="button is-primary" value="Envoyer" :disabled="form.errors.any()"/>
+				<div class='field is-grouped is-fullwidth'>
+					<div class="control is-expanded">
+						<input type="submit" class="button is-primary is-outlined is-fullwidth" value="Envoyer" :disabled="form.errors.any()"/>
 					</div>
-					<div class="control">
-						<input type="reset" class="button" value="Effacer" @click.prevent="form.reset"/>
+					<div class="control is-expanded">
+						<input type="reset" class="button is-fullwidth" value="Effacer" @click.prevent="form.reset"/>
 					</div>
 				</div>
 			</form>

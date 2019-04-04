@@ -2,7 +2,7 @@
 @section('content')
 <div class="content">
 	@can('create', ['App\Post', $chan])
-	<a href='{{route('posts.create', ['chan' => $chan->name])}}' class='button is-primary'>Créer un event</a>
+	<a href='{{route('posts.create', ['chan' => $chan->name])}}' class='button is-primary is-outlined is-fullwidth'>Créer un event</a>
 	@endcan
 	@if($posts->count() > 0)
 	<h1>A venir</h1>

@@ -5,12 +5,12 @@
 	<p>Aura lieu {{ $post->date->diffForHumans() }} ({{$post->date->isoFormat('LLLL')}})</p>
 	<p>{!! $post->content !!}</p>
 	@can('update', $post)
-	<div class="field is-grouped">
-		<div class="control">
-			<a href="{{route('posts.edit', ['chan' => $chan->name, 'post' => $post->id])}}" class='button is-warning'>Modifier l'event</a>
+	<div class="field is-grouped is-fullwidth">
+		<div class="control is-expanded">
+			<a href="{{route('posts.edit', ['chan' => $chan->name, 'post' => $post->id])}}" class='button is-warning is-outlined is-fullwidth'>Modifier l'event</a>
 		</div>
-		<div class="control">
-			<a href="{{route('posts.destroy', ['chan' => $chan->name, 'post' => $post->id])}}" class="button is-danger" onclick="event.preventDefault();document.getElementById('delete-form-{{$post->id}}').submit();">Supprimer l'event</a>
+		<div class="control is-expanded">
+			<a href="{{route('posts.destroy', ['chan' => $chan->name, 'post' => $post->id])}}" class="button is-danger is-outlined is-fullwidth" onclick="event.preventDefault();document.getElementById('delete-form-{{$post->id}}').submit();">Supprimer l'event</a>
 			<form id="delete-form-{{$post->id}}" action="{{route('posts.destroy', ['chan' => $chan->name, 'post' => $post->id])}}" method="post">
 				@csrf
 				@method('DELETE')
@@ -27,7 +27,7 @@
 		<div class="panel-block">
 			{{$subscriber->name}}
 			@can('delete', $subscriber)
-			<a title="Supprimer" class="has-text-danger" href="{{route('postSubscribers.destroy', ['chan' => $chan->name, 'post' => $post->id, 'postSubscriber' => $subscriber->id])}}" onclick="event.preventDefault();document.getElementById('delete-form-subscriber-{{$subscriber->id}}').submit();">
+			<a style="flex-grow:1;justify-content:flex-end;display:inline-flex;" title="Supprimer" class="has-text-danger" href="{{route('postSubscribers.destroy', ['chan' => $chan->name, 'post' => $post->id, 'postSubscriber' => $subscriber->id])}}" onclick="event.preventDefault();document.getElementById('delete-form-subscriber-{{$subscriber->id}}').submit();">
 				<span class="icon"><i class="fas fa-times"></i></span>
 			</a>
 				<form id="delete-form-subscriber-{{$subscriber->id}}" action="{{route('postSubscribers.destroy', ['chan' => $chan->name, 'post' => $post->id, 'postSubscriber' => $subscriber->id])}}" method="POST">

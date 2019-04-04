@@ -27,18 +27,18 @@
 				</div>
 				<span class='help is-danger' v-if="editForm.errors.has('content')" v-text="editForm.errors.get('content')"></span>
 			</div>
-			<div class='field is-grouped'>
-				<div class='control'>
-					<input type='submit' class='button is-primary' value='Modifier' :disabled='editForm.errors.any()'/>
+			<div class='field is-grouped is-fullwidth'>
+				<div class='control is-expanded'>
+					<input type='submit' class='button is-primary is-outlined is-fullwidth' value='Modifier' :disabled='editForm.errors.any()'/>
 				</div>
-				<div class='control'>
-					<input type='reset' class='button' value='Annuler' @click.prevent='toggleEdit'/>
+				<div class='control is-expanded'>
+					<input type='reset' class='button is-fullwidth' value='Annuler' @click.prevent='toggleEdit'/>
 				</div>
 			</div>
 		</form>
 
 		<comment v-for="index in comment.replies" :key="index" :id="index"></comment>
-		<a v-if="!replying && depth <= 4" class="button is-primary" @click="toggleReply">Répondre</a>
+		<a v-if="!replying && depth <= 4" class="button is-primary is-outlined is-fullwidth" @click="toggleReply">Répondre</a>
 		<div v-if="replying" class="comment">
 			<message v-if="replyForm.message.any()" :type="replyForm.message.type" :content="replyForm.message.content"></message>
 			<form :method='replyForm.method' :action='replyForm.action' @submit.prevent='onReply' @keydown='replyForm.errors.clear($event.target.name)'>
@@ -56,12 +56,12 @@
 					</div>
 					<span class='help is-danger' v-if="replyForm.errors.has('content')" v-text="replyForm.errors.get('content')"></span>
 				</div>
-				<div class='field is-grouped is-grouped-centered'>
-					<div class='control'>
-						<input type='submit' class='button is-primary' value='Répondre' :disabled='replyForm.errors.any()'/>
+				<div class='field is-grouped is-fullwidth'>
+					<div class='control is-expanded'>
+						<input type='submit' class='button is-primary is-outlined is-fullwidth' value='Répondre' :disabled='replyForm.errors.any()'/>
 					</div>
-					<div class='control'>
-						<input type='reset' class='button' value='Annuler' @click.prevent='toggleReply'/>
+					<div class='control is-expanded'>
+						<input type='reset' class='button is-fullwidth' value='Annuler' @click.prevent='toggleReply'/>
 					</div>
 				</div>
 			</form>
