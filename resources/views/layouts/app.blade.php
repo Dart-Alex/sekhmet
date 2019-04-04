@@ -62,7 +62,7 @@
 		<message type="{{ session('message')["type"] }}" content="{{ session('message')["content"] }}"></message>
 		@endif
 		@include('layouts.navbar')
-		<div class="container" style="padding-top:20px;">
+		<div class="container" style="margin-top:50px;">
 			{{Breadcrumbs::render()}}
 		</div>
 		<main class="container">
