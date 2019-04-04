@@ -1,19 +1,23 @@
 @extends('layouts.app')
 @section('content')
 <div class="content">
-	@can('create', App\Chan::class)
-	<a href="{{route('chans.create')}}" class="button is-primary">Créer un nouveau chan</a>
-	@endcan
-	<ul class="no-bullet">
+	<div class="panel">
+		<div class="panel-heading">
+			<span class="is-size-3">Canaux</span>
+		</div>
 		@foreach($chans as $chan)
 		@can('view', $chan)
-		<li>
-		<h2><a href="{{ route('chans.show', ['chan' => $chan->name]) }}">{{ $chan->displayName() }}</a></h2>
-			<p>{{ $chan->description }}</p>
-		</li>
+		<a href="{{ route('chans.show', ['chan' => $chan->name]) }}" class="panel-block">
+			<span class="is-size-4 has-text-link">{{ $chan->displayName() }}</span>
+		</a>
 		@endcan
 		@endforeach
-	</ul>
+		@can('create', App\Chan::class)
+		<div class="panel-block">
+			<a href="{{route('chans.create')}}" class="button is-primary is-outlined is-fullwidth">Créer un nouveau chan</a>
+		</div>
+		@endcan
+	</div>
 
 </div>
 @endsection

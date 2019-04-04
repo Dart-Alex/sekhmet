@@ -59,11 +59,13 @@
 				<i class="fas fa-at"></i>
 				@endif
 			</span>
-			{{$chanUser->user->name}}
-			({{join(', ', $chanUser->user->ircNames->pluck('name')->toArray())}})
-			<span class="is-inline-flex is-pulled-right">
+			<span>
+				{{$chanUser->user->name}}
+				({{join(', ', $chanUser->user->ircNames->pluck('name')->toArray())}})
+			</span>
+			<div class="is-inline-flex" style="flex-grow:1;justify-content:flex-end;">
 				@can('update', [$chanUser, $chan])
-				<a title="{{($chanUser->admin?'Rendre utilisateur':'Rendre admin')}}" href="{{route('chanUsers.update', ['chan' => $chan->name, 'chanUser' => $chanUser->id])}}" onclick="event.preventDefault();document.getElementById('update-form-{{$chanUser->id}}').submit();">
+				<a class="is-pulled-right" title="{{($chanUser->admin?'Rendre utilisateur':'Rendre admin')}}" href="{{route('chanUsers.update', ['chan' => $chan->name, 'chanUser' => $chanUser->id])}}" onclick="event.preventDefault();document.getElementById('update-form-{{$chanUser->id}}').submit();">
 					<span class="icon"><i class="fas fa-chevron-{{($chanUser->admin?'down':'up')}}"></i></span>
 				</a>
 				<form id='update-form-{{$chanUser->id}}' action="{{route('chanUsers.update', ['chan' => $chan->name, 'chanUser' => $chanUser->id])}}" method="post">
@@ -80,15 +82,16 @@
 					@method('DELETE')
 				</form>
 				@endcan
-			</span>
+			</div>
 		</div>
 		@endforeach
 		@endif
 		@can('update', $chan)
 		<div class="panel-block">
+			<span class="panel-icon"></span>
 			<form action='{{route('chanUsers.store', ['chan' => $chan->name])}}' method='post'>
 				@csrf
-				<div class="field is-grouped">
+				<span class="field is-grouped">
 					<div class="control">
 						<div class="select">
 							<select name="user_id" required>
@@ -103,7 +106,7 @@
 					<div class="control">
 						<input type="submit" class="button is-primary" value="+">
 					</div>
-				</div>
+				</span>
 			</form>
 		</div>
 		@endcan
