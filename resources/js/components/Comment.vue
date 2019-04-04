@@ -6,10 +6,10 @@
 				<a v-if='canModify' class='fas fa-trash' title='Supprimer' @click='onDelete'></a>
 				<a v-if='canModify' class='fas fa-edit' title='Editer' @click='toggleEdit'></a>
 			</span>
-			<p>Par {{comment.name}}</p>
-			<p>{{createdAt}}</p>
+			<p class="title is-4">{{comment.name}}</p>
+			<p class="subtitle is-6 has-text-grey-light">{{createdAt}}</p>
 			<nl2br tag="p" :text='comment.content'></nl2br>
-			<p v-if="comment.created_at != comment.updated_at">{{updatedAt}}</p>
+			<p v-if="comment.created_at != comment.updated_at" class="has-text-grey-light">{{updatedAt}}</p>
 		</div>
 		<message v-if="editForm.message.any()" :type="editForm.message.type" :content="editForm.message.content"></message>
 		<form style="margin-bottom:24px;" v-if="editing" :method='editForm.method' :action='editForm.action' @submit.prevent='onModify' @keydown='editForm.errors.clear($event.target.name)'>
