@@ -47,7 +47,7 @@
 					<input type="submit" class='button is-primary' value="S'inscrire"/>
 				</div>
 		@endauth
-		@guest
+		{{-- @guest
 			<div class="field is-grouped">
 				<div class='control has-icons-left'>
 					<input class='input' type='text' name='name' id='name' placeholder='Votre pseudo' value='{{old('name')}}' required/>
@@ -61,6 +61,11 @@
 					{{ $errors->first('name') }}
 				</p>
 				@endif
+			</div>
+		@endguest --}}
+		@guest
+			<div>
+				Pour rejoindre l'event sans vous inscrire, !event join sur irc.
 			</div>
 		@endguest
 			</form>
