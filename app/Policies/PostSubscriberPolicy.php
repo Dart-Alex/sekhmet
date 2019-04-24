@@ -20,7 +20,7 @@ class PostSubscriberPolicy
     public function create(?User $user, Post $post)
     {
 			//return $post->date >= now() && (auth()->guest() || !PostSubscriber::where('user_id', $user->id)->where('post_id', $post->id)->exists());
-			return $post->date >= now() && (!PostSubscriber::where('user_id', $user->id)->where('post_id', $post->id)->exists());
+			return $post->date >= now() && !auth()->guest() && !PostSubscriber::where('user_id', $user->id)->where('post_id', $post->id)->exists();
     }
 
     /**
