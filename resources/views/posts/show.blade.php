@@ -63,14 +63,14 @@
 				@endif
 			</div>
 		@endguest --}}
-		@guest
-			<div>
-				Pour rejoindre l'event sans vous inscrire, !event join sur irc.
-			</div>
-		@endguest
 			</form>
 		</div>
 		@endcan
+		@guest
+			<div>
+				Pour rejoindre l'event sans vous inscrire sur le site, !event join sur irc.
+			</div>
+		@endguest
 	</div>
 
 	@if($post->comments_allowed)
