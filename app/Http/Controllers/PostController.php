@@ -45,7 +45,7 @@ class PostController extends Controller
 		$validated = $this->validate($request, [
 			'date' => 'required|date:Y-m-d\TH:i|after:now',
 			'content' => 'required|string',
-			'name' => 'required|string'
+			'name' => 'required|string|max:255'
 		]);
 		$validated['comments_allowed'] = $request->has('comments_allowed');
 		$validated['date'] = Carbon::createFromFormat('Y-m-d\TH:i', $validated['date']);
@@ -93,14 +93,14 @@ class PostController extends Controller
 			$validated = $this->validate($request, [
 				'date' => 'required|date:Y-m-d\TH:i|after:now',
 				'content' => 'required|string',
-				'name' => 'required|string'
+				'name' => 'required|string|max:255'
 			]);
 		}
 		else {
 			$validated = $this->validate($request, [
 				'date' => 'required|date:Y-m-d\TH:i',
 				'content' => 'required|string',
-				'name' => 'required|string'
+				'name' => 'required|string|max:255'
 			]);
 		}
 		$validated['comments_allowed'] = $request->has('comments_allowed');
