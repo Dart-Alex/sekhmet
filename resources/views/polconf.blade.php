@@ -115,6 +115,8 @@
 		n'offre une s&eacute;curit&eacute; maximale, une part de risque est toujours pr&eacute;sente lorsque l'on utilise Internet
 		pour transmettre des renseignements personnels.
 	</p>
+	<hr/>
+	<h2>API Tierces</h2>
 	<p>
 		Le site utilise certains services de l'API Youtube.
 		<ul>
