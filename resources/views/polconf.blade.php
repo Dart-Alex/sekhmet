@@ -115,6 +115,13 @@
 		n'offre une s&eacute;curit&eacute; maximale, une part de risque est toujours pr&eacute;sente lorsque l'on utilise Internet
 		pour transmettre des renseignements personnels.
 	</p>
+	<p>
+		Le site utilise certains services de l'API Youtube.
+		<ul>
+		<li><a href="https://policies.google.com/privacy">Politique de confidentialité Google.</a></li>
+		<li><a href="https://www.youtube.com/t/terms"> ToS Youtube</a></li>
+		</ul>
+	</p>
 	</body>
 
 	</html>
