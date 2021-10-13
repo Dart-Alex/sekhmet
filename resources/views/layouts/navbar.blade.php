@@ -38,7 +38,7 @@
 						<span>Utilisateurs</span>
 					</a>
 					@endcan
-					@if(!auth()->guest() && auth()->user()->isAdmin())
+					@if(false && !auth()->guest() && auth()->user()->isAdmin())
 					<a href="{{route('telescope')}}" class="navbar-item">
 						<span class="icon"><i class="fab fa-galactic-republic"></i></span>
 						<span>Telescope</span>
