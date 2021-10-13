@@ -101,7 +101,25 @@
 					</label>
 				</div>
 			</div>
+			<div class='field is-horizontal'>
+				<div class='field-label is-normal'>
+					<label for='_answer' class='label'>{{getCaptchaQuestion()}}</label>
+				</div>
+				<div class='field-body'>
+					<div class='field'>
+						<div class='control'>
+							<input class='input' type='text' name='_answer' id='_answer' required/>
+						</div>
+						@if($errors->has('_answer'))
+						<p class='help is-danger'>
+							{{ $errors->first('_answer') }}
+						</p>
+						@endif
+					</div>
+				</div>
+			</div>
 
+			
 			<div class="field is-horizontal">
 				<div class="field-label"></div>
 
